@@ -1,5 +1,17 @@
-import React from "react";
-import { MapPin, Clock, Heart, Eye, ChevronRight } from "lucide-react";
+"use client";
+
+import React, { useState } from "react";
+import {
+  Menu,
+  X,
+  Search,
+  MapPin,
+  Clock,
+  Heart,
+  Eye,
+  ChevronRight,
+} from "lucide-react";
+
 
 const StoryCard = ({ story }) => {
   return (
@@ -212,4 +224,139 @@ const FeaturedStoriesSection = () => {
   );
 };
 
-export default FeaturedStoriesSection;
+
+const StoryPageHeader = () => {
+  return (
+    <section className="pt-24 pb-16 bg-white">
+      <div className="max-w-4xl mx-auto px-6 text-center">
+        <h1 className="text-5xl md:text-6xl font-light text-gray-900 mb-6 leading-tight">
+          Stories
+        </h1>
+        <p className="text-xl text-gray-600 mb-8 font-light leading-relaxed max-w-2xl mx-auto">
+          Discover Sri Lanka through the eyes of travelers, locals, and
+          storytellers. Each story is a window into the soul of Ceylon.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+          <button className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors font-medium">
+            Create Your Story
+          </button>
+          <button className="bg-gray-100 text-gray-900 px-8 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium">
+            Browse Categories
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const Footer = () => {
+  return (
+    <footer className="bg-gray-50 border-t border-gray-200 py-16">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="grid md:grid-cols-4 gap-8">
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4">About</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Our Mission
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Team
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Careers
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4">Stories</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Featured
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Categories
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Popular
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4">Contest</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Rules
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Prizes
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Winners
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4">Connect</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Newsletter
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Social Media
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Contact
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-200 mt-12 pt-8 text-center">
+          <p className="text-sm text-gray-500">
+            © 2025 Ceylon Stories. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+const StoriesPage = () => {
+  return (
+    <div className="min-h-screen bg-white">
+      <StoryPageHeader />
+      <FeaturedStoriesSection />
+      <Footer />
+    </div>
+  );
+};
+
+export default StoriesPage;

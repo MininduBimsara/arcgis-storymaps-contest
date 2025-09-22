@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Navigation from "@/components/Home/Navigation";
 
 // Configure Inter font
 const inter = Inter({
@@ -121,6 +122,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         >
           Skip to main content
         </a>
+
+        {/* Global Navigation */}
+        <Navigation />
 
         {/* Main content wrapper */}
         <div id="main-content">{children}</div>
