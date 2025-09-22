@@ -264,6 +264,50 @@ class SubmissionService {
 
     return updatedSubmission;
   }
+
+
+  /**
+ * Bulk approve submissions (Admin only)
+ */
+const bulkApproveSubmissions = async (submissionIds) => {
+  if (!Array.isArray(submissionIds) || submissionIds.length === 0) {
+    throw new Error('Invalid submission IDs provided');
+  }
+
+  const results = {
+    approved: 0,
+    failed: [],
+    total: submissionIds.length
+  };
+
+  for (const submissionId of submissionIds) {
+    try {
+      const submission = await submissionRepository.findById(submissionId);
+      if (!submission) {
+        results.failed.push({ id: submissionId, error: 'Submission not found' });
+        continue;
+      }
+
+      if (submission.status === 'approved') {
+        results.failed.push({ id: submissionId, error: 'Already approved' });
+        continue;
+      }
+
+      await submissionRepository.updateById(submissionId, { 
+        status: 'approved',
+        isPublic: true
+      });
+
+      results.approved++;
+    } catch (error) {
+      results.failed.push({ id: submissionId, error: error.message });
+    }
+  }
+
+  return results;
+};
+
+
 }
 
 module.exports = new SubmissionService();

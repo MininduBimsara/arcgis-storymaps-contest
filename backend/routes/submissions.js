@@ -10,7 +10,7 @@ const {
   requireEmailVerification,
   requireTermsAgreement,
   checkSubmissionLimit,
-} = require("../middleware/auth");
+} = require("../middleware/authMiddleware");
 
 /**
  * Submission Routes
