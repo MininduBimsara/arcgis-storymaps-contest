@@ -4,11 +4,20 @@ import { Search, User, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const Navigation = () => {
+interface NavigationProps {
+  isScrolled?: boolean;
+}
+
+const Navigation = ({ isScrolled: propIsScrolled }: NavigationProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+
+  // Use prop if provided, otherwise detect scroll
+  const scrollState =
+    propIsScrolled !== undefined ? propIsScrolled : isScrolled;
 
   const navItems = [
     { href: "/", label: "Home" },
@@ -16,6 +25,19 @@ const Navigation = () => {
     { href: "/competitions", label: "Competition" },
     { href: "/contact", label: "Contact" },
   ];
+
+  // Handle scroll detection for navbar
+  useEffect(() => {
+    if (propIsScrolled === undefined) {
+      const handleScroll = () => {
+        const scrollTop = window.scrollY;
+        setIsScrolled(scrollTop > 100);
+      };
+
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+  }, [propIsScrolled]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -34,17 +56,25 @@ const Navigation = () => {
 
   return (
     <>
-      <nav className="fixed top-5 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl z-50">
-        <div className="glass-panel px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg">
+      <nav className="fixed top-5 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl z-50 transition-all duration-300">
+        <div
+          className={`glass-panel px-8 py-4 rounded-2xl backdrop-blur-lg border shadow-lg transition-all duration-300 ${
+            scrollState
+              ? "bg-white/95 border-gray-200/50"
+              : "bg-white/10 border-white/20"
+          }`}
+        >
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg">
-                <span className="text-primary-foreground font-bold text-sm">
-                  DT
-                </span>
+              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-sm">DT</span>
               </div>
-              <span className="text-foreground font-semibold text-lg">
+              <span
+                className={`font-semibold text-lg transition-colors duration-300 ${
+                  scrollState ? "text-gray-900" : "text-white"
+                }`}
+              >
                 Desert Tourist
               </span>
             </Link>
@@ -57,16 +87,20 @@ const Navigation = () => {
                     href={item.href}
                     className={`relative font-medium transition-colors duration-300 group ${
                       isActivePage(item.href)
-                        ? "text-primary"
-                        : "text-foreground/80 hover:text-primary"
+                        ? scrollState
+                          ? "text-orange-600"
+                          : "text-orange-300"
+                        : scrollState
+                          ? "text-gray-900 hover:text-orange-600"
+                          : "text-white/90 hover:text-orange-300"
                     }`}
                   >
                     {item.label}
                     <span
-                      className={`absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300 ${
+                      className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-300 ${
                         isActivePage(item.href)
-                          ? "w-full"
-                          : "w-0 group-hover:w-full"
+                          ? "w-full bg-orange-500"
+                          : "w-0 group-hover:w-full bg-orange-500"
                       }`}
                     />
                   </Link>
@@ -76,17 +110,39 @@ const Navigation = () => {
 
             {/* Right side actions */}
             <div className="flex items-center space-x-4">
-              <button className="glass-button p-2 rounded-lg bg-white/10 hover:bg-white/20 text-foreground/80 hover:text-foreground transition-all duration-300">
+              <button
+                className={`glass-button p-2 rounded-lg transition-all duration-300 ${
+                  scrollState
+                    ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                    : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
+                }`}
+              >
                 <Search className="w-5 h-5" />
               </button>
               <div className="hidden md:flex items-center space-x-2">
-                <span className="text-foreground/70 text-sm">Sign in</span>
-                <button className="glass-button p-2 rounded-lg bg-white/10 hover:bg-white/20 text-foreground/80 hover:text-foreground transition-all duration-300">
+                <span
+                  className={`text-sm transition-colors duration-300 ${
+                    scrollState ? "text-gray-600" : "text-white/70"
+                  }`}
+                >
+                  Sign in
+                </span>
+                <button
+                  className={`glass-button p-2 rounded-lg transition-all duration-300 ${
+                    scrollState
+                      ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                      : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
+                  }`}
+                >
                   <User className="w-5 h-5" />
                 </button>
               </div>
               <button
-                className="md:hidden glass-button p-2 rounded-lg bg-white/10 hover:bg-white/20 text-foreground/80 hover:text-foreground transition-all duration-300"
+                className={`md:hidden glass-button p-2 rounded-lg transition-all duration-300 ${
+                  scrollState
+                    ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                    : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
+                }`}
                 onClick={toggleMobileMenu}
               >
                 {isMobileMenuOpen ? (
@@ -109,17 +165,27 @@ const Navigation = () => {
             />
 
             {/* Mobile Menu Content */}
-            <div className="relative md:hidden mt-2 glass-panel rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg p-6 animate-slide-down z-20">
+            <div
+              className={`relative md:hidden mt-2 glass-panel rounded-2xl backdrop-blur-lg border shadow-lg p-6 animate-slide-down z-20 ${
+                scrollState
+                  ? "bg-white/95 border-gray-200/50"
+                  : "bg-white/10 border-white/20"
+              }`}
+            >
               <ul className="space-y-4">
                 {navItems.map((item) => (
                   <li key={item.href}>
                     <Link
                       href={item.href}
                       onClick={closeMobileMenu}
-                      className={`block text-lg font-medium py-3 border-b border-white/10 transition-colors ${
+                      className={`block text-lg font-medium py-3 border-b transition-colors ${
                         isActivePage(item.href)
-                          ? "text-primary"
-                          : "text-foreground/80 hover:text-primary"
+                          ? scrollState
+                            ? "text-orange-600 border-gray-200"
+                            : "text-orange-300 border-white/10"
+                          : scrollState
+                            ? "text-gray-900 hover:text-orange-600 border-gray-200"
+                            : "text-white/90 hover:text-orange-300 border-white/10"
                       }`}
                     >
                       {item.label}
@@ -131,7 +197,13 @@ const Navigation = () => {
               {/* Mobile Sign In */}
               <div className="mt-6 pt-4 border-t border-white/10">
                 <div className="flex items-center space-x-3">
-                  <button className="flex items-center space-x-2 glass-button px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-foreground/80 hover:text-foreground transition-all duration-300">
+                  <button
+                    className={`flex items-center space-x-2 glass-button px-4 py-2 rounded-lg transition-all duration-300 ${
+                      scrollState
+                        ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                        : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
+                    }`}
+                  >
                     <User className="w-4 h-4" />
                     <span className="text-sm">Sign in</span>
                   </button>
