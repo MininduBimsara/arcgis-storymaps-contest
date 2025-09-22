@@ -292,6 +292,105 @@ class SubmissionController {
       { submission: updatedSubmission }
     );
   });
+
+  /**
+   * Get public submissions (approved and public)
+   * GET /api/v1/submissions/public
+   */
+  getPublicSubmissions = asyncHandler(async (req, res) => {
+    const pagination = PaginationHelper.getParams(req);
+
+    const filters = {
+      status: "approved",
+      isPublic: true,
+    };
+
+    // Additional filters from query params
+    if (req.query.category) filters.category = req.query.category;
+    if (req.query.region) filters.region = req.query.region;
+    if (req.query.submissionYear)
+      filters.submissionYear = parseInt(req.query.submissionYear);
+
+    const options = {
+      page: pagination.page,
+      limit: pagination.limit,
+      sort: req.query.sortBy
+        ? { [req.query.sortBy]: req.query.order === "asc" ? 1 : -1 }
+        : { createdAt: -1 },
+      populate: ["submittedBy", "category"],
+    };
+
+    const result = await submissionService.getSubmissions(filters, options);
+
+    return responseHandler.paginated(
+      res,
+      result.submissions,
+      {
+        page: result.page,
+        limit: pagination.limit,
+        total: result.total,
+      },
+      "Public submissions retrieved successfully"
+    );
+  });
+
+  /**
+   * Get ArcGIS StoryMap embed data
+   * GET /api/v1/submissions/:id/storymap
+   */
+  getStoryMapEmbed = asyncHandler(async (req, res) => {
+    const submissionId = req.params.id;
+
+    const submission = await submissionService.getSubmissionById(submissionId);
+
+    // Check if submission is public or user has access
+    const hasAccess =
+      (submission.status === "approved" && submission.isPublic) ||
+      (req.user &&
+        (submission.submittedBy._id.toString() === req.user.id ||
+          req.user.role === "admin"));
+
+    if (!hasAccess) {
+      return responseHandler.error(res, "Access denied", 403);
+    }
+
+    // Extract StoryMap ID from URL
+    const storyMapId = submission.storyMapId;
+
+    // Return embed data
+    const embedData = {
+      storyMapId,
+      storyMapUrl: submission.storyMapUrl,
+      embedUrl: `https://storymaps.arcgis.com/stories/${storyMapId}/embed`,
+      iframeHtml: `<iframe src="https://storymaps.arcgis.com/stories/${storyMapId}/embed" width="100%" height="600" frameborder="0" scrolling="no"></iframe>`,
+      title: submission.title,
+      description: submission.description,
+    };
+
+    return responseHandler.success(
+      res,
+      "StoryMap embed data retrieved successfully",
+      embedData
+    );
+  });
+
+  /**
+   * Bulk approve submissions (Admin only)
+   * POST /api/v1/submissions/bulk-approve
+   */
+  bulkApproveSubmissions = asyncHandler(async (req, res) => {
+    const { submissionIds } = req.body;
+
+    const results = await submissionService.bulkApproveSubmissions(
+      submissionIds
+    );
+
+    return responseHandler.success(
+      res,
+      `Bulk approval completed. ${results.approved} submissions approved, ${results.failed.length} failed.`,
+      results
+    );
+  });
 }
 
 module.exports = new SubmissionController();
