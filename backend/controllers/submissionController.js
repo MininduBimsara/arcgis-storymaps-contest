@@ -1,11 +1,11 @@
-// controllers/submissionController.js - Updated with ArcGIS Integration
+// controllers/submissionController.js
 const submissionService = require("../services/submissionService");
 const { responseHandler } = require("../utils/responseHandler");
 const { asyncHandler } = require("../middleware/errorHandler");
 const PaginationHelper = require("../utils/pagination");
 
 /**
- * Submission Controller - HTTP Request Handlers with ArcGIS Integration
+ * Submission Controller - HTTP Request Handlers
  */
 class SubmissionController {
   /**
@@ -15,18 +15,6 @@ class SubmissionController {
   createSubmission = asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const submissionData = req.body;
-
-    // Handle uploaded files if any
-    if (req.files) {
-      if (req.files.thumbnail) {
-        submissionData.thumbnailUrl = `/uploads/thumbnails/${req.files.thumbnail[0].filename}`;
-      }
-      if (req.files.previews) {
-        submissionData.previewImages = req.files.previews.map(
-          (file) => `/uploads/previews/${file.filename}`
-        );
-      }
-    }
 
     const submission = await submissionService.createSubmission(
       userId,
@@ -46,12 +34,18 @@ class SubmissionController {
     const pagination = PaginationHelper.getParams(req);
     const filters = {};
 
-    // Apply role-based filters
-    if (req.user.role === "user") {
-      // Regular users can see approved/public submissions and their own
+    // Apply filters based on user role
+    if (req.user.role === "participant") {
+      // Participants can only see approved/public submissions and their own
       filters.$or = [
         { status: "approved", isPublic: true },
         { submittedBy: req.user.id },
+      ];
+    } else if (req.user.role === "judge") {
+      // Judges can see approved submissions and assigned ones
+      filters.$or = [
+        { status: "approved" },
+        { "judgeAssignments.judge": req.user.judgeId },
       ];
     }
     // Admins can see all submissions (no additional filters)
@@ -88,41 +82,6 @@ class SubmissionController {
   });
 
   /**
-   * Get public submissions (for non-authenticated users)
-   * GET /api/v1/submissions/public
-   */
-  getPublicSubmissions = asyncHandler(async (req, res) => {
-    const pagination = PaginationHelper.getParams(req);
-    const filters = {
-      status: "approved",
-      isPublic: true,
-    };
-
-    if (req.query.category) filters.category = req.query.category;
-    if (req.query.region) filters.region = req.query.region;
-
-    const options = {
-      page: pagination.page,
-      limit: pagination.limit,
-      sort: { averageScore: -1, createdAt: -1 },
-      populate: ["submittedBy", "category"],
-    };
-
-    const result = await submissionService.getSubmissions(filters, options);
-
-    return responseHandler.paginated(
-      res,
-      result.submissions,
-      {
-        page: result.page,
-        limit: pagination.limit,
-        total: result.total,
-      },
-      "Public submissions retrieved successfully"
-    );
-  });
-
-  /**
    * Get submission by ID
    * GET /api/v1/submissions/:id
    */
@@ -132,58 +91,22 @@ class SubmissionController {
     const submission = await submissionService.getSubmissionById(submissionId);
 
     // Check access permissions
-    const isOwner =
-      req.user && submission.submittedBy._id.toString() === req.user.id;
-    const isAdmin = req.user && req.user.role === "admin";
+    const isOwner = submission.submittedBy._id.toString() === req.user.id;
+    const isAdmin = req.user.role === "admin";
+    const isJudge =
+      req.user.role === "judge" &&
+      submission.judgeAssignments.some(
+        (assignment) => assignment.judge.toString() === req.user.judgeId
+      );
     const isPublic = submission.status === "approved" && submission.isPublic;
 
-    if (!isOwner && !isAdmin && !isPublic) {
+    if (!isOwner && !isAdmin && !isJudge && !isPublic) {
       return responseHandler.error(res, "Access denied", 403);
     }
 
     return responseHandler.success(res, "Submission retrieved successfully", {
       submission,
     });
-  });
-
-  /**
-   * Get ArcGIS StoryMap embed data
-   * GET /api/v1/submissions/:id/storymap
-   */
-  getStoryMapEmbed = asyncHandler(async (req, res) => {
-    const submissionId = req.params.id;
-
-    const submission = await submissionService.getSubmissionById(submissionId);
-
-    // Check if submission is public or user has access
-    const isOwner =
-      req.user && submission.submittedBy._id.toString() === req.user.id;
-    const isAdmin = req.user && req.user.role === "admin";
-    const isPublic = submission.status === "approved" && submission.isPublic;
-
-    if (!isOwner && !isAdmin && !isPublic) {
-      return responseHandler.error(res, "Access denied", 403);
-    }
-
-    // Extract StoryMap ID from URL for embedding
-    const storyMapId = submission.storyMapId;
-    const embedUrl = `https://storymaps.arcgis.com/stories/${storyMapId}`;
-
-    // Return embed configuration
-    const embedConfig = {
-      storyMapId,
-      embedUrl,
-      embedHtml: `<iframe src="${embedUrl}" width="100%" height="600" frameborder="0" allowfullscreen allow="geolocation"></iframe>`,
-      title: submission.title,
-      description: submission.description,
-      thumbnail: submission.thumbnailUrl,
-    };
-
-    return responseHandler.success(
-      res,
-      "StoryMap embed data retrieved successfully",
-      { embed: embedConfig }
-    );
   });
 
   /**
@@ -195,18 +118,6 @@ class SubmissionController {
     const userId = req.user.id;
     const userRole = req.user.role;
     const updateData = req.body;
-
-    // Handle uploaded files if any
-    if (req.files) {
-      if (req.files.thumbnail) {
-        updateData.thumbnailUrl = `/uploads/thumbnails/${req.files.thumbnail[0].filename}`;
-      }
-      if (req.files.previews) {
-        updateData.previewImages = req.files.previews.map(
-          (file) => `/uploads/previews/${file.filename}`
-        );
-      }
-    }
 
     const updatedSubmission = await submissionService.updateSubmission(
       submissionId,
@@ -323,7 +234,7 @@ class SubmissionController {
     if (req.query.region) filters.region = req.query.region;
 
     // Apply role-based filters
-    if (!req.user || req.user.role === "user") {
+    if (req.user.role === "participant") {
       filters.status = "approved";
       filters.isPublic = true;
     }
@@ -379,24 +290,6 @@ class SubmissionController {
       res,
       "Submission status updated successfully",
       { submission: updatedSubmission }
-    );
-  });
-
-  /**
-   * Bulk approve submissions (Admin only)
-   * POST /api/v1/submissions/bulk-approve
-   */
-  bulkApproveSubmissions = asyncHandler(async (req, res) => {
-    const { submissionIds } = req.body;
-
-    const result = await submissionService.bulkApproveSubmissions(
-      submissionIds
-    );
-
-    return responseHandler.success(
-      res,
-      "Submissions bulk approved successfully",
-      result
     );
   });
 }
