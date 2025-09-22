@@ -1,0 +1,447 @@
+// src/models/Submission.js
+const mongoose = require("mongoose");
+const slugify = require("slugify");
+
+const submissionSchema = new mongoose.Schema(
+  {
+    // Basic Information
+    title: {
+      type: String,
+      required: [true, "Submission title is required"],
+      trim: true,
+      maxLength: [100, "Title cannot exceed 100 characters"],
+      minLength: [5, "Title must be at least 5 characters"],
+    },
+    slug: {
+      type: String,
+      unique: true,
+      lowercase: true,
+    },
+    description: {
+      type: String,
+      required: [true, "Description is required"],
+      trim: true,
+      maxLength: [1000, "Description cannot exceed 1000 characters"],
+      minLength: [50, "Description must be at least 50 characters"],
+    },
+
+    // StoryMap Details
+    storyMapUrl: {
+      type: String,
+      required: [true, "StoryMap URL is required"],
+      validate: {
+        validator: function (url) {
+          // Validate ArcGIS StoryMaps URL format
+          const arcgisPattern =
+            /^https:\/\/storymaps\.arcgis\.com\/stories\/[a-zA-Z0-9]+$/;
+          return arcgisPattern.test(url);
+        },
+        message: "Please provide a valid ArcGIS StoryMaps URL",
+      },
+    },
+    storyMapId: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: {
+        validator: function (id) {
+          return /^[a-zA-Z0-9]{32}$/.test(id);
+        },
+        message: "Invalid StoryMap ID format",
+      },
+    },
+
+    // Media and Assets
+    thumbnailUrl: {
+      type: String,
+      validate: {
+        validator: function (url) {
+          if (!url) return true; // Optional field
+          return /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+        },
+        message: "Thumbnail must be a valid image URL",
+      },
+    },
+    previewImages: [
+      {
+        type: String,
+        validate: {
+          validator: function (url) {
+            return /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+          },
+          message: "Preview images must be valid image URLs",
+        },
+      },
+    ],
+
+    // Categorization
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: [true, "Category is required"],
+    },
+    tags: [
+      {
+        type: String,
+        trim: true,
+        lowercase: true,
+        maxLength: [30, "Tag cannot exceed 30 characters"],
+      },
+    ],
+
+    // Geographic Information
+    region: {
+      type: String,
+      required: [true, "Region is required"],
+      enum: [
+        "North America",
+        "South America",
+        "Europe",
+        "Africa",
+        "Asia",
+        "Oceania",
+        "Global",
+      ],
+    },
+    specificLocation: {
+      type: String,
+      trim: true,
+      maxLength: [100, "Specific location cannot exceed 100 characters"],
+    },
+
+    // Submission Metadata
+    submittedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    teamMembers: [
+      {
+        name: {
+          type: String,
+          required: true,
+          trim: true,
+          maxLength: [100, "Team member name cannot exceed 100 characters"],
+        },
+        email: {
+          type: String,
+          required: true,
+          match: [
+            /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+            "Invalid email format",
+          ],
+        },
+        role: {
+          type: String,
+          trim: true,
+          maxLength: [50, "Role cannot exceed 50 characters"],
+        },
+      },
+    ],
+
+    // Competition Status
+    status: {
+      type: String,
+      enum: [
+        "draft",
+        "submitted",
+        "under_review",
+        "approved",
+        "rejected",
+        "winner",
+      ],
+      default: "draft",
+    },
+    isPublic: {
+      type: Boolean,
+      default: false,
+    },
+    submissionDate: {
+      type: Date,
+    },
+
+    // Judging and Scoring
+    judgeAssignments: [
+      {
+        judge: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Judge",
+        },
+        assignedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        status: {
+          type: String,
+          enum: ["assigned", "in_progress", "completed"],
+          default: "assigned",
+        },
+      },
+    ],
+
+    scores: [
+      {
+        judge: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Judge",
+          required: true,
+        },
+        criteria: {
+          storytelling: {
+            type: Number,
+            min: 1,
+            max: 10,
+            required: true,
+          },
+          technicalExecution: {
+            type: Number,
+            min: 1,
+            max: 10,
+            required: true,
+          },
+          innovation: {
+            type: Number,
+            min: 1,
+            max: 10,
+            required: true,
+          },
+          visualDesign: {
+            type: Number,
+            min: 1,
+            max: 10,
+            required: true,
+          },
+          dataQuality: {
+            type: Number,
+            min: 1,
+            max: 10,
+            required: true,
+          },
+        },
+        totalScore: {
+          type: Number,
+          min: 5,
+          max: 50,
+        },
+        feedback: {
+          type: String,
+          maxLength: [1000, "Feedback cannot exceed 1000 characters"],
+        },
+        scoredAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+
+    averageScore: {
+      type: Number,
+      min: 0,
+      max: 50,
+    },
+
+    // Technical Details
+    dataSourcesUsed: [
+      {
+        name: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        url: {
+          type: String,
+          validate: {
+            validator: function (url) {
+              return /^https?:\/\/.+/.test(url);
+            },
+            message: "Data source URL must be valid",
+          },
+        },
+        type: {
+          type: String,
+          enum: [
+            "REST Service",
+            "Feature Service",
+            "CSV",
+            "Shapefile",
+            "GeoJSON",
+            "Other",
+          ],
+          required: true,
+        },
+      },
+    ],
+
+    // Contest Specific
+    submissionYear: {
+      type: Number,
+      required: true,
+      default: () => new Date().getFullYear(),
+    },
+    eligibilityChecked: {
+      type: Boolean,
+      default: false,
+    },
+    copyrightCompliant: {
+      type: Boolean,
+      required: [true, "Copyright compliance confirmation required"],
+    },
+
+    // Admin Notes
+    adminNotes: [
+      {
+        note: String,
+        addedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        addedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+  },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
+
+// Virtual for formatted submission date
+submissionSchema.virtual("formattedSubmissionDate").get(function () {
+  return this.submissionDate ? this.submissionDate.toLocaleDateString() : null;
+});
+
+// Virtual for team size
+submissionSchema.virtual("teamSize").get(function () {
+  return this.teamMembers.length + 1; // +1 for submitter
+});
+
+// Indexes for performance
+submissionSchema.index({ submittedBy: 1 });
+submissionSchema.index({ category: 1 });
+submissionSchema.index({ status: 1 });
+submissionSchema.index({ submissionYear: 1 });
+submissionSchema.index({ averageScore: -1 });
+submissionSchema.index({ createdAt: -1 });
+submissionSchema.index({ storyMapId: 1 }, { unique: true });
+submissionSchema.index({ slug: 1 }, { unique: true });
+
+// Text index for search functionality
+submissionSchema.index({
+  title: "text",
+  description: "text",
+  tags: "text",
+});
+
+// Pre-save middleware to generate slug
+submissionSchema.pre("save", function (next) {
+  if (this.isModified("title")) {
+    this.slug = slugify(this.title, {
+      lower: true,
+      strict: true,
+      remove: /[*+~.()'"!:@]/g,
+    });
+  }
+  next();
+});
+
+// Pre-save middleware to extract StoryMap ID from URL
+submissionSchema.pre("save", function (next) {
+  if (this.isModified("storyMapUrl")) {
+    const urlMatch = this.storyMapUrl.match(/\/stories\/([a-zA-Z0-9]+)$/);
+    if (urlMatch) {
+      this.storyMapId = urlMatch[1];
+    }
+  }
+  next();
+});
+
+// Pre-save middleware to calculate average score
+submissionSchema.pre("save", function (next) {
+  if (this.scores && this.scores.length > 0) {
+    const totalScore = this.scores.reduce(
+      (sum, score) => sum + score.totalScore,
+      0
+    );
+    this.averageScore = totalScore / this.scores.length;
+  }
+  next();
+});
+
+// Pre-save middleware to calculate total score for each scoring entry
+submissionSchema.pre("save", function (next) {
+  this.scores.forEach((score) => {
+    if (score.criteria) {
+      score.totalScore =
+        score.criteria.storytelling +
+        score.criteria.technicalExecution +
+        score.criteria.innovation +
+        score.criteria.visualDesign +
+        score.criteria.dataQuality;
+    }
+  });
+  next();
+});
+
+// Static method to get submissions by category
+submissionSchema.statics.findByCategory = function (categoryId) {
+  return this.find({ category: categoryId, status: "approved" })
+    .populate("submittedBy", "firstName lastName organization")
+    .populate("category", "name")
+    .sort({ averageScore: -1 });
+};
+
+// Static method to get top submissions
+submissionSchema.statics.getTopSubmissions = function (limit = 10) {
+  return this.find({ status: "approved", averageScore: { $exists: true } })
+    .populate("submittedBy", "firstName lastName organization country")
+    .populate("category", "name")
+    .sort({ averageScore: -1 })
+    .limit(limit);
+};
+
+// Static method to get submission statistics
+submissionSchema.statics.getSubmissionStats = function () {
+  return this.aggregate([
+    {
+      $group: {
+        _id: "$status",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        statuses: {
+          $push: {
+            status: "$_id",
+            count: "$count",
+          },
+        },
+        total: { $sum: "$count" },
+      },
+    },
+  ]);
+};
+
+// Instance method to assign judge
+submissionSchema.methods.assignJudge = function (judgeId) {
+  const existingAssignment = this.judgeAssignments.find(
+    (assignment) => assignment.judge.toString() === judgeId.toString()
+  );
+
+  if (!existingAssignment) {
+    this.judgeAssignments.push({
+      judge: judgeId,
+      assignedAt: new Date(),
+      status: "assigned",
+    });
+  }
+
+  return this.save();
+};
+
+module.exports = mongoose.model("Submission", submissionSchema);
