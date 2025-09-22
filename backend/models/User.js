@@ -1,22 +1,19 @@
-// src/models/User.js
+// models/User.js - Updated to match documentation
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema(
   {
     // Basic Information
-    firstName: {
+    username: {
       type: String,
-      required: [true, "First name is required"],
+      required: [true, "Username is required"],
+      unique: true,
       trim: true,
-      maxLength: [50, "First name cannot exceed 50 characters"],
-    },
-    lastName: {
-      type: String,
-      required: [true, "Last name is required"],
-      trim: true,
-      maxLength: [50, "Last name cannot exceed 50 characters"],
+      maxLength: [50, "Username cannot exceed 50 characters"],
+      minLength: [3, "Username must be at least 3 characters"],
     },
     email: {
       type: String,
@@ -35,77 +32,64 @@ const userSchema = new mongoose.Schema(
       select: false, // Don't include password in queries by default
     },
 
-    // Profile Information
-    organization: {
+    // Role and Status
+    role: {
       type: String,
-      trim: true,
-      maxLength: [100, "Organization name cannot exceed 100 characters"],
+      enum: ["user", "admin"],
+      default: "user",
     },
-    jobTitle: {
+    status: {
       type: String,
-      trim: true,
-      maxLength: [100, "Job title cannot exceed 100 characters"],
+      enum: ["active", "banned"],
+      default: "active",
     },
-    country: {
+
+    // Profile Information (Optional)
+    profileImage: {
       type: String,
-      required: [true, "Country is required"],
-      trim: true,
+      validate: {
+        validator: function (url) {
+          if (!url) return true; // Optional field
+          return /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+        },
+        message: "Profile image must be a valid image URL",
+      },
     },
-    phoneNumber: {
+    phone: {
       type: String,
       trim: true,
       match: [/^[\+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number"],
     },
-    bio: {
+    address: {
       type: String,
-      maxLength: [500, "Bio cannot exceed 500 characters"],
       trim: true,
+      maxLength: [200, "Address cannot exceed 200 characters"],
     },
-
-    // System Fields
-    role: {
+    city: {
       type: String,
-      enum: ["participant", "judge", "admin"],
-      default: "participant",
-    },
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    lastLogin: {
-      type: Date,
+      trim: true,
+      maxLength: [100, "City cannot exceed 100 characters"],
     },
 
-    // Competition Specific
-    submissionCount: {
-      type: Number,
-      default: 0,
-      max: [5, "Maximum 5 submissions allowed per user"],
-    },
-    agreedToTerms: {
-      type: Boolean,
-      required: [true, "Must agree to terms and conditions"],
-      default: false,
-    },
-    consentToMarketing: {
+    // Email Verification
+    emailVerified: {
       type: Boolean,
       default: false,
     },
-
-    // Security Fields
     emailVerificationToken: String,
     emailVerificationExpires: Date,
-    passwordResetToken: String,
-    passwordResetExpires: Date,
+
+    // Password Reset
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
+
+    // Security
     loginAttempts: {
       type: Number,
       default: 0,
     },
     lockUntil: Date,
+    lastLogin: Date,
   },
   {
     timestamps: true,
@@ -114,11 +98,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Virtual for full name
-userSchema.virtual("fullName").get(function () {
-  return `${this.firstName} ${this.lastName}`;
-});
-
 // Virtual for account lock status
 userSchema.virtual("isLocked").get(function () {
   return !!(this.lockUntil && this.lockUntil > Date.now());
@@ -126,9 +105,10 @@ userSchema.virtual("isLocked").get(function () {
 
 // Indexes for performance
 userSchema.index({ email: 1 });
+userSchema.index({ username: 1 });
 userSchema.index({ role: 1 });
+userSchema.index({ status: 1 });
 userSchema.index({ createdAt: -1 });
-userSchema.index({ isActive: 1, isEmailVerified: 1 });
 
 // Pre-save middleware to hash password
 userSchema.pre("save", async function (next) {
@@ -169,19 +149,28 @@ userSchema.methods.generateAuthToken = function () {
 
 // Instance method to generate password reset token
 userSchema.methods.generatePasswordResetToken = function () {
-  const crypto = require("crypto");
   const resetToken = crypto.randomBytes(32).toString("hex");
 
   // Hash token and set to resetPasswordToken field
-  this.passwordResetToken = crypto
+  this.resetPasswordToken = crypto
     .createHash("sha256")
     .update(resetToken)
     .digest("hex");
 
   // Set expire time (10 minutes)
-  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
 
   return resetToken;
+};
+
+// Instance method to generate email verification token
+userSchema.methods.generateEmailVerificationToken = function () {
+  const verificationToken = crypto.randomBytes(32).toString("hex");
+
+  this.emailVerificationToken = verificationToken;
+  this.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+
+  return verificationToken;
 };
 
 // Static method to find by email
