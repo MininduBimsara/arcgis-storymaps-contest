@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navigation from "@/components/Home/Navigation";
+import Navigation from "@/components/layout/Navigation";
 
 // Configure Inter font
 const inter = Inter({

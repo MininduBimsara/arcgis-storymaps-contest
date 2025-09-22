@@ -1,79 +1,14 @@
 import React from "react";
-import { MapPin, Clock, Heart, Eye, ChevronRight } from "lucide-react";
+import StoryCard, { Story } from "./StoryCard";
 
-const StoryCard = ({ story }) => {
-  return (
-    <article className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 group">
-      {/* Story Preview Image */}
-      <div className="aspect-[16/9] bg-gray-200 relative overflow-hidden group-hover:scale-105 transition-transform duration-300">
-        {/* Background Image */}
-        <img
-          src={story.image}
-          alt={story.title}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+interface FeaturedStoriesSectionProps {
+  onReadMore: (story: Story) => void;
+}
 
-        {/* Gradient overlay matching category */}
-        <div className={`absolute inset-0 ${story.gradientOverlay}`}></div>
-
-        {/* Category Badge */}
-        <div className="absolute top-4 left-4">
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-medium text-white backdrop-blur-sm ${story.categoryColor}`}
-          >
-            {story.category}
-          </span>
-        </div>
-      </div>
-
-      {/* Card Content */}
-      <div className="p-6">
-        {/* Meta Information */}
-        <div className="flex items-center space-x-2 text-sm text-gray-500 mb-3">
-          <MapPin className="w-4 h-4" />
-          <span>{story.location}</span>
-          <span>•</span>
-          <Clock className="w-4 h-4" />
-          <span>{story.readTime}</span>
-        </div>
-
-        {/* Story Title */}
-        <h3 className="text-lg font-medium text-gray-900 mb-2 leading-tight group-hover:text-gray-700 transition-colors">
-          {story.title}
-        </h3>
-
-        {/* Author */}
-        <p className="text-gray-600 text-sm mb-4">By {story.author}</p>
-
-        {/* Description */}
-        <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
-          {story.description}
-        </p>
-
-        {/* Footer with engagement metrics and CTA */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          <div className="flex items-center space-x-4 text-sm text-gray-500">
-            <div className="flex items-center space-x-1">
-              <Heart className="w-4 h-4" />
-              <span>{story.likes}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Eye className="w-4 h-4" />
-              <span>{story.views}</span>
-            </div>
-          </div>
-          <button className="text-sm font-medium text-gray-900 hover:text-orange-600 transition-colors flex items-center space-x-1">
-            <span>Read More</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-    </article>
-  );
-};
-
-const FeaturedStoriesSection = () => {
-  const featuredStories = [
+const FeaturedStoriesSection: React.FC<FeaturedStoriesSectionProps> = ({
+  onReadMore,
+}) => {
+  const featuredStories: Story[] = [
     {
       id: 1,
       title: "Sacred Peaks: Journey to Adam's Peak",
@@ -175,7 +110,6 @@ const FeaturedStoriesSection = () => {
   return (
     <section className="py-20 bg-gray-50">
       <div className="max-w-6xl mx-auto px-6">
-        {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-light text-gray-900 mb-4">
             Featured Stories
@@ -186,14 +120,12 @@ const FeaturedStoriesSection = () => {
           </p>
         </div>
 
-        {/* Stories Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {featuredStories.map((story) => (
-            <StoryCard key={story.id} story={story} />
+            <StoryCard key={story.id} story={story} onReadMore={onReadMore} />
           ))}
         </div>
 
-        {/* Section Footer CTAs */}
         <div className="text-center space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
             <button className="bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors font-medium">

@@ -16,10 +16,22 @@ class AuthController {
 
     const result = await authService.register(userData);
 
+    // Set HTTP-only cookie with JWT token
+    res.cookie("token", result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
+
     return responseHandler.created(
       res,
       "User registered successfully. Please check your email to verify your account.",
-      { user: result }
+      {
+        user: result.user,
+        token: result.token,
+      }
     );
   });
 
@@ -32,15 +44,14 @@ class AuthController {
 
     const result = await authService.login(email, password);
 
-    // Set HTTP-only cookie with JWT token (optional, for additional security)
-    if (process.env.NODE_ENV === "production") {
-      res.cookie("token", result.token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      });
-    }
+    // Set HTTP-only cookie with JWT token
+    res.cookie("token", result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
 
     return responseHandler.success(res, "Login successful", result);
   });
@@ -50,10 +61,13 @@ class AuthController {
    * POST /api/v1/auth/logout
    */
   logout = asyncHandler(async (req, res) => {
-    // Clear cookie if using HTTP-only cookies
-    if (process.env.NODE_ENV === "production") {
-      res.clearCookie("token");
-    }
+    // Clear the cookie
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+    });
 
     return responseHandler.success(res, "Logout successful");
   });
