@@ -1,4 +1,4 @@
-// services/submissionService.js - Fixed bulk approve method
+// services/submissionService.js - Fixed final version
 const submissionRepository = require("../repositories/submissionRepository");
 const userRepository = require("../repositories/userRepository");
 const categoryRepository = require("../repositories/categoryRepository");
@@ -19,7 +19,9 @@ class SubmissionService {
     }
 
     const maxSubmissions = parseInt(process.env.MAX_SUBMISSIONS_PER_USER) || 5;
-    if (user.submissionCount >= maxSubmissions) {
+    const currentCount = user.submissionCount || 0;
+
+    if (currentCount >= maxSubmissions) {
       throw new Error(`Maximum ${maxSubmissions} submissions allowed per user`);
     }
 
@@ -47,8 +49,12 @@ class SubmissionService {
 
     // Update user submission count and category submission count
     await Promise.all([
-      userRepository.incrementSubmissionCount(userId),
-      categoryRepository.incrementSubmissionCount(category._id),
+      userRepository.updateById(userId, {
+        $inc: { submissionCount: 1 },
+      }),
+      categoryRepository.updateById(category._id, {
+        $inc: { submissionCount: 1 },
+      }),
     ]);
 
     // Populate submission data
@@ -94,8 +100,6 @@ class SubmissionService {
     const submission = await submissionRepository.findById(id, [
       "submittedBy",
       "category",
-      "judgeAssignments.judge",
-      "scores.judge",
     ]);
 
     if (!submission) {
@@ -185,8 +189,12 @@ class SubmissionService {
 
     // Update counters
     await Promise.all([
-      userRepository.decrementSubmissionCount(submission.submittedBy),
-      categoryRepository.decrementSubmissionCount(submission.category),
+      userRepository.updateById(submission.submittedBy, {
+        $inc: { submissionCount: -1 },
+      }),
+      categoryRepository.updateById(submission.category, {
+        $inc: { submissionCount: -1 },
+      }),
     ]);
 
     return { message: "Submission deleted successfully" };

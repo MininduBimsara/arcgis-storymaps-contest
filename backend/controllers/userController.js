@@ -1,7 +1,18 @@
-// controllers/userController.js
+// controllers/userController.js - Fixed version with inline pagination helper
 const userService = require("../services/userService");
 const { responseHandler } = require("../utils/responseHandler");
 const { asyncHandler } = require("../middleware/errorHandler");
+
+/**
+ * Pagination Helper Class - Inline to avoid import issues
+ */
+class PaginationHelper {
+  static getParams(req) {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 10));
+    return { page, limit };
+  }
+}
 
 /**
  * User Controller - HTTP Request Handlers
@@ -48,10 +59,9 @@ class UserController {
 
     // Apply filters
     if (req.query.role) filters.role = req.query.role;
-    if (req.query.isActive !== undefined)
-      filters.isActive = req.query.isActive === "true";
-    if (req.query.isEmailVerified !== undefined)
-      filters.isEmailVerified = req.query.isEmailVerified === "true";
+    if (req.query.status) filters.status = req.query.status;
+    if (req.query.emailVerified !== undefined)
+      filters.emailVerified = req.query.emailVerified === "true";
 
     const result = await userService.getUsersList(
       filters,
@@ -181,8 +191,7 @@ class UserController {
 
     const filters = {};
     if (req.query.role) filters.role = req.query.role;
-    if (req.query.isActive !== undefined)
-      filters.isActive = req.query.isActive === "true";
+    if (req.query.status) filters.status = req.query.status;
 
     const result = await userService.searchUsers(
       searchTerm,

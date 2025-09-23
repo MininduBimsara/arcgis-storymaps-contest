@@ -1,4 +1,4 @@
-// middleware/authMiddleware.js - Fixed function scoping issue
+// middleware/authMiddleware.js - Fixed version
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { asyncHandler } = require("./errorHandler");
@@ -113,7 +113,7 @@ const requireEmailVerification = (req, res, next) => {
 /**
  * Check submission limits for users
  */
-const checkSubmissionLimit = async (req, res, next) => {
+const checkSubmissionLimit = asyncHandler(async (req, res, next) => {
   try {
     if (!req.user) {
       return responseHandler.error(
@@ -130,19 +130,17 @@ const checkSubmissionLimit = async (req, res, next) => {
 
     const maxSubmissions = parseInt(process.env.MAX_SUBMISSIONS_PER_USER) || 5;
 
-    // Get user's current submission count
-    const submissionRepository = require("../repositories/submissionRepository");
-    const userSubmissions = await submissionRepository.findWithFilters(
-      { submittedBy: req.user.id },
-      { page: 1, limit: 1 }
-    );
+    // Get user's current submission count from user model
+    const User = require("../models/User");
+    const user = await User.findById(req.user.id);
+    const currentCount = user.submissionCount || 0;
 
-    if (userSubmissions.total >= maxSubmissions) {
+    if (currentCount >= maxSubmissions) {
       return responseHandler.error(
         res,
         `Maximum number of submissions (${maxSubmissions}) reached.`,
         403,
-        { maxSubmissions, currentCount: userSubmissions.total }
+        { maxSubmissions, currentCount }
       );
     }
 
@@ -155,7 +153,7 @@ const checkSubmissionLimit = async (req, res, next) => {
       500
     );
   }
-};
+});
 
 /**
  * Require terms agreement

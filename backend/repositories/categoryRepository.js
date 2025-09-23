@@ -1,4 +1,4 @@
-// repositories/categoryRepository.js
+// repositories/categoryRepository.js - Fixed version
 const Category = require("../models/Category");
 const slugify = require("slugify");
 
@@ -106,43 +106,23 @@ class CategoryRepository {
   }
 
   /**
-   * Increment submission count
-   */
-  async incrementSubmissionCount(categoryId) {
-    return await Category.findByIdAndUpdate(
-      categoryId,
-      { $inc: { submissionCount: 1 } },
-      { new: true }
-    );
-  }
-
-  /**
-   * Decrement submission count
-   */
-  async decrementSubmissionCount(categoryId) {
-    return await Category.findByIdAndUpdate(
-      categoryId,
-      { $inc: { submissionCount: -1 } },
-      { new: true }
-    );
-  }
-
-  /**
    * Get category statistics
    */
   async getStats() {
-    return await Category.aggregate([
-      {
-        $group: {
-          _id: null,
-          totalCategories: { $sum: 1 },
-          activeCategories: {
-            $sum: { $cond: [{ $eq: ["$isActive", true] }, 1, 0] },
-          },
-          totalSubmissions: { $sum: "$submissionCount" },
-        },
-      },
-    ]);
+    const [totalCategories, activeCategories, totalSubmissions] =
+      await Promise.all([
+        Category.countDocuments(),
+        Category.countDocuments({ isActive: true }),
+        Category.aggregate([
+          { $group: { _id: null, total: { $sum: "$submissionCount" } } },
+        ]),
+      ]);
+
+    return {
+      totalCategories,
+      activeCategories,
+      totalSubmissions: totalSubmissions[0]?.total || 0,
+    };
   }
 }
 

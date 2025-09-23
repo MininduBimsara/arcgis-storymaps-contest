@@ -1,8 +1,18 @@
-// controllers/submissionController.js
+// controllers/submissionController.js - Final version with no pagination import
 const submissionService = require("../services/submissionService");
 const { responseHandler } = require("../utils/responseHandler");
 const { asyncHandler } = require("../middleware/errorHandler");
-const PaginationHelper = require("../utils/pagination");
+
+/**
+ * Pagination Helper Class - Inline to avoid import issues
+ */
+class PaginationHelper {
+  static getParams(req) {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 10));
+    return { page, limit };
+  }
+}
 
 /**
  * Submission Controller - HTTP Request Handlers
@@ -35,17 +45,11 @@ class SubmissionController {
     const filters = {};
 
     // Apply filters based on user role
-    if (req.user.role === "participant") {
-      // Participants can only see approved/public submissions and their own
+    if (req.user.role === "user") {
+      // Users can only see approved/public submissions and their own
       filters.$or = [
         { status: "approved", isPublic: true },
         { submittedBy: req.user.id },
-      ];
-    } else if (req.user.role === "judge") {
-      // Judges can see approved submissions and assigned ones
-      filters.$or = [
-        { status: "approved" },
-        { "judgeAssignments.judge": req.user.judgeId },
       ];
     }
     // Admins can see all submissions (no additional filters)
@@ -91,16 +95,24 @@ class SubmissionController {
     const submission = await submissionService.getSubmissionById(submissionId);
 
     // Check access permissions
-    const isOwner = submission.submittedBy._id.toString() === req.user.id;
-    const isAdmin = req.user.role === "admin";
-    const isJudge =
-      req.user.role === "judge" &&
-      submission.judgeAssignments.some(
-        (assignment) => assignment.judge.toString() === req.user.judgeId
-      );
-    const isPublic = submission.status === "approved" && submission.isPublic;
+    let hasAccess = false;
 
-    if (!isOwner && !isAdmin && !isJudge && !isPublic) {
+    // Public access for approved submissions
+    if (submission.status === "approved" && submission.isPublic) {
+      hasAccess = true;
+    }
+
+    // Owner access
+    if (req.user && submission.submittedBy._id.toString() === req.user.id) {
+      hasAccess = true;
+    }
+
+    // Admin access
+    if (req.user && req.user.role === "admin") {
+      hasAccess = true;
+    }
+
+    if (!hasAccess) {
       return responseHandler.error(res, "Access denied", 403);
     }
 
@@ -234,7 +246,7 @@ class SubmissionController {
     if (req.query.region) filters.region = req.query.region;
 
     // Apply role-based filters
-    if (req.user.role === "participant") {
+    if (!req.user || req.user.role === "user") {
       filters.status = "approved";
       filters.isPublic = true;
     }

@@ -1,4 +1,4 @@
-// validators/submissionValidator.js
+// validators/submissionValidator.js - Fixed version
 const Joi = require("joi");
 const { responseHandler } = require("../utils/responseHandler");
 
@@ -70,10 +70,6 @@ class SubmissionValidator {
         .required()
         .valid(true)
         .message("You must confirm copyright compliance"),
-      agreedToTerms: Joi.boolean()
-        .required()
-        .valid(true)
-        .message("You must agree to the terms and conditions"),
     });
 
     const { error } = schema.validate(req.body);

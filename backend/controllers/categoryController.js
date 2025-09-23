@@ -1,8 +1,18 @@
-// controllers/categoryController.js
+// controllers/categoryController.js - Final version with no pagination import
 const categoryService = require("../services/categoryService");
 const { responseHandler } = require("../utils/responseHandler");
 const { asyncHandler } = require("../middleware/errorHandler");
-const PaginationHelper = require("../utils/pagination");
+
+/**
+ * Pagination Helper Class - Inline to avoid import issues
+ */
+class PaginationHelper {
+  static getParams(req) {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 10));
+    return { page, limit };
+  }
+}
 
 /**
  * Category Controller - HTTP Request Handlers

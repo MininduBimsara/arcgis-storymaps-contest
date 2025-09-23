@@ -1,4 +1,4 @@
-// routes/users.js
+// routes/users.js - Fixed version without uploadConfigs
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
@@ -9,6 +9,16 @@ const { userValidator } = require("../validators/userValidator");
  * User Routes
  * All routes require authentication
  */
+
+// @desc    Search users (moved before /:id to avoid conflicts)
+// @route   GET /api/v1/users/search
+// @access  Private/Admin
+router.get("/search", protect, adminOnly, userController.searchUsers);
+
+// @desc    Get user statistics
+// @route   GET /api/v1/users/stats
+// @access  Private/Admin
+router.get("/stats", protect, adminOnly, userController.getUserStats);
 
 // @desc    Get current user profile
 // @route   GET /api/v1/users/profile
@@ -21,26 +31,15 @@ router.get("/profile", protect, userController.getProfile);
 router.put(
   "/profile",
   protect,
-  uploadConfigs.avatar,
   userValidator.updateProfile,
   userController.updateProfile
 );
-
-// @desc    Get user submissions
-// @route   GET /api/v1/users/my-submissions
-// @access  Private
-router.get("/my-submissions", protect, userController.getMySubmissions);
 
 // Admin only routes
 // @desc    Get all users
 // @route   GET /api/v1/users
 // @access  Private/Admin
 router.get("/", protect, adminOnly, userController.getUsersList);
-
-// @desc    Get user statistics
-// @route   GET /api/v1/users/stats
-// @access  Private/Admin
-router.get("/stats", protect, adminOnly, userController.getUserStats);
 
 // @desc    Get user by ID
 // @route   GET /api/v1/users/:id
@@ -88,10 +87,5 @@ router.post(
 // @route   DELETE /api/v1/users/:id
 // @access  Private/Admin
 router.delete("/:id", protect, adminOnly, userController.deleteUser);
-
-// @desc    Search users
-// @route   GET /api/v1/users/search
-// @access  Private/Admin
-router.get("/search", protect, adminOnly, userController.searchUsers);
 
 module.exports = router;

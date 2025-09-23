@@ -1,4 +1,4 @@
-// app.js - Simplified version that works with your database.js
+// app.js - Fixed version with better environment variable handling
 const express = require("express");
 const cors = require("cors");
 const compression = require("compression");
@@ -20,9 +20,10 @@ app.use(compression());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// CORS configuration
+// CORS configuration - Handle undefined CORS_ORIGIN
+const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:3000";
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim()),
+  origin: corsOrigin.split(",").map((origin) => origin.trim()),
   credentials: true,
   optionsSuccessStatus: 200,
 };
@@ -52,20 +53,20 @@ app.get("/health", (req, res) => {
   res.json({
     status: "OK",
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
+    environment: process.env.NODE_ENV || "development",
     version: "1.0.0",
   });
 });
 
 // API routes
-app.use(`/api/${process.env.API_VERSION}`, routes);
+app.use(`/api/${process.env.API_VERSION || "v1"}`, routes);
 
 // Root endpoint
 app.get("/", (req, res) => {
   res.json({
     message: "ArcGIS StoryMaps Competition API",
     version: "1.0.0",
-    environment: process.env.NODE_ENV,
+    environment: process.env.NODE_ENV || "development",
     timestamp: new Date().toISOString(),
   });
 });
@@ -83,7 +84,7 @@ const startServer = async () => {
     const port = process.env.PORT || 5000;
     app.listen(port, () => {
       console.log(`🚀 Server running on port ${port}`);
-      console.log(`📍 Environment: ${process.env.NODE_ENV}`);
+      console.log(`📍 Environment: ${process.env.NODE_ENV || "development"}`);
       console.log(`🌐 API Base URL: http://localhost:${port}/api/v1`);
     });
   } catch (error) {
