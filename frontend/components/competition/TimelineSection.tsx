@@ -6,71 +6,46 @@ export const TimelineSection = () => {
       id: "registration",
       title: "Registration Open",
       date: "January 2025",
-      description: "Competition launches, registration begins",
       status: "completed",
       icon: CheckCircle,
-      details: [
-        "Competition officially launched",
-        "Registration portal opened",
-        "Guidelines published",
-        "Community platform activated",
-      ],
+      color: "from-green-50 to-green-100",
+      iconColor: "text-green-600",
     },
     {
       id: "submissions",
       title: "Submissions Open",
       date: "February 2025",
-      description: "Story creation and submission period",
       status: "current",
       icon: Clock,
-      details: [
-        "Create ArcGIS StoryMaps",
-        "Upload story content",
-        "Add interactive elements",
-        "Submit for review",
-      ],
+      color: "from-orange-50 to-orange-100",
+      iconColor: "text-orange-600",
     },
     {
       id: "deadline",
       title: "Submission Deadline",
       date: "March 31, 2025",
-      description: "Final submissions must be completed",
       status: "upcoming",
       icon: Calendar,
-      details: [
-        "All submissions finalized",
-        "No new entries accepted",
-        "Technical review begins",
-        "Community voting opens",
-      ],
+      color: "from-blue-50 to-blue-100",
+      iconColor: "text-blue-600",
     },
     {
       id: "judging",
       title: "Judging Period",
       date: "April 2025",
-      description: "Expert panel review and community voting",
       status: "upcoming",
       icon: Clock,
-      details: [
-        "Expert panel evaluation",
-        "Community voting period",
-        "Technical assessment",
-        "Final scoring compilation",
-      ],
+      color: "from-purple-50 to-purple-100",
+      iconColor: "text-purple-600",
     },
     {
       id: "results",
       title: "Winners Announced",
       date: "May 2025",
-      description: "Results announcement and awards ceremony",
       status: "upcoming",
       icon: Trophy,
-      details: [
-        "Winners announcement",
-        "Awards ceremony",
-        "Prize distribution",
-        "Success stories featured",
-      ],
+      color: "from-amber-50 to-amber-100",
+      iconColor: "text-amber-600",
     },
   ];
 
@@ -81,9 +56,9 @@ export const TimelineSection = () => {
       case "current":
         return "bg-ceylon-orange text-white";
       case "upcoming":
-        return "bg-gray-200 text-gray-600";
+        return "bg-gray-300 text-gray-700";
       default:
-        return "bg-gray-200 text-gray-600";
+        return "bg-gray-300 text-gray-700";
     }
   };
 
@@ -110,7 +85,7 @@ export const TimelineSection = () => {
         <div className="hidden md:block">
           <div className="relative">
             {/* Progress Line */}
-            <div className="absolute top-6 left-0 w-full h-1 bg-gray-200 rounded-full">
+            <div className="absolute top-16 left-0 w-full h-1 bg-gray-200 rounded-full">
               <div
                 className="h-full bg-ceylon-orange rounded-full transition-all duration-1000"
                 style={{ width: getProgressWidth() }}
@@ -126,28 +101,25 @@ export const TimelineSection = () => {
                 >
                   {/* Timeline Point */}
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center ${getPhaseColor(phase.status)} shadow-lg mb-4 z-10 relative`}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center ${getPhaseColor(phase.status)} shadow-lg mb-6 z-10 relative border-2 border-white`}
                   >
                     <phase.icon className="w-5 h-5" />
                   </div>
 
                   {/* Phase Card */}
-                  <div className="bg-white rounded-lg p-6 shadow-competition hover:shadow-hover transition-all duration-300 text-center">
+                  <div className="bg-white rounded-xl p-6 shadow-competition hover:shadow-hover transition-all duration-300 text-center group cursor-pointer transform hover:scale-105 w-full">
+                    <div
+                      className={`w-16 h-16 bg-gradient-to-br ${phase.color} rounded-full flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300`}
+                    >
+                      <phase.icon className={`w-8 h-8 ${phase.iconColor}`} />
+                    </div>
+
                     <div className="text-sm font-medium text-ceylon-orange mb-2">
                       {phase.date}
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <h3 className="text-lg font-medium text-gray-900">
                       {phase.title}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      {phase.description}
-                    </p>
-
-                    {phase.status === "current" && (
-                      <div className="text-xs text-ceylon-orange font-medium">
-                        Current Phase
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
@@ -156,48 +128,33 @@ export const TimelineSection = () => {
         </div>
 
         {/* Mobile Timeline */}
-        <div className="md:hidden space-y-6">
+        <div className="md:hidden space-y-8">
           {timelinePhases.map((phase, index) => (
-            <div key={phase.id} className="flex gap-4">
+            <div key={phase.id} className="flex gap-4 items-start">
               <div className="flex flex-col items-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center ${getPhaseColor(phase.status)} shadow-lg`}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center ${getPhaseColor(phase.status)} shadow-lg border-2 border-white`}
                 >
                   <phase.icon className="w-4 h-4" />
                 </div>
                 {index < timelinePhases.length - 1 && (
-                  <div className="w-0.5 h-16 bg-gray-200 mt-4"></div>
+                  <div className="w-0.5 h-20 bg-gray-200 mt-4"></div>
                 )}
               </div>
 
-              <div className="bg-white rounded-lg p-6 shadow-competition flex-1">
-                <div className="text-sm font-medium text-ceylon-orange mb-1">
+              <div className="bg-white rounded-xl p-6 shadow-competition flex-1 text-center group cursor-pointer transform hover:scale-105 transition-all duration-300">
+                <div
+                  className={`w-12 h-12 bg-gradient-to-br ${phase.color} rounded-full flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform duration-300`}
+                >
+                  <phase.icon className={`w-6 h-6 ${phase.iconColor}`} />
+                </div>
+
+                <div className="text-xs font-medium text-ceylon-orange mb-1">
                   {phase.date}
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <h3 className="text-base font-medium text-gray-900">
                   {phase.title}
                 </h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  {phase.description}
-                </p>
-
-                <ul className="space-y-1">
-                  {phase.details.map((detail, idx) => (
-                    <li
-                      key={idx}
-                      className="flex items-center gap-2 text-xs text-gray-500"
-                    >
-                      <div className="w-1 h-1 bg-ceylon-orange rounded-full flex-shrink-0"></div>
-                      {detail}
-                    </li>
-                  ))}
-                </ul>
-
-                {phase.status === "current" && (
-                  <div className="text-xs text-ceylon-orange font-medium mt-3">
-                    Current Phase
-                  </div>
-                )}
               </div>
             </div>
           ))}

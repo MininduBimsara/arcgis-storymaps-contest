@@ -1,4 +1,6 @@
+// ResourcesSection.tsx
 import { Clock, ExternalLink, Award, ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 export default function ResourcesSection() {
   return (
@@ -26,6 +28,7 @@ export default function ResourcesSection() {
                 "Complete rules, judging criteria, and submission requirements",
               icon: ExternalLink,
               color: "ceylon-orange",
+              image: "/guidelines.jpg",
             },
             {
               title: "StoryMaps Tutorial",
@@ -33,6 +36,7 @@ export default function ResourcesSection() {
                 "Step-by-step guide to creating interactive ArcGIS StoryMaps",
               icon: ExternalLink,
               color: "ceylon-green",
+              image: "/tutorial.jpg",
             },
             {
               title: "Example Stories",
@@ -40,26 +44,35 @@ export default function ResourcesSection() {
                 "Inspiring examples from previous competitions and winners",
               icon: Award,
               color: "ceylon-gold",
+              image: "/examples.jpg",
             },
           ].map((resource, index) => (
             <button
               key={index}
-              className={`group bg-white border border-gray-200 hover:border-${resource.color}/20 rounded-xl p-6 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
+              className={`group bg-white border border-gray-200 hover:border-${resource.color}/30 rounded-xl overflow-hidden text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
             >
-              <div
-                className={`flex items-center justify-center w-12 h-12 bg-${resource.color}/10 rounded-lg mb-4 group-hover:bg-${resource.color}/20 transition-colors duration-300`}
-              >
-                <resource.icon className={`w-6 h-6 text-${resource.color}`} />
+              <div className="relative h-32 bg-gray-200">
+                <Image
+                  src={resource.image}
+                  alt={resource.title}
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2">
+                  <resource.icon className={`w-4 h-4 text-${resource.color}`} />
+                </div>
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-ceylon-orange transition-colors duration-300">
-                {resource.title}
-              </h4>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                {resource.description}
-              </p>
-              <div className="flex items-center gap-2 mt-4 text-sm font-medium text-gray-500 group-hover:text-ceylon-orange transition-colors duration-300">
-                <span>Learn More</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+              <div className="p-5">
+                <h4 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-ceylon-orange transition-colors duration-300">
+                  {resource.title}
+                </h4>
+                <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                  {resource.description}
+                </p>
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-500 group-hover:text-ceylon-orange transition-colors duration-300">
+                  <span>Learn More</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                </div>
               </div>
             </button>
           ))}

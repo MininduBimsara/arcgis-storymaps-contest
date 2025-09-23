@@ -1,3 +1,4 @@
+// Overview.tsx
 import Link from "next/link";
 import {
   Trophy,
@@ -7,6 +8,7 @@ import {
   ExternalLink,
   Target,
 } from "lucide-react";
+import Image from "next/image";
 
 export default function OverviewSection() {
   return (
@@ -28,130 +30,149 @@ export default function OverviewSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {/* Prize Pool Card */}
-          <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-ceylon-gold/20 hover:-translate-y-2">
-            <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-ceylon-gold to-ceylon-gold-light rounded-2xl mx-auto mb-8 shadow-lg">
-              <Trophy className="w-10 h-10 text-white" />
-            </div>
-            <h3 className="text-3xl font-bold text-gray-900 mb-4 text-center">
-              ₹2.5 Million
-            </h3>
-            <p className="text-gray-600 mb-6 text-center font-medium">
-              Total prize pool distributed across all categories and winners
-            </p>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <span className="text-sm font-medium text-gray-700">
-                  Grand Prize
-                </span>
-                <span className="text-sm font-bold text-ceylon-gold">
-                  ₹500,000
-                </span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <span className="text-sm font-medium text-gray-700">
-                  Category Winners
-                </span>
-                <span className="text-sm font-bold text-ceylon-orange">
-                  ₹200,000 each
-                </span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <span className="text-sm font-medium text-gray-700">
-                  People's Choice
-                </span>
-                <span className="text-sm font-bold text-ceylon-green">
-                  ₹100,000
-                </span>
+          {/* Prize Pool Card with Image */}
+          <div className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-ceylon-gold/20 hover:-translate-y-2">
+            <div className="relative h-48 bg-gradient-to-br from-ceylon-gold to-ceylon-gold-light">
+              <Image
+                src="/prizes.jpg"
+                alt="Competition prizes"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-black/20"></div>
+              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2">
+                <Trophy className="w-6 h-6 text-ceylon-gold" />
               </div>
             </div>
-          </div>
-
-          {/* Categories Card */}
-          <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-ceylon-orange/20 hover:-translate-y-2">
-            <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-ceylon-orange to-ceylon-orange-light rounded-2xl mx-auto mb-8 shadow-lg">
-              <MapPin className="w-10 h-10 text-white" />
-            </div>
-            <h3 className="text-3xl font-bold text-gray-900 mb-4 text-center">
-              6 Categories
-            </h3>
-            <p className="text-gray-600 mb-6 text-center font-medium">
-              Diverse storytelling categories to showcase every aspect of Sri
-              Lanka
-            </p>
-            <div className="grid grid-cols-1 gap-2">
-              {[
-                "Cultural Heritage",
-                "Adventure Tourism",
-                "Wildlife & Nature",
-                "Local Experiences",
-                "Coastal Stories",
-                "Hidden Gems",
-              ].map((category, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <div className="w-2 h-2 bg-ceylon-orange rounded-full"></div>
-                  <span className="text-sm font-medium text-gray-700">
-                    {category}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Timeline Card */}
-          <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-ceylon-green/20 hover:-translate-y-2">
-            <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-ceylon-green to-ceylon-green-light rounded-2xl mx-auto mb-8 shadow-lg">
-              <Calendar className="w-10 h-10 text-white" />
-            </div>
-            <h3 className="text-3xl font-bold text-gray-900 mb-4 text-center">
-              Timeline
-            </h3>
-            <p className="text-gray-600 mb-6 text-center font-medium">
-              Important dates and milestones for the competition
-            </p>
-            <div className="space-y-4">
-              {[
-                { phase: "Submissions Open", date: "Now", status: "active" },
-                {
-                  phase: "Registration Deadline",
-                  date: "March 31, 2025",
-                  status: "upcoming",
-                },
-                {
-                  phase: "Judging Period",
-                  date: "April 2025",
-                  status: "future",
-                },
-                {
-                  phase: "Results Announced",
-                  date: "May 2025",
-                  status: "future",
-                },
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-gray-50"
-                >
+            <div className="p-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                LKR 2.5 Million
+              </h3>
+              <p className="text-gray-600 mb-4 text-sm">
+                Total prize pool distributed across winners
+              </p>
+              <div className="space-y-2">
+                {[
+                  { label: "Grand Prize", amount: "LKR 500,000" },
+                  { label: "Category Winners", amount: "LKR 200,000 each" },
+                  { label: "People's Choice", amount: "LKR 100,000" },
+                ].map((item, index) => (
                   <div
-                    className={`w-3 h-3 rounded-full ${
-                      item.status === "active"
-                        ? "bg-ceylon-green"
-                        : item.status === "upcoming"
-                          ? "bg-ceylon-orange"
-                          : "bg-gray-300"
-                    }`}
-                  ></div>
-                  <div className="flex-1">
-                    <div className="text-sm font-semibold text-gray-900">
-                      {item.phase}
-                    </div>
-                    <div className="text-xs text-gray-600">{item.date}</div>
+                    key={index}
+                    className="flex justify-between items-center py-2 border-b border-gray-100"
+                  >
+                    <span className="text-sm font-medium text-gray-700">
+                      {item.label}
+                    </span>
+                    <span className="text-sm font-bold text-ceylon-gold">
+                      {item.amount}
+                    </span>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Categories Card with Image */}
+          <div className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-ceylon-orange/20 hover:-translate-y-2">
+            <div className="relative h-48 bg-gradient-to-br from-ceylon-orange to-ceylon-orange-light">
+              <Image
+                src="/categories.jpg"
+                alt="Story categories"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-black/20"></div>
+              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2">
+                <MapPin className="w-6 h-6 text-ceylon-orange" />
+              </div>
+            </div>
+            <div className="p-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                6 Categories
+              </h3>
+              <p className="text-gray-600 mb-4 text-sm">
+                Diverse storytelling themes for Sri Lankan stories
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  "Cultural Heritage",
+                  "Adventure Tourism",
+                  "Wildlife & Nature",
+                  "Local Experiences",
+                  "Coastal Stories",
+                  "Hidden Gems",
+                ].map((category, index) => (
+                  <div key={index} className="flex items-center gap-2 p-1">
+                    <div className="w-2 h-2 bg-ceylon-orange rounded-full flex-shrink-0"></div>
+                    <span className="text-xs font-medium text-gray-700 truncate">
+                      {category}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Timeline Card with Image */}
+          <div className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-ceylon-green/20 hover:-translate-y-2">
+            <div className="relative h-48 bg-gradient-to-br from-ceylon-green to-ceylon-green-light">
+              <Image
+                src="/timeline.jpg"
+                alt="Competition timeline"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-black/20"></div>
+              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2">
+                <Calendar className="w-6 h-6 text-ceylon-green" />
+              </div>
+            </div>
+            <div className="p-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                Timeline
+              </h3>
+              <p className="text-gray-600 mb-4 text-sm">
+                Important competition dates and milestones
+              </p>
+              <div className="space-y-3">
+                {[
+                  { phase: "Submissions Open", date: "Now", status: "active" },
+                  {
+                    phase: "Registration Deadline",
+                    date: "March 31, 2025",
+                    status: "upcoming",
+                  },
+                  {
+                    phase: "Judging Period",
+                    date: "April 2025",
+                    status: "future",
+                  },
+                  {
+                    phase: "Results Announced",
+                    date: "May 2025",
+                    status: "future",
+                  },
+                ].map((item, index) => (
+                  <div key={index} className="flex items-center gap-3">
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        item.status === "active"
+                          ? "bg-ceylon-green"
+                          : item.status === "upcoming"
+                            ? "bg-ceylon-orange"
+                            : "bg-gray-300"
+                      }`}
+                    ></div>
+                    <div className="flex-1">
+                      <div className="text-sm font-semibold text-gray-900">
+                        {item.phase}
+                      </div>
+                      <div className="text-xs text-gray-600">{item.date}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
