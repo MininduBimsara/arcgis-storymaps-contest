@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Navigation from "@/components/layout/Navigation";
 import StoriesHeroSection from "@/components/stories/StoriesHeroSection";
 import FeaturedStoriesSection from "@/components/stories/FeaturedStories";
 import StoryDetails from "@/components/stories/StoryDetails";
@@ -48,7 +47,6 @@ const StoriesPage = () => {
   // Default stories page view
   return (
     <div className="min-h-screen bg-white">
-      <Navigation isScrolled={isScrolled} />
       <StoriesHeroSection />
       <FeaturedStoriesSection onReadMore={handleReadMore} />
       <Footer />

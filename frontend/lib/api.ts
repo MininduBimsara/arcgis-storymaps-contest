@@ -167,10 +167,39 @@ class ApiService {
 
           switch (status) {
             case 401:
-              // FIXED: Only redirect if not already on auth page
+              // FIXED: Only redirect if on a protected page
               if (typeof window !== "undefined") {
                 const currentPath = window.location.pathname;
-                if (currentPath !== "/auth" && currentPath !== "/Auth") {
+                const publicPages = [
+                  "/",
+                  "/Auth",
+                  "/auth",
+                  "/about",
+                  "/contact",
+                  "/details",
+                  "/stories",
+                  "/verify-email",
+                  "/reset-password",
+                ];
+                const protectedPages = [
+                  "/profile",
+                  "/submissions/create",
+                  "/submissions/my-submissions",
+                ];
+
+                const isPublicPage = publicPages.some(
+                  (page) => currentPath === page || currentPath.startsWith(page)
+                );
+                const isProtectedPage = protectedPages.some((page) =>
+                  currentPath.startsWith(page)
+                );
+
+                // Only redirect if on protected page or not on auth page already
+                if (
+                  isProtectedPage &&
+                  currentPath !== "/auth" &&
+                  currentPath !== "/Auth"
+                ) {
                   window.location.href = "/Auth";
                 }
               }

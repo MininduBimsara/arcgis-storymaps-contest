@@ -29,7 +29,6 @@ const Navigation = () => {
   const navigationItems = [
     { name: "Home", href: "/" },
     { name: "Stories", href: "/stories" },
-    { name: "Competition", href: "/competition" },
     { name: "Contact", href: "/contact" },
   ];
 

@@ -43,16 +43,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const pathname = usePathname();
   const isAuthenticated = !!user;
 
-  // FIXED: Only check auth status if not on auth page and not already checked
+  // FIXED: Only check auth status on protected pages
   useEffect(() => {
     let isMounted = true;
 
-    // Skip auth check on auth pages
-    const isAuthPage = pathname === "/Auth" || pathname === "/auth";
+    // Define public pages that don't need authentication
+    const publicPages = [
+      "/",
+      "/Auth",
+      "/auth",
+      "/about",
+      "/contact",
+      "/details",
+      "/stories",
+      "/verify-email",
+      "/reset-password",
+    ];
+
+    // Define protected pages that require authentication
+    const protectedPages = [
+      "/profile",
+      "/submissions/create",
+      "/submissions/my-submissions",
+      // Add other protected routes here
+    ];
+
+    const isPublicPage = publicPages.some(
+      (page) => pathname === page || pathname.startsWith(page)
+    );
+    const isProtectedPage = protectedPages.some((page) =>
+      pathname.startsWith(page)
+    );
 
     const checkAuthStatus = async () => {
-      // Don't check auth if already authenticated or on auth page
-      if (isAuthPage) {
+      // If it's a public page, don't check auth but still allow checking if user wants to
+      if (isPublicPage && !isProtectedPage) {
+        // Try to get user data silently without redirecting on failure
+        try {
+          const response = await apiService.getCurrentUser();
+          if (isMounted && response.success && response.data?.user) {
+            setUser(response.data.user);
+          }
+        } catch (error) {
+          // Silently fail for public pages - don't redirect
+          if (isMounted) {
+            setUser(null);
+          }
+        }
+
         if (isMounted) {
           setIsLoading(false);
           setAuthChecked(true);
@@ -60,32 +98,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
 
-      // Skip if already checked
-      if (authChecked) {
-        if (isMounted) {
-          setIsLoading(false);
+      // For protected pages, check auth and redirect if needed
+      if (isProtectedPage) {
+        // Skip if already checked
+        if (authChecked) {
+          if (isMounted) {
+            setIsLoading(false);
+          }
+          return;
+        }
+
+        try {
+          const response = await apiService.getCurrentUser();
+
+          if (isMounted && response.success && response.data?.user) {
+            setUser(response.data.user);
+          } else if (isMounted) {
+            setUser(null);
+            // Only redirect to auth for protected pages
+            window.location.href = "/Auth";
+          }
+        } catch (error) {
+          if (isMounted) {
+            console.log("Auth check failed - redirecting to login");
+            setUser(null);
+            window.location.href = "/Auth";
+          }
+        } finally {
+          if (isMounted) {
+            setIsLoading(false);
+            setAuthChecked(true);
+          }
         }
         return;
       }
 
-      try {
-        const response = await apiService.getCurrentUser();
-
-        if (isMounted && response.success && response.data?.user) {
-          setUser(response.data.user);
-        } else if (isMounted) {
-          setUser(null);
-        }
-      } catch (error) {
-        if (isMounted) {
-          console.log("Auth check failed - user not authenticated");
-          setUser(null);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-          setAuthChecked(true);
-        }
+      // For other pages, don't check auth at all
+      if (isMounted) {
+        setIsLoading(false);
+        setAuthChecked(true);
       }
     };
 
