@@ -1,9 +1,9 @@
-// server.js
-const Application = require("./app");
-const logger = require("./utils/logger");
+// server.js - Fixed version
+require("dotenv").config();
+const { startServer } = require("./app");
 
 process.on("uncaughtException", (err) => {
-  logger.error("Uncaught Exception! Shutting down...", {
+  console.error("Uncaught Exception! Shutting down...", {
     error: err.message,
     stack: err.stack,
   });
@@ -11,15 +11,12 @@ process.on("uncaughtException", (err) => {
 });
 
 process.on("unhandledRejection", (err) => {
-  logger.error("Unhandled Rejection! Shutting down...", {
+  console.error("Unhandled Rejection! Shutting down...", {
     error: err.message,
     stack: err.stack,
   });
   process.exit(1);
 });
 
-// Create and start application
-const app = new Application();
-app.start();
-
-module.exports = app;
+// Start the server
+startServer();
