@@ -7,6 +7,7 @@ import React, {
   useState,
   ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 import apiService, { User } from "@/lib/api";
 
 interface AuthContextType {
@@ -39,13 +40,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
 
+  const pathname = usePathname();
   const isAuthenticated = !!user;
 
-  // Check if user is logged in on mount
+  // FIXED: Only check auth status if not on auth page and not already checked
   useEffect(() => {
     let isMounted = true;
 
+    // Skip auth check on auth pages
+    const isAuthPage = pathname === "/Auth" || pathname === "/auth";
+
     const checkAuthStatus = async () => {
+      // Don't check auth if already authenticated or on auth page
+      if (isAuthPage) {
+        if (isMounted) {
+          setIsLoading(false);
+          setAuthChecked(true);
+        }
+        return;
+      }
+
+      // Skip if already checked
+      if (authChecked) {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+        return;
+      }
+
       try {
         const response = await apiService.getCurrentUser();
 
@@ -56,6 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       } catch (error) {
         if (isMounted) {
+          console.log("Auth check failed - user not authenticated");
           setUser(null);
         }
       } finally {
@@ -71,7 +94,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [pathname, authChecked]); // Add pathname and authChecked as dependencies
 
   const login = async (email: string, password: string) => {
     try {
@@ -80,6 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (response.success && response.data?.user) {
         setUser(response.data.user);
+        setAuthChecked(true);
       } else {
         throw new Error(response.error || "Login failed");
       }
@@ -98,6 +122,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (response.success && response.data?.user) {
         setUser(response.data.user);
+        setAuthChecked(true);
       } else {
         throw new Error(response.error || "Registration failed");
       }
@@ -117,6 +142,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error("Logout error:", error);
     } finally {
       setUser(null);
+      setAuthChecked(false); // Reset auth check on logout
       setIsLoading(false);
     }
   };

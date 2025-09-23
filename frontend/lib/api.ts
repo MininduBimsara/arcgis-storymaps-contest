@@ -1,4 +1,4 @@
-// lib/api.ts
+// lib/api.ts - FIXED VERSION
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 // Types
@@ -155,7 +155,7 @@ class ApiService {
       }
     );
 
-    // Response interceptor
+    // Response interceptor - FIXED
     this.api.interceptors.response.use(
       (response: AxiosResponse) => {
         return response.data;
@@ -167,9 +167,12 @@ class ApiService {
 
           switch (status) {
             case 401:
-              // Unauthorized - redirect to login
+              // FIXED: Only redirect if not already on auth page
               if (typeof window !== "undefined") {
-                window.location.href = "/auth";
+                const currentPath = window.location.pathname;
+                if (currentPath !== "/auth" && currentPath !== "/Auth") {
+                  window.location.href = "/Auth";
+                }
               }
               break;
             case 403:

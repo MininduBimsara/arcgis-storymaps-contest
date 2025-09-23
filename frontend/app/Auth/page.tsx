@@ -52,17 +52,19 @@ const CeylonStoriesAuth = () => {
     city: "",
   });
 
+  // FIXED: Better redirect logic
   useEffect(() => {
     // Clear any existing timers
     if (redirectTimerRef.current) {
       clearTimeout(redirectTimerRef.current);
     }
 
-    // Only redirect if not loading and authenticated
+    // Only redirect if authenticated and not currently loading
+    // Also add a small delay to prevent rapid redirects
     if (isAuthenticated && !isLoading) {
       redirectTimerRef.current = setTimeout(() => {
         router.replace("/");
-      }, 100);
+      }, 500); // Increased delay to 500ms
     }
 
     return () => {
@@ -233,8 +235,9 @@ const CeylonStoriesAuth = () => {
     }
   };
 
-  // If still loading authentication status, show loading spinner
-  if (isLoading) {
+  // FIXED: Show loading during auth check on protected pages only
+  // If on auth page, don't show loading screen
+  if (isLoading && isAuthenticated === null) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center">
@@ -245,14 +248,14 @@ const CeylonStoriesAuth = () => {
     );
   }
 
-  // If user is already authenticated, show brief message before redirect
-  if (isAuthenticated) {
+  // Show redirect message only briefly
+  if (isAuthenticated && !isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center">
           <CheckCircle className="w-12 h-12 text-green-500 mb-4" />
           <p className="text-gray-600">
-            You are already logged in. Redirecting...
+            Welcome back! Redirecting to dashboard...
           </p>
         </div>
       </div>
