@@ -1,446 +1,241 @@
 "use client";
 
-import {
-  Search,
-  User,
-  Menu,
-  X,
-  LogOut,
-  Settings,
-  PlusCircle,
-} from "lucide-react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { Menu, X, MapPin, User, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
-interface NavigationProps {
-  isScrolled?: boolean;
-}
-
-const Navigation = ({ isScrolled: propIsScrolled }: NavigationProps) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const pathname = usePathname();
+const Navigation = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const { user, isLoading, isAuthenticated, logout } = useAuth();
   const router = useRouter();
-  const { user, isAuthenticated, logout, isLoading } = useAuth();
+  const pathname = usePathname();
 
-  // Use prop if provided, otherwise detect scroll
-  const scrollState =
-    propIsScrolled !== undefined ? propIsScrolled : isScrolled;
-
-  const navItems = [
-    { href: "/", label: "Home" },
-    { href: "/stories", label: "Stories" },
-    { href: "/details", label: "Competition" },
-    { href: "/contact", label: "Contact" },
-  ];
-
-  // Handle scroll detection for navbar
-  useEffect(() => {
-    if (propIsScrolled === undefined) {
-      const handleScroll = () => {
-        const scrollTop = window.scrollY;
-        setIsScrolled(scrollTop > 100);
-      };
-
-      window.addEventListener("scroll", handleScroll);
-      return () => window.removeEventListener("scroll", handleScroll);
-    }
-  }, [propIsScrolled]);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest(".user-dropdown")) {
-        setShowUserDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
-
-  const isActivePage = (href: string) => {
-    if (href === "/") {
-      return pathname === "/";
-    }
-    return pathname.startsWith(href);
-  };
+  // Don't redirect from Navigation component - let individual pages handle this
+  // This was likely causing the redirect loop
 
   const handleLogout = async () => {
     try {
       await logout();
-      setShowUserDropdown(false);
+      setIsProfileDropdownOpen(false);
       router.push("/");
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
 
-  const getUserInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
+  const navigationItems = [
+    { name: "Home", href: "/" },
+    { name: "Stories", href: "/stories" },
+    { name: "Competition", href: "/competition" },
+    { name: "Contact", href: "/contact" },
+  ];
 
   return (
-    <>
-      <nav className="fixed top-5 left-1/2 -translate-x-1/2 w-[95%] max-w-4xl z-50 transition-all duration-300">
-        <div
-          className={`glass-panel px-8 py-4 rounded-2xl backdrop-blur-lg border shadow-lg transition-all duration-300 ${
-            scrollState
-              ? "bg-white/95 border-gray-200/50"
-              : "bg-white/10 border-white/20"
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            {/* Logo */}
+    <nav className="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          {/* Logo and Brand */}
+          <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-sm">CS</span>
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
+                <MapPin className="h-6 w-6 text-white" />
               </div>
-              <span
-                className={`font-semibold text-lg transition-colors duration-300 ${
-                  scrollState ? "text-gray-900" : "text-white"
-                }`}
-              >
+              <span className="font-bold text-xl text-gray-900">
                 Ceylon Stories
               </span>
             </Link>
+          </div>
 
-            {/* Desktop Navigation Links */}
-            <ul className="hidden md:flex items-center space-x-8">
-              {navItems.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={`relative font-medium transition-colors duration-300 group ${
-                      isActivePage(item.href)
-                        ? scrollState
-                          ? "text-orange-600"
-                          : "text-orange-300"
-                        : scrollState
-                          ? "text-gray-900 hover:text-orange-600"
-                          : "text-white/90 hover:text-orange-300"
-                    }`}
-                  >
-                    {item.label}
-                    <span
-                      className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-300 ${
-                        isActivePage(item.href)
-                          ? "w-full bg-orange-500"
-                          : "w-0 group-hover:w-full bg-orange-500"
-                      }`}
-                    />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
-            {/* Right side actions */}
-            <div className="flex items-center space-x-4">
-              <button
-                className={`glass-button p-2 rounded-lg transition-all duration-300 ${
-                  scrollState
-                    ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
-                    : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            {navigationItems.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`text-sm font-medium transition-colors hover:text-blue-600 ${
+                  pathname === item.href
+                    ? "text-blue-600 border-b-2 border-blue-600"
+                    : "text-gray-700"
                 }`}
               >
-                <Search className="w-5 h-5" />
-              </button>
+                {item.name}
+              </Link>
+            ))}
+          </div>
 
-              {/* User Authentication Section */}
-              <div className="hidden md:flex items-center space-x-2">
-                {isLoading ? (
-                  <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
-                ) : isAuthenticated && user ? (
-                  // Authenticated User Dropdown
-                  <div className="relative user-dropdown">
-                    <button
-                      onClick={() => setShowUserDropdown(!showUserDropdown)}
-                      className={`flex items-center space-x-2 glass-button p-2 rounded-lg transition-all duration-300 ${
-                        scrollState
-                          ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
-                          : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
-                      }`}
-                    >
-                      {user.profileImage ? (
-                        <img
-                          src={user.profileImage}
-                          alt={user.username}
-                          className="w-6 h-6 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
-                          <span className="text-white text-xs font-semibold">
-                            {getUserInitials(user.username)}
-                          </span>
-                        </div>
-                      )}
-                      <span className="text-sm font-medium hidden lg:block">
-                        {user.username}
-                      </span>
-                    </button>
-
-                    {/* Dropdown Menu */}
-                    {showUserDropdown && (
-                      <div
-                        className={`absolute right-0 mt-2 w-64 rounded-lg shadow-lg z-50 border ${
-                          scrollState
-                            ? "bg-white border-gray-200"
-                            : "bg-white/95 backdrop-blur-lg border-white/20"
-                        }`}
-                      >
-                        {/* User Info */}
-                        <div className="px-4 py-3 border-b border-gray-100">
-                          <p className="text-sm font-medium text-gray-900">
-                            {user.username}
-                          </p>
-                          <p className="text-xs text-gray-500">{user.email}</p>
-                          {user.role === "admin" && (
-                            <span className="inline-block mt-1 px-2 py-0.5 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
-                              Admin
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Menu Items */}
-                        <div className="py-2">
-                          <Link
-                            href="/submissions/create"
-                            onClick={() => setShowUserDropdown(false)}
-                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                          >
-                            <PlusCircle className="w-4 h-4 mr-3" />
-                            Submit Story
-                          </Link>
-                          <Link
-                            href="/submissions"
-                            onClick={() => setShowUserDropdown(false)}
-                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                          >
-                            <User className="w-4 h-4 mr-3" />
-                            My Submissions
-                          </Link>
-                          <Link
-                            href="/profile"
-                            onClick={() => setShowUserDropdown(false)}
-                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                          >
-                            <Settings className="w-4 h-4 mr-3" />
-                            Profile Settings
-                          </Link>
-                        </div>
-
-                        {/* Logout */}
-                        <div className="border-t border-gray-100">
-                          <button
-                            onClick={handleLogout}
-                            className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                          >
-                            <LogOut className="w-4 h-4 mr-3" />
-                            Sign Out
-                          </button>
-                        </div>
-                      </div>
-                    )}
+          {/* User Actions */}
+          <div className="hidden md:flex items-center space-x-4">
+            {isLoading ? (
+              <div className="animate-pulse">
+                <div className="h-8 w-20 bg-gray-200 rounded"></div>
+              </div>
+            ) : isAuthenticated && user ? (
+              <div className="relative">
+                <button
+                  onClick={() =>
+                    setIsProfileDropdownOpen(!isProfileDropdownOpen)
+                  }
+                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
                   </div>
-                ) : (
-                  // Not Authenticated - Sign In Button
-                  <div className="flex items-center space-x-3">
-                    <span
-                      className={`text-sm transition-colors duration-300 ${
-                        scrollState ? "text-gray-600" : "text-white/70"
-                      }`}
+                  <span className="font-medium">{user.username}</span>
+                </button>
+
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                    <Link
+                      href="/profile"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsProfileDropdownOpen(false)}
                     >
-                      Sign in
-                    </span>
+                      <Settings className="w-4 h-4 mr-2" />
+                      Profile Settings
+                    </Link>
+                    <Link
+                      href="/submissions"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsProfileDropdownOpen(false)}
+                    >
+                      <MapPin className="w-4 h-4 mr-2" />
+                      My Submissions
+                    </Link>
+                    <hr className="my-1" />
                     <button
-                      onClick={() => router.push("/auth")}
-                      className={`glass-button p-2 rounded-lg transition-all duration-300 ${
-                        scrollState
-                          ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
-                          : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
-                      }`}
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                     >
-                      <User className="w-5 h-5" />
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
                     </button>
                   </div>
                 )}
               </div>
+            ) : (
+              <div className="flex items-center space-x-3">
+                <Link
+                  href="/auth"
+                  className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/auth"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium"
+                >
+                  Get Started
+                </Link>
+              </div>
+            )}
+          </div>
 
-              {/* Mobile Menu Button */}
-              <button
-                className={`md:hidden glass-button p-2 rounded-lg transition-all duration-300 ${
-                  scrollState
-                    ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
-                    : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
-                }`}
-                onClick={toggleMobileMenu}
-              >
-                {isMobileMenuOpen ? (
-                  <X className="w-5 h-5" />
-                ) : (
-                  <Menu className="w-5 h-5" />
-                )}
-              </button>
-            </div>
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <>
-            {/* Mobile Menu Backdrop */}
-            <div
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-10 md:hidden"
-              onClick={closeMobileMenu}
-            />
+        {/* Mobile Navigation Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 border-t border-gray-200">
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                    pathname === item.href
+                      ? "text-blue-600 bg-blue-50"
+                      : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              ))}
 
-            {/* Mobile Menu Content */}
-            <div
-              className={`relative md:hidden mt-2 glass-panel rounded-2xl backdrop-blur-lg border shadow-lg p-6 animate-slide-down z-20 ${
-                scrollState
-                  ? "bg-white/95 border-gray-200/50"
-                  : "bg-white/10 border-white/20"
-              }`}
-            >
-              {/* Navigation Links */}
-              <ul className="space-y-4">
-                {navItems.map((item) => (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      onClick={closeMobileMenu}
-                      className={`block text-lg font-medium py-3 border-b transition-colors ${
-                        isActivePage(item.href)
-                          ? scrollState
-                            ? "text-orange-600 border-gray-200"
-                            : "text-orange-300 border-white/10"
-                          : scrollState
-                            ? "text-gray-900 hover:text-orange-600 border-gray-200"
-                            : "text-white/90 hover:text-orange-300 border-white/10"
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <hr className="my-3" />
 
-              {/* Mobile User Section */}
-              <div className="mt-6 pt-4 border-t border-white/10">
-                {isLoading ? (
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
-                    <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
+              {isLoading ? (
+                <div className="px-3 py-2">
+                  <div className="animate-pulse h-6 w-24 bg-gray-200 rounded"></div>
+                </div>
+              ) : isAuthenticated && user ? (
+                <div className="space-y-1">
+                  <div className="px-3 py-2 text-sm text-gray-500">
+                    Signed in as {user.username}
                   </div>
-                ) : isAuthenticated && user ? (
-                  <div className="space-y-3">
-                    {/* User Info */}
-                    <div className="flex items-center space-x-3 pb-3 border-b border-white/10">
-                      {user.profileImage ? (
-                        <img
-                          src={user.profileImage}
-                          alt={user.username}
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
-                          <span className="text-white text-sm font-semibold">
-                            {getUserInitials(user.username)}
-                          </span>
-                        </div>
-                      )}
-                      <div>
-                        <p
-                          className={`font-medium ${scrollState ? "text-gray-900" : "text-white"}`}
-                        >
-                          {user.username}
-                        </p>
-                        <p
-                          className={`text-xs ${scrollState ? "text-gray-500" : "text-white/70"}`}
-                        >
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Mobile Menu Actions */}
-                    <div className="space-y-2">
-                      <Link
-                        href="/submissions/create"
-                        onClick={closeMobileMenu}
-                        className={`flex items-center space-x-3 glass-button px-4 py-2 rounded-lg transition-all duration-300 ${
-                          scrollState
-                            ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
-                            : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
-                        }`}
-                      >
-                        <PlusCircle className="w-4 h-4" />
-                        <span className="text-sm">Submit Story</span>
-                      </Link>
-                      <Link
-                        href="/submissions"
-                        onClick={closeMobileMenu}
-                        className={`flex items-center space-x-3 glass-button px-4 py-2 rounded-lg transition-all duration-300 ${
-                          scrollState
-                            ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
-                            : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
-                        }`}
-                      >
-                        <User className="w-4 h-4" />
-                        <span className="text-sm">My Submissions</span>
-                      </Link>
-                      <button
-                        onClick={() => {
-                          handleLogout();
-                          closeMobileMenu();
-                        }}
-                        className="flex items-center space-x-3 w-full glass-button px-4 py-2 rounded-lg transition-all duration-300 text-red-600 bg-red-50 hover:bg-red-100"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span className="text-sm">Sign Out</span>
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  // Not Authenticated Mobile
+                  <Link
+                    href="/profile"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Profile Settings
+                  </Link>
+                  <Link
+                    href="/submissions"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    My Submissions
+                  </Link>
                   <button
                     onClick={() => {
-                      router.push("/auth");
-                      closeMobileMenu();
+                      handleLogout();
+                      setIsMenuOpen(false);
                     }}
-                    className={`flex items-center space-x-2 glass-button px-4 py-2 rounded-lg transition-all duration-300 ${
-                      scrollState
-                        ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
-                        : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
-                    }`}
+                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-gray-50"
                   >
-                    <User className="w-4 h-4" />
-                    <span className="text-sm">Sign in</span>
+                    Sign Out
                   </button>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  <Link
+                    href="/auth"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/auth"
+                    className="block px-3 py-2 rounded-md text-base font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Get Started
+                  </Link>
+                </div>
+              )}
             </div>
-          </>
+          </div>
         )}
-      </nav>
-    </>
+      </div>
+
+      {/* Click outside to close dropdowns */}
+      {(isProfileDropdownOpen || isMenuOpen) && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => {
+            setIsProfileDropdownOpen(false);
+            setIsMenuOpen(false);
+          }}
+        />
+      )}
+    </nav>
   );
 };
 

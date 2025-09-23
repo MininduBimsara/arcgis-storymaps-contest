@@ -1,4 +1,3 @@
-// contexts/AuthContext.tsx
 "use client";
 
 import React, {
@@ -38,28 +37,41 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
 
   const isAuthenticated = !!user;
 
   // Check if user is logged in on mount
   useEffect(() => {
-    checkAuthStatus();
-  }, []);
+    let isMounted = true;
 
-  const checkAuthStatus = async () => {
-    try {
-      setIsLoading(true);
-      const response = await apiService.getCurrentUser();
-      if (response.success && response.data?.user) {
-        setUser(response.data.user);
+    const checkAuthStatus = async () => {
+      try {
+        const response = await apiService.getCurrentUser();
+
+        if (isMounted && response.success && response.data?.user) {
+          setUser(response.data.user);
+        } else if (isMounted) {
+          setUser(null);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setUser(null);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+          setAuthChecked(true);
+        }
       }
-    } catch (error) {
-      // User is not authenticated
-      setUser(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
+
+    checkAuthStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const login = async (email: string, password: string) => {
     try {
@@ -102,7 +114,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       await apiService.logout();
     } catch (error) {
-      // Even if logout fails on server, clear local state
       console.error("Logout error:", error);
     } finally {
       setUser(null);

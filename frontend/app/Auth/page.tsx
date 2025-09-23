@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   Eye,
   EyeOff,
@@ -12,7 +13,6 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
 
 interface FormData {
   email: string;
@@ -40,6 +40,7 @@ const CeylonStoriesAuth = () => {
 
   const { login, register, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const redirectTimerRef = useRef<NodeJS.Timeout>();
 
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -51,11 +52,24 @@ const CeylonStoriesAuth = () => {
     city: "",
   });
 
-  // Redirect if already authenticated
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.push("/");
+    // Clear any existing timers
+    if (redirectTimerRef.current) {
+      clearTimeout(redirectTimerRef.current);
     }
+
+    // Only redirect if not loading and authenticated
+    if (isAuthenticated && !isLoading) {
+      redirectTimerRef.current = setTimeout(() => {
+        router.replace("/");
+      }, 100);
+    }
+
+    return () => {
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+    };
   }, [isAuthenticated, isLoading, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -127,7 +141,7 @@ const CeylonStoriesAuth = () => {
     try {
       if (isLogin) {
         await login(formData.email, formData.password);
-        // Redirect will be handled by useEffect when isAuthenticated changes
+        // The redirect will be handled by the useEffect
       } else {
         const registerData = {
           username: formData.username,
@@ -142,6 +156,16 @@ const CeylonStoriesAuth = () => {
         setSuccessMessage(
           "Registration successful! Please check your email to verify your account."
         );
+        // Reset form after successful registration
+        setFormData({
+          email: "",
+          password: "",
+          username: "",
+          confirmPassword: "",
+          phone: "",
+          address: "",
+          city: "",
+        });
       }
     } catch (error: any) {
       console.error("Auth error:", error);
@@ -209,13 +233,27 @@ const CeylonStoriesAuth = () => {
     }
   };
 
-  // Show loading spinner while checking authentication
+  // If still loading authentication status, show loading spinner
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
           <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is already authenticated, show brief message before redirect
+  if (isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <CheckCircle className="w-12 h-12 text-green-500 mb-4" />
+          <p className="text-gray-600">
+            You are already logged in. Redirecting...
+          </p>
         </div>
       </div>
     );
