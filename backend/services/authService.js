@@ -1,4 +1,4 @@
-// services/authService.js
+// services/authService.js - FIXED VERSION
 const userRepository = require("../repositories/userRepository");
 const emailService = require("./emailService");
 const jwt = require("jsonwebtoken");
@@ -30,9 +30,15 @@ class AuthService {
     const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${user.emailVerificationToken}`;
     await emailService.sendEmailVerification(user, verificationUrl);
 
+    // Generate token for user
+    const token = user.generateAuthToken();
+
     // Return user without password
     const { password, ...userWithoutPassword } = user.toObject();
-    return userWithoutPassword;
+    return {
+      user: userWithoutPassword,
+      token,
+    };
   }
 
   /**
@@ -60,8 +66,8 @@ class AuthService {
       throw new Error("Invalid email or password");
     }
 
-    // Check if email is verified
-    if (!user.isEmailVerified) {
+    // Check if email is verified - FIXED: Use emailVerified instead of isEmailVerified
+    if (!user.emailVerified) {
       throw new Error("Please verify your email before logging in");
     }
 
@@ -80,7 +86,7 @@ class AuthService {
   }
 
   /**
-   * Verify email
+   * Verify email - FIXED VERSION
    */
   async verifyEmail(token) {
     const user = await userRepository.findByVerificationToken(token);
@@ -88,9 +94,9 @@ class AuthService {
       throw new Error("Invalid or expired verification token");
     }
 
-    // Update user as verified
+    // Update user as verified - FIXED: Use emailVerified instead of isEmailVerified
     const updatedUser = await userRepository.updateById(user._id, {
-      isEmailVerified: true,
+      emailVerified: true, // FIXED: Correct field name
       emailVerificationToken: undefined,
       emailVerificationExpires: undefined,
     });
@@ -130,9 +136,12 @@ class AuthService {
       throw new Error("Invalid or expired reset token");
     }
 
+    // Hash new password before updating
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
     // Update password and clear reset token
     const updatedUser = await userRepository.updateById(user._id, {
-      password: newPassword,
+      password: hashedPassword,
       passwordResetToken: undefined,
       passwordResetExpires: undefined,
       loginAttempts: undefined,
@@ -147,7 +156,8 @@ class AuthService {
    */
   async refreshToken(userId) {
     const user = await userRepository.findById(userId);
-    if (!user || !user.isActive) {
+    if (!user || user.status !== "active") {
+      // FIXED: Check status instead of isActive
       throw new Error("Invalid user");
     }
 
@@ -187,7 +197,8 @@ class AuthService {
       throw new Error("User not found");
     }
 
-    if (user.isEmailVerified) {
+    // FIXED: Check emailVerified instead of isEmailVerified
+    if (user.emailVerified) {
       throw new Error("Email is already verified");
     }
 

@@ -1,5 +1,7 @@
-// services/userService.js
+// services/userService.js - FIXED VERSION
 const userRepository = require("../repositories/userRepository");
+const crypto = require("crypto");
+
 /**
  * User Service - Business Logic Layer
  */
@@ -13,15 +15,8 @@ class UserService {
       throw new Error("User not found");
     }
 
-    // If user is a judge, get judge profile too
-    let judgeProfile = null;
-    if (user.role === "judge") {
-      judgeProfile = await judgeRepository.findByUserId(userId);
-    }
-
     return {
       user,
-      judgeProfile,
     };
   }
 
@@ -30,7 +25,7 @@ class UserService {
    */
   async updateProfile(userId, updateData) {
     // Remove sensitive fields that shouldn't be updated this way
-    const { password, role, isEmailVerified, ...allowedUpdates } = updateData;
+    const { password, role, emailVerified, ...allowedUpdates } = updateData;
 
     // Check if email is being changed
     if (allowedUpdates.email) {
@@ -42,10 +37,9 @@ class UserService {
       }
 
       // If email is changed, require re-verification
-      if (
-        allowedUpdates.email !== (await userRepository.findById(userId)).email
-      ) {
-        allowedUpdates.isEmailVerified = false;
+      const currentUser = await userRepository.findById(userId);
+      if (allowedUpdates.email !== currentUser.email) {
+        allowedUpdates.emailVerified = false; // FIXED: Use emailVerified instead of isEmailVerified
         allowedUpdates.emailVerificationToken = crypto
           .randomBytes(32)
           .toString("hex");
@@ -86,7 +80,7 @@ class UserService {
    */
   async deactivateUser(userId) {
     const updatedUser = await userRepository.updateById(userId, {
-      isActive: false,
+      status: "banned", // FIXED: Use status instead of isActive
     });
     if (!updatedUser) {
       throw new Error("User not found");
@@ -99,7 +93,7 @@ class UserService {
    */
   async activateUser(userId) {
     const updatedUser = await userRepository.updateById(userId, {
-      isActive: true,
+      status: "active", // FIXED: Use status instead of isActive
     });
     if (!updatedUser) {
       throw new Error("User not found");
@@ -111,7 +105,7 @@ class UserService {
    * Change user role (Admin only)
    */
   async changeUserRole(userId, newRole) {
-    const validRoles = ["participant", "judge", "admin"];
+    const validRoles = ["user", "admin"]; // FIXED: Match your actual User model roles
     if (!validRoles.includes(newRole)) {
       throw new Error("Invalid role");
     }
@@ -130,13 +124,12 @@ class UserService {
    * Delete user (Admin only)
    */
   async deleteUser(userId) {
-    // Check if user has submissions
-    const submissionRepository = require("../repositories/submissionRepository");
-    const userSubmissions = await submissionRepository.findByUser(userId, 1, 1);
-
-    if (userSubmissions.total > 0) {
-      throw new Error("Cannot delete user with existing submissions");
-    }
+    // Check if user has submissions (if you have submissions)
+    // const submissionRepository = require("../repositories/submissionRepository");
+    // const userSubmissions = await submissionRepository.findByUser(userId, 1, 1);
+    // if (userSubmissions.total > 0) {
+    //   throw new Error("Cannot delete user with existing submissions");
+    // }
 
     const deletedUser = await userRepository.deleteById(userId);
     if (!deletedUser) {
@@ -153,10 +146,9 @@ class UserService {
     const searchFilters = {
       ...filters,
       $or: [
-        { firstName: { $regex: searchTerm, $options: "i" } },
-        { lastName: { $regex: searchTerm, $options: "i" } },
+        { username: { $regex: searchTerm, $options: "i" } }, // FIXED: Use username instead of firstName/lastName
         { email: { $regex: searchTerm, $options: "i" } },
-        { organization: { $regex: searchTerm, $options: "i" } },
+        { city: { $regex: searchTerm, $options: "i" } },
       ],
     };
 

@@ -31,12 +31,14 @@ const submissionSchema = new mongoose.Schema(
       required: [true, "StoryMap URL is required"],
       validate: {
         validator: function (url) {
-          // Validate ArcGIS StoryMaps URL format
-          const arcgisPattern =
+          // Validate both ArcGIS StoryMaps URL formats
+          const shortUrlPattern = /^https:\/\/arcg\.is\/[a-zA-Z0-9]+$/;
+          const longUrlPattern =
             /^https:\/\/storymaps\.arcgis\.com\/stories\/[a-zA-Z0-9]+$/;
-          return arcgisPattern.test(url);
+          return shortUrlPattern.test(url) || longUrlPattern.test(url);
         },
-        message: "Please provide a valid ArcGIS StoryMaps URL",
+        message:
+          "Please provide a valid ArcGIS StoryMaps URL (short or long format)",
       },
     },
     storyMapId: {
@@ -45,7 +47,8 @@ const submissionSchema = new mongoose.Schema(
       unique: true,
       validate: {
         validator: function (id) {
-          return /^[a-zA-Z0-9]{32}$/.test(id);
+          // Allow both the short ID format (like 0ezGLG0) and long format IDs
+          return /^[a-zA-Z0-9]{6,32}$/.test(id); // More flexible length validation
         },
         message: "Invalid StoryMap ID format",
       },
@@ -264,9 +267,26 @@ submissionSchema.pre("save", function (next) {
 // Pre-save middleware to extract StoryMap ID from URL
 submissionSchema.pre("save", function (next) {
   if (this.isModified("storyMapUrl")) {
-    const urlMatch = this.storyMapUrl.match(/\/stories\/([a-zA-Z0-9]+)$/);
-    if (urlMatch) {
-      this.storyMapId = urlMatch[1];
+    // Handle both short URL format (https://arcg.is/0ezGLG0)
+    // and long format (https://storymaps.arcgis.com/stories/abc123)
+    let storyMapId;
+
+    // Check for short URL format first
+    const shortUrlMatch = this.storyMapUrl.match(
+      /\/\/arcg\.is\/([a-zA-Z0-9]+)$/
+    );
+    if (shortUrlMatch) {
+      storyMapId = shortUrlMatch[1];
+    } else {
+      // Check for long URL format
+      const longUrlMatch = this.storyMapUrl.match(/\/stories\/([a-zA-Z0-9]+)$/);
+      if (longUrlMatch) {
+        storyMapId = longUrlMatch[1];
+      }
+    }
+
+    if (storyMapId) {
+      this.storyMapId = storyMapId;
     }
   }
   next();

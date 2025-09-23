@@ -1,4 +1,4 @@
-// repositories/userRepository.js
+// repositories/userRepository.js - FIXED VERSION
 const User = require("../models/User");
 
 /**
@@ -33,7 +33,7 @@ class UserRepository {
   }
 
   /**
-   * Find user by verification token
+   * Find user by verification token - FIXED
    */
   async findByVerificationToken(token) {
     return await User.findOne({
@@ -50,8 +50,8 @@ class UserRepository {
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
     return await User.findOne({
-      passwordResetToken: hashedToken,
-      passwordResetExpires: { $gt: Date.now() },
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() },
     });
   }
 
@@ -100,7 +100,23 @@ class UserRepository {
    * Get user statistics
    */
   async getStats() {
-    return await User.getUserStats();
+    const [totalUsers, activeUsers, bannedUsers, verifiedUsers, adminUsers] =
+      await Promise.all([
+        User.countDocuments(),
+        User.countDocuments({ status: "active" }),
+        User.countDocuments({ status: "banned" }),
+        User.countDocuments({ emailVerified: true }),
+        User.countDocuments({ role: "admin" }),
+      ]);
+
+    return {
+      total: totalUsers,
+      active: activeUsers,
+      banned: bannedUsers,
+      verified: verifiedUsers,
+      admins: adminUsers,
+      unverified: totalUsers - verifiedUsers,
+    };
   }
 
   /**
@@ -109,28 +125,6 @@ class UserRepository {
   async emailExists(email) {
     const user = await User.findOne({ email: email.toLowerCase() });
     return !!user;
-  }
-
-  /**
-   * Increment submission count
-   */
-  async incrementSubmissionCount(userId) {
-    return await User.findByIdAndUpdate(
-      userId,
-      { $inc: { submissionCount: 1 } },
-      { new: true }
-    );
-  }
-
-  /**
-   * Decrement submission count
-   */
-  async decrementSubmissionCount(userId) {
-    return await User.findByIdAndUpdate(
-      userId,
-      { $inc: { submissionCount: -1 } },
-      { new: true }
-    );
   }
 
   /**
@@ -155,6 +149,7 @@ class UserRepository {
     const lockTime = 2 * 60 * 60 * 1000; // 2 hours
 
     const user = await User.findById(userId);
+    if (!user) return null;
 
     if (user.loginAttempts + 1 >= maxAttempts && !user.isLocked) {
       return await User.findByIdAndUpdate(userId, {
