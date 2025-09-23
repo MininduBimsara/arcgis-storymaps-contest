@@ -1,123 +1,106 @@
-// app.js
+// app.js - Simplified version that works with your database.js
 const express = require("express");
 const cors = require("cors");
 const compression = require("compression");
-
-// Import configurations
-const envConfig = require("./config/env");
 const connectDB = require("./config/database");
 
 // Import middleware
-const {
-  securityMiddleware,
-  sanitizeInput,
-  requestLogger,
-  apiLimiter,
-} = require("./middleware/security");
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
 
 // Import routes
 const routes = require("./routes");
 
-// Import utilities
-const logger = require("./utils/logger");
-
 /**
- * Express application configuration
+ * Express application setup
  */
-class Application {
-  constructor() {
-    this.app = express();
-    this.setupMiddleware();
-    this.setupRoutes();
-    this.setupErrorHandling();
-  }
+const app = express();
 
-  setupMiddleware() {
-    this.app.use(compression());
-    this.app.use(express.json({ limit: "10mb" }));
-    this.app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-    this.app.use(cors(envConfig.corsConfig));
+// Basic middleware
+app.use(compression());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-    this.app.use(securityMiddleware);
-    this.app.use(sanitizeInput);
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim()),
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 
-    if (envConfig.isDevelopment) {
-      this.app.use(requestLogger);
-    }
+// Basic security headers
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  next();
+});
 
-    this.app.use("/api", apiLimiter);
-    this.app.use("/uploads", express.static("uploads"));
-
-    this.app.get("/health", (req, res) => {
-      res.json({
-        status: "OK",
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV,
-        version: process.env.npm_package_version || "1.0.0",
-      });
-    });
-  }
-
-  setupRoutes() {
-    this.app.use(`/api/${process.env.API_VERSION}`, routes);
-
-    this.app.get("/", (req, res) => {
-      res.json({
-        message: "ArcGIS StoryMaps Competition API",
-        version: process.env.npm_package_version || "1.0.0",
-        environment: process.env.NODE_ENV,
-        timestamp: new Date().toISOString(),
-      });
-    });
-  }
-
-  setupErrorHandling() {
-    this.app.use(notFoundHandler);
-    this.app.use(errorHandler);
-  }
-
-  async start() {
-    try {
-      // Connect to database
-      await connectDB();
-
-      // Start server
-      const port = envConfig.port;
-      this.server = this.app.listen(port, () => {
-        logger.info(`🚀 Server running on port ${port}`, {
-          environment: process.env.NODE_ENV,
-          port,
-        });
-      });
-
-      this.setupGracefulShutdown();
-    } catch (error) {
-      logger.error("Failed to start application", { error: error.message });
-      process.exit(1);
-    }
-  }
-
-  setupGracefulShutdown() {
-    const gracefulShutdown = (signal) => {
-      logger.info(`Received ${signal}. Starting graceful shutdown...`);
-
-      this.server.close(() => {
-        logger.info("HTTP server closed");
-        process.exit(0);
-      });
-
-      setTimeout(() => {
-        logger.error(
-          "Could not close connections in time, forcefully shutting down"
-        );
-        process.exit(1);
-      }, 10000);
-    };
-
-    process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
-    process.on("SIGINT", () => gracefulShutdown("SIGINT"));
-  }
+// Request logging in development
+if (process.env.NODE_ENV === "development") {
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`);
+    next();
+  });
 }
 
-module.exports = Application;
+// Serve static files
+app.use("/uploads", express.static("uploads"));
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.json({
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    version: "1.0.0",
+  });
+});
+
+// API routes
+app.use(`/api/${process.env.API_VERSION}`, routes);
+
+// Root endpoint
+app.get("/", (req, res) => {
+  res.json({
+    message: "ArcGIS StoryMaps Competition API",
+    version: "1.0.0",
+    environment: process.env.NODE_ENV,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Error handling
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+// Start server function
+const startServer = async () => {
+  try {
+    // Connect to database
+    await connectDB();
+
+    const port = process.env.PORT || 5000;
+    app.listen(port, () => {
+      console.log(`🚀 Server running on port ${port}`);
+      console.log(`📍 Environment: ${process.env.NODE_ENV}`);
+      console.log(`🌐 API Base URL: http://localhost:${port}/api/v1`);
+    });
+  } catch (error) {
+    console.error("❌ Failed to start server:", error.message);
+    process.exit(1);
+  }
+};
+
+// Graceful shutdown
+process.on("SIGTERM", () => {
+  console.log("👋 SIGTERM received. Shutting down gracefully...");
+  process.exit(0);
+});
+
+process.on("SIGINT", () => {
+  console.log("👋 SIGINT received. Shutting down gracefully...");
+  process.exit(0);
+});
+
+module.exports = { app, startServer };
