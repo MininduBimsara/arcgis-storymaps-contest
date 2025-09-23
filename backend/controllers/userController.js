@@ -2,7 +2,6 @@
 const userService = require("../services/userService");
 const { responseHandler } = require("../utils/responseHandler");
 const { asyncHandler } = require("../middleware/errorHandler");
-const PaginationHelper = require("../utils/pagination");
 
 /**
  * User Controller - HTTP Request Handlers

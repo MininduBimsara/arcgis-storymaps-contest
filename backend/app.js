@@ -1,139 +1,106 @@
+// app.js - Simplified version that works with your database.js
 const express = require("express");
 const cors = require("cors");
 const compression = require("compression");
-
-// Import configurations
-const envConfig = require("./config/env");
-const databaseConfig = require("./config/database");
+const connectDB = require("./config/database");
 
 // Import middleware
-const {
-  securityMiddleware,
-  sanitizeInput,
-  requestLogger,
-  apiLimiter,
-} = require("./middleware/security");
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
 
 // Import routes
 const routes = require("./routes");
 
-// Import utilities
-const logger = require("./utils/logger");
-
 /**
- * Express application configuration
+ * Express application setup
  */
-class Application {
-  constructor() {
-    this.app = express();
-    this.setupMiddleware();
-    this.setupRoutes();
-    this.setupErrorHandling();
-  }
+const app = express();
 
-  setupMiddleware() {
-    // Basic middleware
-    this.app.use(compression()); // Compress responses
-    this.app.use(express.json({ limit: "10mb" })); // Parse JSON bodies
-    this.app.use(express.urlencoded({ extended: true, limit: "10mb" })); // Parse URL-encoded bodies
+// Basic middleware
+app.use(compression());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-    // CORS configuration
-    this.app.use(cors(envConfig.corsConfig));
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim()),
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 
-    // Security middleware
-    this.app.use(securityMiddleware);
-    this.app.use(sanitizeInput);
+// Basic security headers
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  next();
+});
 
-    // Request logging (only in development)
-    if (envConfig.isDevelopment) {
-      this.app.use(requestLogger);
-    }
-
-    // Rate limiting
-    this.app.use("/api", apiLimiter);
-
-    // Serve static files
-    this.app.use("/uploads", express.static("uploads"));
-
-    // Health check endpoint
-    this.app.get("/health", (req, res) => {
-      res.json({
-        status: "OK",
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV,
-        database: databaseConfig.isConnected() ? "connected" : "disconnected",
-        version: process.env.npm_package_version || "1.0.0",
-      });
-    });
-  }
-
-  setupRoutes() {
-    // API routes
-    this.app.use(`/api/${process.env.API_VERSION}`, routes);
-
-    // Root endpoint
-    this.app.get("/", (req, res) => {
-      res.json({
-        message: "ArcGIS StoryMaps Competition API",
-        version: process.env.npm_package_version || "1.0.0",
-        environment: process.env.NODE_ENV,
-        timestamp: new Date().toISOString(),
-      });
-    });
-  }
-
-  setupErrorHandling() {
-    // 404 handler
-    this.app.use(notFoundHandler);
-
-    // Global error handler (must be last)
-    this.app.use(errorHandler);
-  }
-
-  async start() {
-    try {
-      // Connect to database
-      await databaseConfig.connect();
-
-      // Start server
-      const port = envConfig.port;
-      this.server = this.app.listen(port, () => {
-        logger.info(`Server running on port ${port}`, {
-          environment: process.env.NODE_ENV,
-          port,
-        });
-      });
-
-      // Graceful shutdown handling
-      this.setupGracefulShutdown();
-    } catch (error) {
-      logger.error("Failed to start application", { error: error.message });
-      process.exit(1);
-    }
-  }
-
-  setupGracefulShutdown() {
-    const gracefulShutdown = (signal) => {
-      logger.info(`Received ${signal}. Starting graceful shutdown...`);
-
-      this.server.close(() => {
-        logger.info("HTTP server closed");
-        process.exit(0);
-      });
-
-      // Force close after 10 seconds
-      setTimeout(() => {
-        logger.error(
-          "Could not close connections in time, forcefully shutting down"
-        );
-        process.exit(1);
-      }, 10000);
-    };
-
-    process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
-    process.on("SIGINT", () => gracefulShutdown("SIGINT"));
-  }
+// Request logging in development
+if (process.env.NODE_ENV === "development") {
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`);
+    next();
+  });
 }
 
-module.exports = Application;
+// Serve static files
+app.use("/uploads", express.static("uploads"));
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.json({
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    version: "1.0.0",
+  });
+});
+
+// API routes
+app.use(`/api/${process.env.API_VERSION}`, routes);
+
+// Root endpoint
+app.get("/", (req, res) => {
+  res.json({
+    message: "ArcGIS StoryMaps Competition API",
+    version: "1.0.0",
+    environment: process.env.NODE_ENV,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Error handling
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+// Start server function
+const startServer = async () => {
+  try {
+    // Connect to database
+    await connectDB();
+
+    const port = process.env.PORT || 5000;
+    app.listen(port, () => {
+      console.log(`🚀 Server running on port ${port}`);
+      console.log(`📍 Environment: ${process.env.NODE_ENV}`);
+      console.log(`🌐 API Base URL: http://localhost:${port}/api/v1`);
+    });
+  } catch (error) {
+    console.error("❌ Failed to start server:", error.message);
+    process.exit(1);
+  }
+};
+
+// Graceful shutdown
+process.on("SIGTERM", () => {
+  console.log("👋 SIGTERM received. Shutting down gracefully...");
+  process.exit(0);
+});
+
+process.on("SIGINT", () => {
+  console.log("👋 SIGINT received. Shutting down gracefully...");
+  process.exit(0);
+});
+
+module.exports = { app, startServer };

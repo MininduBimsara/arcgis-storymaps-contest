@@ -1,4 +1,4 @@
-// src/models/Submission.js
+// models/Submission.js - Cleaned version with redundant methods removed
 const mongoose = require("mongoose");
 const slugify = require("slugify");
 
@@ -160,86 +160,6 @@ const submissionSchema = new mongoose.Schema(
       type: Date,
     },
 
-    // Judging and Scoring
-    judgeAssignments: [
-      {
-        judge: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Judge",
-        },
-        assignedAt: {
-          type: Date,
-          default: Date.now,
-        },
-        status: {
-          type: String,
-          enum: ["assigned", "in_progress", "completed"],
-          default: "assigned",
-        },
-      },
-    ],
-
-    scores: [
-      {
-        judge: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Judge",
-          required: true,
-        },
-        criteria: {
-          storytelling: {
-            type: Number,
-            min: 1,
-            max: 10,
-            required: true,
-          },
-          technicalExecution: {
-            type: Number,
-            min: 1,
-            max: 10,
-            required: true,
-          },
-          innovation: {
-            type: Number,
-            min: 1,
-            max: 10,
-            required: true,
-          },
-          visualDesign: {
-            type: Number,
-            min: 1,
-            max: 10,
-            required: true,
-          },
-          dataQuality: {
-            type: Number,
-            min: 1,
-            max: 10,
-            required: true,
-          },
-        },
-        totalScore: {
-          type: Number,
-          min: 5,
-          max: 50,
-        },
-        feedback: {
-          type: String,
-          maxLength: [1000, "Feedback cannot exceed 1000 characters"],
-        },
-        scoredAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
-
-    averageScore: {
-      type: Number,
-      min: 0,
-      max: 50,
-    },
-
     // Technical Details
     dataSourcesUsed: [
       {
@@ -252,6 +172,7 @@ const submissionSchema = new mongoose.Schema(
           type: String,
           validate: {
             validator: function (url) {
+              if (!url) return true; // Optional field
               return /^https?:\/\/.+/.test(url);
             },
             message: "Data source URL must be valid",
@@ -277,10 +198,6 @@ const submissionSchema = new mongoose.Schema(
       type: Number,
       required: true,
       default: () => new Date().getFullYear(),
-    },
-    eligibilityChecked: {
-      type: Boolean,
-      default: false,
     },
     copyrightCompliant: {
       type: Boolean,
@@ -309,25 +226,21 @@ const submissionSchema = new mongoose.Schema(
   }
 );
 
-// Virtual for formatted submission date
+// Virtuals
 submissionSchema.virtual("formattedSubmissionDate").get(function () {
   return this.submissionDate ? this.submissionDate.toLocaleDateString() : null;
 });
 
-// Virtual for team size
 submissionSchema.virtual("teamSize").get(function () {
   return this.teamMembers.length + 1; // +1 for submitter
 });
 
-// Indexes for performance
+// Indexes for performance (unique fields already have indexes)
 submissionSchema.index({ submittedBy: 1 });
 submissionSchema.index({ category: 1 });
 submissionSchema.index({ status: 1 });
 submissionSchema.index({ submissionYear: 1 });
-submissionSchema.index({ averageScore: -1 });
 submissionSchema.index({ createdAt: -1 });
-submissionSchema.index({ storyMapId: 1 }, { unique: true });
-submissionSchema.index({ slug: 1 }, { unique: true });
 
 // Text index for search functionality
 submissionSchema.index({
@@ -358,90 +271,5 @@ submissionSchema.pre("save", function (next) {
   }
   next();
 });
-
-// Pre-save middleware to calculate average score
-submissionSchema.pre("save", function (next) {
-  if (this.scores && this.scores.length > 0) {
-    const totalScore = this.scores.reduce(
-      (sum, score) => sum + score.totalScore,
-      0
-    );
-    this.averageScore = totalScore / this.scores.length;
-  }
-  next();
-});
-
-// Pre-save middleware to calculate total score for each scoring entry
-submissionSchema.pre("save", function (next) {
-  this.scores.forEach((score) => {
-    if (score.criteria) {
-      score.totalScore =
-        score.criteria.storytelling +
-        score.criteria.technicalExecution +
-        score.criteria.innovation +
-        score.criteria.visualDesign +
-        score.criteria.dataQuality;
-    }
-  });
-  next();
-});
-
-// Static method to get submissions by category
-submissionSchema.statics.findByCategory = function (categoryId) {
-  return this.find({ category: categoryId, status: "approved" })
-    .populate("submittedBy", "firstName lastName organization")
-    .populate("category", "name")
-    .sort({ averageScore: -1 });
-};
-
-// Static method to get top submissions
-submissionSchema.statics.getTopSubmissions = function (limit = 10) {
-  return this.find({ status: "approved", averageScore: { $exists: true } })
-    .populate("submittedBy", "firstName lastName organization country")
-    .populate("category", "name")
-    .sort({ averageScore: -1 })
-    .limit(limit);
-};
-
-// Static method to get submission statistics
-submissionSchema.statics.getSubmissionStats = function () {
-  return this.aggregate([
-    {
-      $group: {
-        _id: "$status",
-        count: { $sum: 1 },
-      },
-    },
-    {
-      $group: {
-        _id: null,
-        statuses: {
-          $push: {
-            status: "$_id",
-            count: "$count",
-          },
-        },
-        total: { $sum: "$count" },
-      },
-    },
-  ]);
-};
-
-// Instance method to assign judge
-submissionSchema.methods.assignJudge = function (judgeId) {
-  const existingAssignment = this.judgeAssignments.find(
-    (assignment) => assignment.judge.toString() === judgeId.toString()
-  );
-
-  if (!existingAssignment) {
-    this.judgeAssignments.push({
-      judge: judgeId,
-      assignedAt: new Date(),
-      status: "assigned",
-    });
-  }
-
-  return this.save();
-};
 
 module.exports = mongoose.model("Submission", submissionSchema);

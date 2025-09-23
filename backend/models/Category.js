@@ -1,4 +1,6 @@
+// models/Category.js - Fixed with proper export and slug generation
 const mongoose = require("mongoose");
+const slugify = require("slugify");
 
 const categorySchema = new mongoose.Schema(
   {
@@ -32,10 +34,6 @@ const categorySchema = new mongoose.Schema(
       type: Number,
       default: null, // null means unlimited
     },
-    judgeCount: {
-      type: Number,
-      default: 0,
-    },
     icon: {
       type: String,
       trim: true,
@@ -58,7 +56,19 @@ const categorySchema = new mongoose.Schema(
   }
 );
 
-categorySchema.index({ slug: 1 }, { unique: true });
+// Indexes (slug already has unique: true, so no duplicate needed)
 categorySchema.index({ isActive: 1, order: 1 });
 
-const Category = mongoose.model("Category", categorySchema);
+// Pre-save middleware to generate slug
+categorySchema.pre("save", function (next) {
+  if (this.isModified("name") && !this.slug) {
+    this.slug = slugify(this.name, {
+      lower: true,
+      strict: true,
+      remove: /[*+~.()'"!:@]/g,
+    });
+  }
+  next();
+});
+
+module.exports = mongoose.model("Category", categorySchema);

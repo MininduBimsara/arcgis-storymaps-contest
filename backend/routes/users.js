@@ -4,7 +4,6 @@ const router = express.Router();
 const userController = require("../controllers/userController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
 const { userValidator } = require("../validators/userValidator");
-const { uploadConfigs } = require("../utils/fileUpload");
 
 /**
  * User Routes
