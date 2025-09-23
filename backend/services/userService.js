@@ -1,7 +1,5 @@
 // services/userService.js
 const userRepository = require("../repositories/userRepository");
-const judgeRepository = require("../repositories/judgeRepository");
-
 /**
  * User Service - Business Logic Layer
  */

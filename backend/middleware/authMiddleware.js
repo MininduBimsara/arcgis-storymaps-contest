@@ -1,4 +1,4 @@
-// middleware/authMiddleware.js - Updated to match your existing system
+// middleware/authMiddleware.js - Fixed function scoping issue
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { asyncHandler } = require("./errorHandler");
@@ -155,23 +155,23 @@ const checkSubmissionLimit = async (req, res, next) => {
       500
     );
   }
+};
 
-  /**
-   * Require terms agreement
-   */
-  const requireTermsAgreement = (req, res, next) => {
-    if (!req.user) {
-      return responseHandler.error(
-        res,
-        "Access denied. Authentication required.",
-        401
-      );
-    }
+/**
+ * Require terms agreement
+ */
+const requireTermsAgreement = (req, res, next) => {
+  if (!req.user) {
+    return responseHandler.error(
+      res,
+      "Access denied. Authentication required.",
+      401
+    );
+  }
 
-    // Check if user has agreed to terms (you may need to add this field to User model)
-    // For now, we'll skip this check and just proceed
-    next();
-  };
+  // For now, we'll skip this check and just proceed
+  // You can add terms agreement field to User model if needed
+  next();
 };
 
 module.exports = {

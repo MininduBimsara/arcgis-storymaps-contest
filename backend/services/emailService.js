@@ -1,4 +1,4 @@
-// services/emailService.js
+// services/emailService.js - Fixed nodemailer method name
 const nodemailer = require("nodemailer");
 const logger = require("../utils/logger");
 
@@ -24,7 +24,7 @@ class EmailService {
 
     // For development, use Ethereal Email if no SMTP configured
     if (process.env.NODE_ENV === "development" && !process.env.SMTP_HOST) {
-      return nodemailer.createTransporter({
+      return nodemailer.createTransport({
         host: "smtp.ethereal.email",
         port: 587,
         auth: {
@@ -34,7 +34,7 @@ class EmailService {
       });
     }
 
-    return nodemailer.createTransporter(config);
+    return nodemailer.createTransport(config);
   }
 
   /**

@@ -1,7 +1,7 @@
+// server.js
 const Application = require("./app");
 const logger = require("./utils/logger");
 
-// Handle uncaught exceptions
 process.on("uncaughtException", (err) => {
   logger.error("Uncaught Exception! Shutting down...", {
     error: err.message,
@@ -10,7 +10,6 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 
-// Handle unhandled promise rejections
 process.on("unhandledRejection", (err) => {
   logger.error("Unhandled Rejection! Shutting down...", {
     error: err.message,
