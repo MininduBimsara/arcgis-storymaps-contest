@@ -1,3 +1,4 @@
+// components/password-reset/ResetPassword.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -11,6 +12,7 @@ import {
   Lock,
   AlertCircle,
 } from "lucide-react";
+import apiService from "@/lib/api";
 
 interface ResetState {
   status: "loading" | "ready" | "success" | "error" | "expired" | "invalid";
@@ -35,10 +37,6 @@ const PasswordResetPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token");
-
-  // API Base URL
-  const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 
   // Validate token on component mount
   useEffect(() => {
@@ -93,54 +91,45 @@ const PasswordResetPage = () => {
     });
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          token: token,
-          password: formData.password,
-        }),
-      });
+      const response = await apiService.resetPassword(token, formData.password);
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (response.success) {
         setResetState({
           status: "success",
           message:
             "Your password has been successfully reset! You can now sign in with your new password.",
         });
       } else {
-        if (response.status === 400) {
-          setResetState({
-            status: "expired",
-            message:
-              "This reset link has expired or is invalid. Please request a new password reset email.",
-          });
-        } else {
-          setResetState({
-            status: "error",
-            message: data.error || "Password reset failed. Please try again.",
-          });
-        }
+        setResetState({
+          status: "error",
+          message: response.error || "Password reset failed. Please try again.",
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Password reset error:", error);
-      setResetState({
-        status: "error",
-        message:
-          "Network error occurred. Please check your connection and try again.",
-      });
+
+      if (error.response?.status === 400) {
+        setResetState({
+          status: "expired",
+          message:
+            "This reset link has expired or is invalid. Please request a new password reset email.",
+        });
+      } else {
+        setResetState({
+          status: "error",
+          message:
+            error.error ||
+            error.message ||
+            "Network error occurred. Please check your connection and try again.",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleForgotPassword = () => {
-    router.push("/auth"); // Navigate back to auth page where they can request a new reset
+    router.push("/auth");
   };
 
   const handleSignIn = () => {

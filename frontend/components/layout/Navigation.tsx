@@ -1,10 +1,18 @@
 "use client";
 
-import { Search, User, Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import {
+  Search,
+  User,
+  Menu,
+  X,
+  LogOut,
+  Settings,
+  PlusCircle,
+} from "lucide-react";
 import Link from "next/link";
-import { usePathname , useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 interface NavigationProps {
   isScrolled?: boolean;
@@ -13,8 +21,10 @@ interface NavigationProps {
 const Navigation = ({ isScrolled: propIsScrolled }: NavigationProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const { user, isAuthenticated, logout, isLoading } = useAuth();
 
   // Use prop if provided, otherwise detect scroll
   const scrollState =
@@ -23,7 +33,7 @@ const Navigation = ({ isScrolled: propIsScrolled }: NavigationProps) => {
   const navItems = [
     { href: "/", label: "Home" },
     { href: "/stories", label: "Stories" },
-    
+    { href: "/details", label: "Competition" },
     { href: "/contact", label: "Contact" },
   ];
 
@@ -40,6 +50,19 @@ const Navigation = ({ isScrolled: propIsScrolled }: NavigationProps) => {
     }
   }, [propIsScrolled]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(".user-dropdown")) {
+        setShowUserDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
@@ -53,6 +76,25 @@ const Navigation = ({ isScrolled: propIsScrolled }: NavigationProps) => {
       return pathname === "/";
     }
     return pathname.startsWith(href);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setShowUserDropdown(false);
+      router.push("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  const getUserInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
@@ -120,25 +162,128 @@ const Navigation = ({ isScrolled: propIsScrolled }: NavigationProps) => {
               >
                 <Search className="w-5 h-5" />
               </button>
+
+              {/* User Authentication Section */}
               <div className="hidden md:flex items-center space-x-2">
-                <span
-                  className={`text-sm transition-colors duration-300 ${
-                    scrollState ? "text-gray-600" : "text-white/70"
-                  }`}
-                >
-                  Sign in
-                </span>
-                <button
-                  onClick={() => router.push("/Auth")}
-                  className={`glass-button p-2 rounded-lg transition-all duration-300 ${
-                    scrollState
-                      ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
-                      : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
-                  }`}
-                >
-                  <User className="w-5 h-5" />
-                </button>
+                {isLoading ? (
+                  <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
+                ) : isAuthenticated && user ? (
+                  // Authenticated User Dropdown
+                  <div className="relative user-dropdown">
+                    <button
+                      onClick={() => setShowUserDropdown(!showUserDropdown)}
+                      className={`flex items-center space-x-2 glass-button p-2 rounded-lg transition-all duration-300 ${
+                        scrollState
+                          ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                          : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
+                      }`}
+                    >
+                      {user.profileImage ? (
+                        <img
+                          src={user.profileImage}
+                          alt={user.username}
+                          className="w-6 h-6 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
+                          <span className="text-white text-xs font-semibold">
+                            {getUserInitials(user.username)}
+                          </span>
+                        </div>
+                      )}
+                      <span className="text-sm font-medium hidden lg:block">
+                        {user.username}
+                      </span>
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    {showUserDropdown && (
+                      <div
+                        className={`absolute right-0 mt-2 w-64 rounded-lg shadow-lg z-50 border ${
+                          scrollState
+                            ? "bg-white border-gray-200"
+                            : "bg-white/95 backdrop-blur-lg border-white/20"
+                        }`}
+                      >
+                        {/* User Info */}
+                        <div className="px-4 py-3 border-b border-gray-100">
+                          <p className="text-sm font-medium text-gray-900">
+                            {user.username}
+                          </p>
+                          <p className="text-xs text-gray-500">{user.email}</p>
+                          {user.role === "admin" && (
+                            <span className="inline-block mt-1 px-2 py-0.5 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
+                              Admin
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Menu Items */}
+                        <div className="py-2">
+                          <Link
+                            href="/submissions/create"
+                            onClick={() => setShowUserDropdown(false)}
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            <PlusCircle className="w-4 h-4 mr-3" />
+                            Submit Story
+                          </Link>
+                          <Link
+                            href="/submissions"
+                            onClick={() => setShowUserDropdown(false)}
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            <User className="w-4 h-4 mr-3" />
+                            My Submissions
+                          </Link>
+                          <Link
+                            href="/profile"
+                            onClick={() => setShowUserDropdown(false)}
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            <Settings className="w-4 h-4 mr-3" />
+                            Profile Settings
+                          </Link>
+                        </div>
+
+                        {/* Logout */}
+                        <div className="border-t border-gray-100">
+                          <button
+                            onClick={handleLogout}
+                            className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                          >
+                            <LogOut className="w-4 h-4 mr-3" />
+                            Sign Out
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  // Not Authenticated - Sign In Button
+                  <div className="flex items-center space-x-3">
+                    <span
+                      className={`text-sm transition-colors duration-300 ${
+                        scrollState ? "text-gray-600" : "text-white/70"
+                      }`}
+                    >
+                      Sign in
+                    </span>
+                    <button
+                      onClick={() => router.push("/auth")}
+                      className={`glass-button p-2 rounded-lg transition-all duration-300 ${
+                        scrollState
+                          ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                          : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
+                      }`}
+                    >
+                      <User className="w-5 h-5" />
+                    </button>
+                  </div>
+                )}
               </div>
+
+              {/* Mobile Menu Button */}
               <button
                 className={`md:hidden glass-button p-2 rounded-lg transition-all duration-300 ${
                   scrollState
@@ -174,6 +319,7 @@ const Navigation = ({ isScrolled: propIsScrolled }: NavigationProps) => {
                   : "bg-white/10 border-white/20"
               }`}
             >
+              {/* Navigation Links */}
               <ul className="space-y-4">
                 {navItems.map((item) => (
                   <li key={item.href}>
@@ -196,10 +342,89 @@ const Navigation = ({ isScrolled: propIsScrolled }: NavigationProps) => {
                 ))}
               </ul>
 
-              {/* Mobile Sign In */}
+              {/* Mobile User Section */}
               <div className="mt-6 pt-4 border-t border-white/10">
-                <div className="flex items-center space-x-3">
+                {isLoading ? (
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
+                    <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
+                  </div>
+                ) : isAuthenticated && user ? (
+                  <div className="space-y-3">
+                    {/* User Info */}
+                    <div className="flex items-center space-x-3 pb-3 border-b border-white/10">
+                      {user.profileImage ? (
+                        <img
+                          src={user.profileImage}
+                          alt={user.username}
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
+                          <span className="text-white text-sm font-semibold">
+                            {getUserInitials(user.username)}
+                          </span>
+                        </div>
+                      )}
+                      <div>
+                        <p
+                          className={`font-medium ${scrollState ? "text-gray-900" : "text-white"}`}
+                        >
+                          {user.username}
+                        </p>
+                        <p
+                          className={`text-xs ${scrollState ? "text-gray-500" : "text-white/70"}`}
+                        >
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Mobile Menu Actions */}
+                    <div className="space-y-2">
+                      <Link
+                        href="/submissions/create"
+                        onClick={closeMobileMenu}
+                        className={`flex items-center space-x-3 glass-button px-4 py-2 rounded-lg transition-all duration-300 ${
+                          scrollState
+                            ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                            : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
+                        }`}
+                      >
+                        <PlusCircle className="w-4 h-4" />
+                        <span className="text-sm">Submit Story</span>
+                      </Link>
+                      <Link
+                        href="/submissions"
+                        onClick={closeMobileMenu}
+                        className={`flex items-center space-x-3 glass-button px-4 py-2 rounded-lg transition-all duration-300 ${
+                          scrollState
+                            ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                            : "bg-white/10 hover:bg-white/20 text-white/80 hover:text-white"
+                        }`}
+                      >
+                        <User className="w-4 h-4" />
+                        <span className="text-sm">My Submissions</span>
+                      </Link>
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          closeMobileMenu();
+                        }}
+                        className="flex items-center space-x-3 w-full glass-button px-4 py-2 rounded-lg transition-all duration-300 text-red-600 bg-red-50 hover:bg-red-100"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span className="text-sm">Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Not Authenticated Mobile
                   <button
+                    onClick={() => {
+                      router.push("/auth");
+                      closeMobileMenu();
+                    }}
                     className={`flex items-center space-x-2 glass-button px-4 py-2 rounded-lg transition-all duration-300 ${
                       scrollState
                         ? "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
@@ -209,7 +434,7 @@ const Navigation = ({ isScrolled: propIsScrolled }: NavigationProps) => {
                     <User className="w-4 h-4" />
                     <span className="text-sm">Sign in</span>
                   </button>
-                </div>
+                )}
               </div>
             </div>
           </>

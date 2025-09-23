@@ -20,8 +20,36 @@ export default function HeroSection() {
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 text-center text-white">
+
+        {/* Compact Horizontal Stats */}
+        <div className="flex flex-wrap justify-center gap-6 mt-8 mb-12">
+          <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-6 py-3">
+            <Trophy className="w-6 h-6 text-ceylon-gold" />
+            <div>
+              <div className="text-2xl font-bold">₹2.5M</div>
+              <div className="text-sm text-white/80">Prize Pool</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-6 py-3">
+            <MapPin className="w-6 h-6 text-ceylon-orange" />
+            <div>
+              <div className="text-2xl font-bold">6</div>
+              <div className="text-sm text-white/80">Categories</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-6 py-3">
+            <Users className="w-6 h-6 text-ceylon-green" />
+            <div>
+              <div className="text-2xl font-bold">2,847</div>
+              <div className="text-sm text-white/80">Stories</div>
+            </div>
+          </div>
+        </div>
+        {/* Main Hero Content */}
         <div className="mb-12">
-          <h1 className="mt-20 text-5xl md:text-7xl lg:text-8xl font-light mb-6 leading-tight tracking-tight">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-light mb-6 leading-tight tracking-tight">
             Ceylon Stories
           </h1>
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-light mb-8 text-white/90">
@@ -36,39 +64,6 @@ export default function HeroSection() {
           <div className="inline-flex items-center gap-3 bg-gradient-to-r from-ceylon-orange to-ceylon-orange-light px-8 py-4 rounded-full text-white font-semibold shadow-2xl mb-12 border border-white/20">
             <Calendar className="w-5 h-5" />
             <span>Registration Deadline: March 31, 2025</span>
-          </div>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-2 mb-7">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 text-center hover:bg-white/15 transition-all duration-300">
-            <div className="flex items-center justify-center w-20 h-20 bg-ceylon-gold/20 backdrop-blur-sm rounded-2xl mx-auto mb-6 border border-ceylon-gold/30">
-              <Trophy className="w-10 h-10 text-ceylon-gold" />
-            </div>
-            <div className="text-4xl font-bold mb-3">₹2.5M</div>
-            <div className="text-lg text-white/80 font-medium">
-              Total Prize Pool
-            </div>
-          </div>
-
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 text-center hover:bg-white/15 transition-all duration-300">
-            <div className="flex items-center justify-center w-20 h-20 bg-ceylon-orange/20 backdrop-blur-sm rounded-2xl mx-auto mb-6 border border-ceylon-orange/30">
-              <MapPin className="w-10 h-10 text-ceylon-orange" />
-            </div>
-            <div className="text-4xl font-bold mb-3">6</div>
-            <div className="text-lg text-white/80 font-medium">
-              Story Categories
-            </div>
-          </div>
-
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 text-center hover:bg-white/15 transition-all duration-300">
-            <div className="flex items-center justify-center w-20 h-20 bg-ceylon-green/20 backdrop-blur-sm rounded-2xl mx-auto mb-6 border border-ceylon-green/30">
-              <Users className="w-10 h-10 text-ceylon-green" />
-            </div>
-            <div className="text-4xl font-bold mb-3">2,847</div>
-            <div className="text-lg text-white/80 font-medium">
-              Stories Submitted
-            </div>
           </div>
         </div>
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
+import { AuthProvider } from "@/context/AuthContext";
 
 // Configure Inter font
 const inter = Inter({
@@ -123,11 +124,14 @@ export default function RootLayout({ children }: RootLayoutProps) {
           Skip to main content
         </a>
 
-        {/* Global Navigation */}
-        <Navigation />
+        {/* Auth Provider wraps everything */}
+        <AuthProvider>
+          {/* Global Navigation */}
+          <Navigation />
 
-        {/* Main content wrapper */}
-        <div id="main-content">{children}</div>
+          {/* Main content wrapper */}
+          <div id="main-content">{children}</div>
+        </AuthProvider>
 
         {/* ArcGIS JavaScript API - Load at the end for better performance */}
         <script src="https://js.arcgis.com/4.28/" async />
