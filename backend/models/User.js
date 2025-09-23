@@ -1,4 +1,4 @@
-// models/User.js - Updated to match documentation
+// models/User.js - Fixed duplicate index warnings
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -103,9 +103,8 @@ userSchema.virtual("isLocked").get(function () {
   return !!(this.lockUntil && this.lockUntil > Date.now());
 });
 
-// Indexes for performance
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
+// ONLY additional indexes (email and username already have unique: true)
+// Remove duplicate indexes that are already created by unique: true
 userSchema.index({ role: 1 });
 userSchema.index({ status: 1 });
 userSchema.index({ createdAt: -1 });
@@ -171,35 +170,6 @@ userSchema.methods.generateEmailVerificationToken = function () {
   this.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
 
   return verificationToken;
-};
-
-// Static method to find by email
-userSchema.statics.findByEmail = function (email) {
-  return this.findOne({ email: email.toLowerCase() });
-};
-
-// Static method to get user stats
-userSchema.statics.getUserStats = function () {
-  return this.aggregate([
-    {
-      $group: {
-        _id: "$role",
-        count: { $sum: 1 },
-      },
-    },
-    {
-      $group: {
-        _id: null,
-        roles: {
-          $push: {
-            role: "$_id",
-            count: "$count",
-          },
-        },
-        total: { $sum: "$count" },
-      },
-    },
-  ]);
 };
 
 module.exports = mongoose.model("User", userSchema);
