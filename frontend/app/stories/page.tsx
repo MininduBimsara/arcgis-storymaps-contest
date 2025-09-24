@@ -37,7 +37,6 @@ const StoriesPage = () => {
   if (selectedStory) {
     return (
       <div className="min-h-screen bg-white">
-        <Navigation isScrolled={true} />
         <StoryDetails story={selectedStory} onBack={handleBackToStories} />
         <Footer />
       </div>

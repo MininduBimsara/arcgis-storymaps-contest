@@ -29,7 +29,7 @@ export default function HeroSection() {
             <div className="grid grid-cols-3 gap-4 py-6">
               <div className="bg-white p-4 rounded-md border border-gray-100 text-center">
                 <div className="flex items-center justify-center mb-2">
-                  <Trophy className="w-5 h-5 text-blue-100" />
+                  <Trophy className="w-5 h-5 text-blue-300" />
                 </div>
                 <div className="text-2xl font-medium text-black">2.5M</div>
                 <div className="text-sm text-gray-500">Prize Pool</div>
@@ -37,7 +37,7 @@ export default function HeroSection() {
 
               <div className="bg-white p-4 rounded-md border border-gray-100 text-center">
                 <div className="flex items-center justify-center mb-2">
-                  <MapPin className="w-5 h-5 text-blue-100" />
+                  <MapPin className="w-5 h-5 text-blue-300" />
                 </div>
                 <div className="text-2xl font-medium text-black">6</div>
                 <div className="text-sm text-gray-500">Categories</div>
@@ -45,7 +45,7 @@ export default function HeroSection() {
 
               <div className="bg-white p-4 rounded-md border border-gray-100 text-center">
                 <div className="flex items-center justify-center mb-2">
-                  <Users className="w-5 h-5 text-blue-100" />
+                  <Users className="w-5 h-5 text-blue-300" />
                 </div>
                 <div className="text-2xl font-medium text-black">2,847</div>
                 <div className="text-sm text-gray-500">Stories</div>
@@ -54,7 +54,7 @@ export default function HeroSection() {
 
             {/* Deadline Banner */}
             <div className="inline-flex items-center gap-3 bg-blue-50 text-black px-6 py-3 rounded-md border border-blue-100">
-              <Calendar className="w-4 h-4 text-blue-100" />
+              <Calendar className="w-4 h-4 text-blue-300" />
               <span className="text-base">
                 Registration Deadline: March 31, 2025
               </span>

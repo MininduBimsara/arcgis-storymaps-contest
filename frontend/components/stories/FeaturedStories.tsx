@@ -108,35 +108,35 @@ const FeaturedStoriesSection: React.FC<FeaturedStoriesSectionProps> = ({
   ];
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-16 bg-gray-50">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-light text-gray-900 mb-4">
+          <h2 className="text-3xl font-light text-black mb-4">
             Featured Stories
           </h2>
-          <p className="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
-            Discover Sri Lanka through immersive digital journeys that showcase
-            the island's natural beauty, rich heritage, and vibrant culture
+          <p className="text-base text-gray-600 leading-relaxed max-w-2xl mx-auto">
+            Discover Sri Lanka through immersive digital journeys showcasing the
+            island's natural beauty, rich heritage, and vibrant culture
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {featuredStories.map((story) => (
             <StoryCard key={story.id} story={story} onReadMore={onReadMore} />
           ))}
         </div>
 
         <div className="text-center space-y-4">
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
-            <button className="bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors font-medium">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button className="bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition-colors font-medium">
               View All Stories
             </button>
-            <button className="bg-white text-gray-900 border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+            <button className="bg-white text-black border border-blue-100 px-6 py-3 rounded-md hover:bg-blue-50 transition-colors font-medium">
               Submit Your Story
             </button>
           </div>
           <p className="text-sm text-gray-500">
-            Share your Ceylon story and compete for amazing prizes
+            Share your Sri Lankan story and compete for amazing prizes
           </p>
         </div>
       </div>

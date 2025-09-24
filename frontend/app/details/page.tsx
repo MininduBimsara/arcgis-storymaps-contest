@@ -16,8 +16,7 @@ export default function CompetitionDetails() {
           style={{
             backgroundImage: "url('/hero.jpg')",
           }}
-        >
-        </div>
+        ></div>
 
         {/* Content */}
         <div className="relative max-w-6xl mx-auto px-6 text-center">
@@ -25,7 +24,7 @@ export default function CompetitionDetails() {
             Competition
             <span className="block text-cyan-300">Details</span>
           </h1>
-          <p className="text-xl lg:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl lg:text-2xl text-blue-300 max-w-3xl mx-auto leading-relaxed">
             Everything you need to know about submitting your Sri Lankan story
             and winning amazing prizes through interactive storytelling
           </p>

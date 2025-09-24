@@ -1,105 +1,98 @@
 import { Trophy, Award, Heart, Gift } from "lucide-react";
 
+// Prize Section Component
 export const PrizeSection = () => {
   const prizes = [
     {
       id: "grand",
       icon: Trophy,
-      title: "Grand Prize",
+      title: "Grand Prize Winner",
       amount: "LKR 500,000",
-      description: "Winner across all categories",
+      description: "Overall competition winner",
       features: [
         "Cash Prize: LKR 500,000",
         "Tourism Board Partnership",
         "Featured Story Promotion",
-        "Professional Recognition",
+        "Professional Recognition Certificate",
       ],
-      accent: "border-l-4 border-ceylon-gold",
-      bgGradient: "bg-gradient-to-br from-ceylon-gold/5 to-ceylon-gold-light/5",
     },
     {
       id: "category",
       icon: Award,
       title: "Category Winners",
       amount: "LKR 200,000",
-      description: "Each category (6 winners)",
+      description: "Best in each category (6 winners)",
       features: [
         "LKR 200,000 per category winner",
-        "Story featured on platform",
+        "Story featured on main platform",
         "Certificate of Excellence",
-        "Tourism Board recognition",
+        "Tourism Board official recognition",
       ],
-      accent: "border-l-4 border-ceylon-orange",
-      bgGradient:
-        "bg-gradient-to-br from-ceylon-orange/5 to-ceylon-orange-light/5",
     },
     {
       id: "peoples",
       icon: Heart,
-      title: "People's Choice",
+      title: "People's Choice Award",
       amount: "LKR 100,000",
-      description: "Most popular story",
+      description: "Most popular community story",
       features: [
         "LKR 100,000 cash prize",
         "Community favorite badge",
-        "Social media promotion",
-        "Audience engagement award",
+        "Social media feature campaign",
+        "Audience engagement recognition",
       ],
-      accent: "border-l-4 border-ceylon-green",
-      bgGradient:
-        "bg-gradient-to-br from-ceylon-green/5 to-ceylon-green-light/5",
     },
     {
       id: "participation",
       icon: Gift,
-      title: "Participation Rewards",
+      title: "Participation Benefits",
       amount: "ArcGIS Licenses",
-      description: "All qualified submissions",
+      description: "All qualifying submissions",
       features: [
-        "Free ArcGIS StoryMaps license",
-        "Digital certificate",
-        "Community membership",
-        "Early access to new features",
+        "Free ArcGIS StoryMaps license (1 year)",
+        "Digital certificate of participation",
+        "Exclusive community membership",
+        "Early access to platform features",
       ],
-      accent: "border-l-4 border-gray-300",
-      bgGradient: "bg-gradient-to-br from-gray-100/50 to-gray-200/50",
     },
   ];
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-16 bg-white">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-light text-gray-900 mb-6">Prize Pool</h2>
-          <div className="text-5xl font-bold text-ceylon-gold mb-4">
-            LKR 2.5 Million Total
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-light text-black mb-4">
+            Competition Prizes
+          </h2>
+          <div className="text-4xl font-medium text-blue-300 mb-4">
+            LKR 2.5 Million Total Prize Pool
           </div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Compete for substantial cash prizes and incredible recognition
-            opportunities in Sri Lankan Rupees
+          <p className="text-base text-gray-600 max-w-2xl mx-auto">
+            Substantial cash prizes and recognition opportunities for Sri Lankan
+            storytellers
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {prizes.map((prize) => (
             <div
               key={prize.id}
-              className={`bg-white rounded-xl p-8 shadow-competition hover:shadow-prize transition-all duration-300 ${prize.accent} ${prize.bgGradient} transform hover:scale-105`}
+              className="bg-white border border-gray-100 rounded-md p-6 hover:border-blue-100 hover:bg-blue-50/30 transition-all duration-300"
             >
-              <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center justify-center w-12 h-12 bg-white rounded-lg shadow-sm">
-                  <prize.icon className="w-6 h-6 text-gray-700" />
+              <div className="flex items-start gap-4 mb-4">
+                <div className="flex items-center justify-center w-12 h-12 bg-blue-50 rounded-md">
+                  <prize.icon className="w-5 h-5 text-blue-300" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-medium text-gray-900">
+                <div className="flex-1">
+                  <h3 className="text-lg font-medium text-black mb-1">
                     {prize.title}
                   </h3>
-                  <p className="text-gray-600">{prize.description}</p>
+                  <p className="text-sm text-gray-500">{prize.description}</p>
                 </div>
               </div>
 
-              <div className="mb-6">
-                <div className="text-3xl font-bold text-gray-900 mb-2">
+              <div className="mb-4">
+                <div className="text-2xl font-medium text-black">
                   {prize.amount}
                 </div>
               </div>
@@ -108,10 +101,10 @@ export const PrizeSection = () => {
                 {prize.features.map((feature, index) => (
                   <li
                     key={index}
-                    className="flex items-center gap-2 text-gray-600"
+                    className="flex items-start gap-2 text-sm text-gray-600"
                   >
-                    <div className="w-1.5 h-1.5 bg-ceylon-orange rounded-full flex-shrink-0"></div>
-                    {feature}
+                    <div className="w-1 h-1 bg-blue-100 rounded-full mt-2 flex-shrink-0"></div>
+                    <span>{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -119,13 +112,12 @@ export const PrizeSection = () => {
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <p className="text-gray-600 mb-6">
-            All prizes are sponsored by the Sri Lankan Tourism Board and our
-            partners
+        <div className="text-center mt-8">
+          <p className="text-sm text-gray-500 mb-4">
+            All prizes sponsored by Sri Lankan Tourism Board and partners
           </p>
-          <button className="bg-ceylon-orange hover:bg-ceylon-orange-light text-white px-8 py-3 rounded-lg font-medium transition-all duration-300">
-            View Prize Terms & Conditions
+          <button className="bg-white text-black border border-blue-100 hover:bg-blue-50 px-6 py-2 rounded-md text-sm font-medium transition-all duration-300">
+            View Terms & Conditions
           </button>
         </div>
       </div>

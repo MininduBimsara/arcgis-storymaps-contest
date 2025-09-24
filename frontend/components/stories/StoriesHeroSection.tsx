@@ -1,37 +1,71 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const StoriesHeroSection = () => {
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background Image Container */}
+      <div className="absolute inset-0">
+        {/* Replace this with your background image */}
         <Image
-          src="/beach.png"
-          alt="Sri Lanka Tea Plantations"
-          className="w-full h-full object-cover"
-          fill
+          src="/cup.png"
+          alt="Hero Background"
+          layout="fill"
+          objectFit="cover"
+          className="opacity-70"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-transparent to-black/60"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/20" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-        <h1 className="text-6xl md:text-7xl lg:text-8xl font-light text-white mb-6 leading-tight">
-          Stories
-        </h1>
-        <p className="text-xl md:text-2xl text-white/90 mb-8 font-light leading-relaxed max-w-3xl mx-auto">
-          Discover Sri Lanka through the eyes of travelers, locals, and
-          storytellers. Each story is a window into the soul of Ceylon.
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-          <button className="bg-white text-gray-900 px-8 py-4 rounded-lg hover:bg-gray-100 transition-all duration-300 font-medium text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-            Create Your Story
-          </button>
-          <button className="bg-white/20 backdrop-blur-sm text-white border border-white/30 px-8 py-4 rounded-lg hover:bg-white/30 transition-all duration-300 font-medium text-lg">
-            Browse Categories
-          </button>
+      {/* Content Container - Centered */}
+      <div className="pt-1 relative z-10 max-w-7xl mx-auto px-6 w-full flex justify-center">
+        <div className="max-w-2xl text-center">
+          {/* Main Content */}
+          <div className="space-y-8">
+            <div className="space-y-6">
+              <div className="text-sm text-white/90 font-medium tracking-wide uppercase">
+                Digital Stories
+              </div>
+
+              <h1 className="text-4xl md:text-5xl lg:text-7xl font-light text-white leading-tight">
+                Explore
+                <br />
+                <span className="font-normal">Sri Lanka</span>
+              </h1>
+
+              <p className="text-xl text-white/90 max-w-lg leading-relaxed mx-auto">
+                Discover the island's beauty through interactive stories from
+                travelers, locals, and cultural explorers
+              </p>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="text-3xl font-medium text-white">150+</div>
+                <div className="text-sm text-white/80">Published Stories</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-medium text-white">25k+</div>
+                <div className="text-sm text-white/80">Total Views</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-medium text-white">6</div>
+                <div className="text-sm text-white/80">Categories</div>
+              </div>
+            </div>
+
+            {/* Action Button */}
+            <div className="flex justify-center">
+              <Link href="/submissions/create">
+                <button className="bg-white text-black px-8 py-4 rounded-lg text-base font-medium hover:bg-gray-100 transition-colors duration-300 shadow-lg">
+                  Create Your Story
+                </button>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>

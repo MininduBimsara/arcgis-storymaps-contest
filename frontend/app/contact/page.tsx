@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Mail, Phone, MapPin } from "lucide-react";
 
 interface FormData {
   name: string;
@@ -38,10 +39,13 @@ const ContactPage: React.FC = () => {
     });
   };
 
-  // Placeholder: hook up to backend/email service if needed
+  const handleSubmit = () => {
+    console.log("Form submitted:", formData);
+    // Add your form submission logic here
+  };
 
   return (
-    <div className="fixed inset-0 overflow-hidden ">
+    <div className="fixed inset-0 overflow-hidden">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -49,23 +53,26 @@ const ContactPage: React.FC = () => {
           backgroundImage: "url('/contact.jpg')",
         }}
       >
-        {/* Dark overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/30"></div>
+        {/* Overlay for better readability */}
+        <div className=" absolute inset-0 bg-black/40"></div>
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex items-center justify-center h-full py-24 px-4 pt-40">
+      <div className="relative z-10 flex items-center justify-center h-full py-8 px-6 pt-25">
         <div className="w-full max-w-xl">
-          {/* Glassmorphism Container */}
-          <div className="backdrop-blur-lg bg-white/20 rounded-2xl p-6 md:p-8 shadow-2xl border border-white/30">
+          {/* Main Container */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-md shadow-lg border border-white/20 p-6">
             {/* Header */}
             <div className="text-center mb-6">
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                CONTACT US
+              <div className="text-sm text-blue-300 font-medium tracking-wide uppercase mb-2">
+                Get In Touch
+              </div>
+              <h1 className="text-2xl md:text-3xl font-light text-black mb-3">
+                Contact Us
               </h1>
-              <p className="text-white/90 text-base leading-relaxed max-w-md mx-auto">
-                Get in touch with us for Ceylon Stories 2025 ArcGIS StoryMaps
-                Competition
+              <p className="text-gray-600 text-sm leading-relaxed max-w-md mx-auto">
+                Have questions about the 2025 ArcGIS StoryMaps Competition?
+                We're here to help you share your Sri Lankan story.
               </p>
             </div>
 
@@ -76,7 +83,7 @@ const ContactPage: React.FC = () => {
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-white/90 text-sm font-medium mb-2"
+                    className="block text-black text-sm font-medium mb-1"
                   >
                     Full Name
                   </label>
@@ -86,7 +93,7 @@ const ContactPage: React.FC = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/40 backdrop-blur-sm transition-all duration-300"
+                    className="w-full px-3 py-2 rounded-md bg-white border border-gray-200 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-100 transition-all duration-300"
                     placeholder="Enter your full name"
                     required
                   />
@@ -96,7 +103,7 @@ const ContactPage: React.FC = () => {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-white/90 text-sm font-medium mb-2"
+                    className="block text-black text-sm font-medium mb-1"
                   >
                     Email Address
                   </label>
@@ -106,8 +113,8 @@ const ContactPage: React.FC = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/40 backdrop-blur-sm transition-all duration-300"
-                    placeholder="Enter your email"
+                    className="w-full px-3 py-2 rounded-md bg-white border border-gray-200 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-100 transition-all duration-300"
+                    placeholder="Enter your email address"
                     required
                   />
                 </div>
@@ -117,7 +124,7 @@ const ContactPage: React.FC = () => {
               <div>
                 <label
                   htmlFor="subject"
-                  className="block text-white/90 text-sm font-medium mb-2"
+                  className="block text-black text-sm font-medium mb-1"
                 >
                   Subject
                 </label>
@@ -127,8 +134,8 @@ const ContactPage: React.FC = () => {
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/40 backdrop-blur-sm transition-all duration-300"
-                  placeholder="What is this about?"
+                  className="w-full px-3 py-2 rounded-md bg-white border border-gray-200 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-100 transition-all duration-300"
+                  placeholder="What can we help you with?"
                   required
                 />
               </div>
@@ -137,7 +144,7 @@ const ContactPage: React.FC = () => {
               <div>
                 <label
                   htmlFor="message"
-                  className="block text-white/90 text-sm font-medium mb-2"
+                  className="block text-black text-sm font-medium mb-1"
                 >
                   Message
                 </label>
@@ -146,18 +153,19 @@ const ContactPage: React.FC = () => {
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  rows={4}
-                  className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/40 backdrop-blur-sm resize-none transition-all duration-300"
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-md bg-white border border-gray-200 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-100 resize-none transition-all duration-300"
                   placeholder="Tell us more about your inquiry..."
                   required
-                ></textarea>
+                />
               </div>
 
               {/* Submit Button */}
-              <div className="text-center">
+              <div className="text-center pt-2">
                 <button
-                  onClick={() => console.log("Form submitted:", formData)}
-                  className="px-6 py-2 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg border border-white/30 hover:border-white/40 transition-all duration-300 backdrop-blur-sm hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30"
+                  type="button"
+                  onClick={handleSubmit}
+                  className="bg-black text-white px-6 py-2 rounded-md font-medium hover:bg-gray-800 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-100"
                 >
                   Send Message
                 </button>
@@ -165,80 +173,46 @@ const ContactPage: React.FC = () => {
             </div>
 
             {/* Contact Information */}
-            <div className="mt-6 pt-6 border-t border-white/20">
+            <div className="mt-6 pt-4 border-t border-gray-200">
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="group">
-                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-white/20 transition-all duration-300">
-                    <svg
-                      className="w-5 h-5 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                      />
-                    </svg>
+                  <div className="w-10 h-10 bg-blue-50 rounded-md flex items-center justify-center mx-auto mb-2 group-hover:bg-blue-100 transition-colors duration-300">
+                    <Mail className="w-4 h-4 text-blue-300" />
                   </div>
-                  <h3 className="text-white font-semibold text-sm mb-1">
-                    Email
+                  <h3 className="text-black font-medium text-sm mb-1">
+                    Email Us
                   </h3>
-                  <p className="text-white/80 text-xs">info@ceylonstories.lk</p>
+                  <p className="text-gray-600 text-xs">info@ceylonstories.lk</p>
                 </div>
 
                 <div className="group">
-                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-white/20 transition-all duration-300">
-                    <svg
-                      className="w-5 h-5 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                      />
-                    </svg>
+                  <div className="w-10 h-10 bg-blue-50 rounded-md flex items-center justify-center mx-auto mb-2 group-hover:bg-blue-100 transition-colors duration-300">
+                    <Phone className="w-4 h-4 text-blue-300" />
                   </div>
-                  <h3 className="text-white font-semibold text-sm mb-1">
-                    Phone
+                  <h3 className="text-black font-medium text-sm mb-1">
+                    Call Us
                   </h3>
-                  <p className="text-white/80 text-xs">+94 11 123 4567</p>
+                  <p className="text-gray-600 text-xs">+94 11 123 4567</p>
                 </div>
 
                 <div className="group">
-                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-white/20 transition-all duration-300">
-                    <svg
-                      className="w-5 h-5 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
+                  <div className="w-10 h-10 bg-blue-50 rounded-md flex items-center justify-center mx-auto mb-2 group-hover:bg-blue-100 transition-colors duration-300">
+                    <MapPin className="w-4 h-4 text-blue-300" />
                   </div>
-                  <h3 className="text-white font-semibold text-sm mb-1">
-                    Location
+                  <h3 className="text-black font-medium text-sm mb-1">
+                    Visit Us
                   </h3>
-                  <p className="text-white/80 text-xs">Colombo, Sri Lanka</p>
+                  <p className="text-gray-600 text-xs">Colombo, Sri Lanka</p>
                 </div>
               </div>
+            </div>
+
+            {/* Additional Information */}
+            <div className="mt-4 pt-3 border-t border-gray-200 text-center">
+              <p className="text-xs text-gray-500 mb-1">
+                Support: Monday - Friday, 9:00 AM - 6:00 PM (IST)
+              </p>
+              <p className="text-xs text-gray-400">Response within 24 hours</p>
             </div>
           </div>
         </div>

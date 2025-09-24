@@ -11,7 +11,21 @@ import {
   Heart,
   Eye,
 } from "lucide-react";
-import { Story } from "./StoryCard";
+
+export interface Story {
+  id: number;
+  title: string;
+  author: string;
+  category: string;
+  categoryColor: string;
+  gradientOverlay: string;
+  location: string;
+  readTime: string;
+  description: string;
+  likes: string;
+  views: string;
+  image: string;
+}
 
 interface StoryDetailsProps {
   story: Story;
@@ -20,48 +34,46 @@ interface StoryDetailsProps {
 
 const StoryDetails: React.FC<StoryDetailsProps> = ({ story, onBack }) => {
   return (
-    <div className="min-h-screen bg-white pt-24">
+    <div className="min-h-screen bg-white">
       {/* Story Header */}
-      <div className="relative h-96 overflow-hidden">
+      <div className="relative h-80 overflow-hidden bg-gray-100">
         <img
           src={story.image}
           alt={story.title}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+        <div className="absolute inset-0 bg-black/40"></div>
 
         {/* Back Button */}
         <button
           onClick={onBack}
-          className="absolute top-6 left-6 bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-all duration-300"
+          className="absolute top-6 left-6 bg-white/90 backdrop-blur-sm text-black p-3 rounded-md hover:bg-white transition-all duration-300"
         >
-          <ArrowLeft className="w-6 h-6" />
+          <ArrowLeft className="w-5 h-5" />
         </button>
 
         {/* Story Title and Meta */}
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <div className="max-w-4xl mx-auto">
             <div className="mb-4">
-              <span
-                className={`px-3 py-1 rounded-full text-sm font-medium text-white backdrop-blur-sm ${story.categoryColor}`}
-              >
+              <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-black rounded-md text-sm font-medium">
                 {story.category}
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-light text-white mb-4 leading-tight">
+            <h1 className="text-3xl md:text-4xl font-light text-white mb-4 leading-tight">
               {story.title}
             </h1>
-            <div className="flex items-center space-x-6 text-white/90">
-              <div className="flex items-center space-x-2">
-                <User className="w-5 h-5" />
+            <div className="flex items-center gap-6 text-white/90 text-sm">
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4" />
                 <span>By {story.author}</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <MapPin className="w-5 h-5" />
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
                 <span>{story.location}</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <Clock className="w-5 h-5" />
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
                 <span>{story.readTime}</span>
               </div>
             </div>
@@ -73,33 +85,33 @@ const StoryDetails: React.FC<StoryDetailsProps> = ({ story, onBack }) => {
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Story Actions */}
         <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200">
-          <div className="flex items-center space-x-6 text-sm text-gray-500">
-            <div className="flex items-center space-x-2">
-              <Heart className="w-5 h-5" />
+          <div className="flex items-center gap-6 text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <Heart className="w-4 h-4" />
               <span>{story.likes} likes</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <Eye className="w-5 h-5" />
+            <div className="flex items-center gap-2">
+              <Eye className="w-4 h-4" />
               <span>{story.views} views</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <Calendar className="w-5 h-5" />
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
               <span>March 15, 2025</span>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors">
-              <Bookmark className="w-5 h-5 text-gray-600" />
+          <div className="flex items-center gap-3">
+            <button className="p-2 rounded-md bg-gray-100 hover:bg-blue-50 hover:text-blue-300 transition-colors">
+              <Bookmark className="w-4 h-4" />
             </button>
-            <button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors">
-              <Share2 className="w-5 h-5 text-gray-600" />
+            <button className="p-2 rounded-md bg-gray-100 hover:bg-blue-50 hover:text-blue-300 transition-colors">
+              <Share2 className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Story Body */}
         <div className="prose prose-lg max-w-none">
-          <p className="text-xl text-gray-700 leading-relaxed mb-8 font-light">
+          <p className="text-lg text-gray-700 leading-relaxed mb-8">
             {story.description}
           </p>
 
@@ -117,7 +129,7 @@ const StoryDetails: React.FC<StoryDetailsProps> = ({ story, onBack }) => {
             chapter in the grand narrative of Sri Lanka's rich heritage.
           </p>
 
-          <h2 className="text-2xl font-medium text-gray-900 mb-4 mt-8">
+          <h2 className="text-2xl font-medium text-black mb-4 mt-8">
             The Experience
           </h2>
 
@@ -135,7 +147,7 @@ const StoryDetails: React.FC<StoryDetailsProps> = ({ story, onBack }) => {
             add depth and authenticity to every encounter.
           </p>
 
-          <h2 className="text-2xl font-medium text-gray-900 mb-4 mt-8">
+          <h2 className="text-2xl font-medium text-black mb-4 mt-8">
             Planning Your Visit
           </h2>
 
@@ -157,9 +169,9 @@ const StoryDetails: React.FC<StoryDetailsProps> = ({ story, onBack }) => {
 
         {/* Tags */}
         <div className="mt-12 pt-8 border-t border-gray-200">
-          <div className="flex items-center space-x-2 mb-4">
-            <Tag className="w-5 h-5 text-gray-500" />
-            <span className="text-gray-700 font-medium">Tags:</span>
+          <div className="flex items-center gap-2 mb-4">
+            <Tag className="w-4 h-4 text-gray-500" />
+            <span className="text-gray-700 font-medium">Related Topics:</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {[
@@ -172,12 +184,23 @@ const StoryDetails: React.FC<StoryDetailsProps> = ({ story, onBack }) => {
             ].map((tag) => (
               <span
                 key={tag}
-                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 cursor-pointer transition-colors"
+                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-blue-50 hover:text-blue-300 cursor-pointer transition-colors"
               >
                 #{tag}
               </span>
             ))}
           </div>
+        </div>
+
+        {/* Back to Stories */}
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <button
+            onClick={onBack}
+            className="bg-black text-white px-6 py-3 rounded-md font-medium hover:bg-gray-800 transition-colors duration-300 flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Stories
+          </button>
         </div>
       </div>
     </div>
