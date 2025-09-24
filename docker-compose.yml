@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      target: development
+    container_name: arcgis-backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - MONGO_URI=mongodb://mongo:27017/arcgis-storymaps
+      - CORS_ORIGIN=http://localhost:3000
+      - JWT_SECRET=your_jwt_secret_key
+      - JWT_EXPIRES_IN=1d
+      - JWT_COOKIE_EXPIRES_IN=1
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+    container_name: arcgis-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  mongo:
+    image: mongo:latest
+    container_name: arcgis-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
