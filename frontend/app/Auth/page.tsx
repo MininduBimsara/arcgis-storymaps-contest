@@ -11,6 +11,7 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
+import { useAuthRedirect } from "@/hooks/useProtectedRoute";
 
 interface FormData {
   email: string;
@@ -35,6 +36,7 @@ const CeylonStoriesAuth = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const { isAuthenticated, isLoading } = useAuthRedirect();
 
   const [formData, setFormData] = useState<FormData>({
     email: "",

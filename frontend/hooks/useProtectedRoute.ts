@@ -17,7 +17,7 @@ export const useProtectedRoute = () => {
 
     // If user is not authenticated, redirect to login
     if (!isAuthenticated) {
-      router.replace("/Auth");
+      router.replace("/auth");
     }
   }, [isAuthenticated, isLoading, router]);
 
