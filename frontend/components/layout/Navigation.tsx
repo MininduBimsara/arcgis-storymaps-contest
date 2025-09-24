@@ -13,9 +13,6 @@ const Navigation = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Don't redirect from Navigation component - let individual pages handle this
-  // This was likely causing the redirect loop
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -33,16 +30,16 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+    <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex justify-between items-center h-16">
           {/* Logo and Brand */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
-                <MapPin className="h-6 w-6 text-white" />
+            <Link href="/" className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
+                <MapPin className="h-5 w-5 text-black" />
               </div>
-              <span className="font-bold text-xl text-gray-900">
+              <span className="text-xl font-medium text-black">
                 Ceylon Stories
               </span>
             </Link>
@@ -54,10 +51,10 @@ const Navigation = () => {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`text-sm font-medium transition-colors hover:text-blue-600 ${
+                className={`text-base font-normal transition-colors ${
                   pathname === item.href
-                    ? "text-blue-600 border-b-2 border-blue-600"
-                    : "text-gray-700"
+                    ? "text-black border-b-2 border-blue-100 pb-1"
+                    : "text-gray-600 hover:text-black"
                 }`}
               >
                 {item.name}
@@ -69,7 +66,7 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-4">
             {isLoading ? (
               <div className="animate-pulse">
-                <div className="h-8 w-20 bg-gray-200 rounded"></div>
+                <div className="h-10 w-20 bg-gray-100 rounded-md"></div>
               </div>
             ) : isAuthenticated && user ? (
               <div className="relative">
@@ -77,19 +74,19 @@ const Navigation = () => {
                   onClick={() =>
                     setIsProfileDropdownOpen(!isProfileDropdownOpen)
                   }
-                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
+                  className="flex items-center space-x-2 text-black hover:text-gray-600 transition-colors p-2 rounded-md hover:bg-gray-50"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
+                    <User className="w-4 h-4 text-black" />
                   </div>
-                  <span className="font-medium">{user.username}</span>
+                  <span className="font-normal">{user.username}</span>
                 </button>
 
                 {isProfileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-sm border border-gray-100 py-1 z-50">
                     <Link
                       href="/profile"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="flex items-center px-4 py-2 text-base text-black hover:bg-gray-50"
                       onClick={() => setIsProfileDropdownOpen(false)}
                     >
                       <Settings className="w-4 h-4 mr-2" />
@@ -97,16 +94,16 @@ const Navigation = () => {
                     </Link>
                     <Link
                       href="/submissions"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="flex items-center px-4 py-2 text-base text-black hover:bg-gray-50"
                       onClick={() => setIsProfileDropdownOpen(false)}
                     >
                       <MapPin className="w-4 h-4 mr-2" />
                       My Submissions
                     </Link>
-                    <hr className="my-1" />
+                    <hr className="my-1 border-gray-100" />
                     <button
                       onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                      className="flex items-center w-full px-4 py-2 text-base text-red-600 hover:bg-gray-50"
                     >
                       <LogOut className="w-4 h-4 mr-2" />
                       Sign Out
@@ -118,13 +115,13 @@ const Navigation = () => {
               <div className="flex items-center space-x-3">
                 <Link
                   href="/auth"
-                  className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+                  className="text-black hover:text-gray-600 font-normal transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/auth"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium"
+                  className="bg-white text-black px-4 py-2 rounded-md border border-blue-100 hover:bg-blue-50 transition-all duration-200 font-normal"
                 >
                   Get Started
                 </Link>
@@ -136,12 +133,12 @@ const Navigation = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              className="text-black hover:text-gray-600 transition-colors p-2"
             >
               {isMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <Menu className="h-5 w-5" />
               )}
             </button>
           </div>
@@ -150,15 +147,15 @@ const Navigation = () => {
         {/* Mobile Navigation Menu */}
         {isMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 border-t border-gray-200">
+            <div className="px-2 pt-2 pb-3 space-y-1 border-t border-gray-100">
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                  className={`block px-3 py-2 rounded-md text-base font-normal transition-colors ${
                     pathname === item.href
-                      ? "text-blue-600 bg-blue-50"
-                      : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                      ? "text-black bg-blue-50"
+                      : "text-gray-600 hover:text-black hover:bg-gray-50"
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -166,11 +163,11 @@ const Navigation = () => {
                 </Link>
               ))}
 
-              <hr className="my-3" />
+              <hr className="my-3 border-gray-100" />
 
               {isLoading ? (
                 <div className="px-3 py-2">
-                  <div className="animate-pulse h-6 w-24 bg-gray-200 rounded"></div>
+                  <div className="animate-pulse h-6 w-24 bg-gray-100 rounded-md"></div>
                 </div>
               ) : isAuthenticated && user ? (
                 <div className="space-y-1">
@@ -179,14 +176,14 @@ const Navigation = () => {
                   </div>
                   <Link
                     href="/profile"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                    className="block px-3 py-2 rounded-md text-base font-normal text-black hover:bg-gray-50"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Profile Settings
                   </Link>
                   <Link
                     href="/submissions"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                    className="block px-3 py-2 rounded-md text-base font-normal text-black hover:bg-gray-50"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     My Submissions
@@ -196,7 +193,7 @@ const Navigation = () => {
                       handleLogout();
                       setIsMenuOpen(false);
                     }}
-                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-gray-50"
+                    className="block w-full text-left px-3 py-2 rounded-md text-base font-normal text-red-600 hover:bg-gray-50"
                   >
                     Sign Out
                   </button>
@@ -205,14 +202,14 @@ const Navigation = () => {
                 <div className="space-y-1">
                   <Link
                     href="/auth"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                    className="block px-3 py-2 rounded-md text-base font-normal text-black hover:bg-gray-50"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/auth"
-                    className="block px-3 py-2 rounded-md text-base font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
+                    className="block px-3 py-2 rounded-md text-base font-normal bg-white text-black border border-blue-100 hover:bg-blue-50"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Get Started

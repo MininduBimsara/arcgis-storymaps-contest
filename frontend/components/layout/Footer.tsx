@@ -2,24 +2,24 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-50 border-t border-gray-200 py-16">
+    <footer className="bg-white border-t border-gray-200 py-16">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-bold text-gray-900 mb-4">About</h3>
+            <h3 className="font-medium text-black mb-4">About</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="#" className="hover:text-blue-600 transition-colors">
                   Our Mission
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="#" className="hover:text-blue-600 transition-colors">
                   Team
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="#" className="hover:text-blue-600 transition-colors">
                   Careers
                 </a>
               </li>
@@ -27,20 +27,20 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-bold text-gray-900 mb-4">Stories</h3>
+            <h3 className="font-medium text-black mb-4">Stories</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="#" className="hover:text-blue-600 transition-colors">
                   Featured
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="#" className="hover:text-blue-600 transition-colors">
                   Categories
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="#" className="hover:text-blue-600 transition-colors">
                   Popular
                 </a>
               </li>
@@ -48,20 +48,20 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-bold text-gray-900 mb-4">Contest</h3>
+            <h3 className="font-medium text-black mb-4">Contest</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="#" className="hover:text-blue-600 transition-colors">
                   Rules
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="#" className="hover:text-blue-600 transition-colors">
                   Prizes
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="#" className="hover:text-blue-600 transition-colors">
                   Winners
                 </a>
               </li>
@@ -69,20 +69,20 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-bold text-gray-900 mb-4">Connect</h3>
+            <h3 className="font-medium text-black mb-4">Connect</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="#" className="hover:text-blue-600 transition-colors">
                   Newsletter
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="#" className="hover:text-blue-600 transition-colors">
                   Social Media
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="#" className="hover:text-blue-600 transition-colors">
                   Contact
                 </a>
               </li>

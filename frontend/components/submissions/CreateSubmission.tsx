@@ -508,7 +508,7 @@ const SubmissionPage: React.FC = () => {
                   type="text"
                   value={formData.title}
                   onChange={(e) => handleInputChange("title", e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                  className={`text-black w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                     errors.title
                       ? "border-red-500 error-field"
                       : "border-gray-300"
@@ -537,7 +537,7 @@ const SubmissionPage: React.FC = () => {
                     handleInputChange("description", e.target.value)
                   }
                   rows={5}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                  className={`text-black w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                     errors.description
                       ? "border-red-500 error-field"
                       : "border-gray-300"
@@ -579,7 +579,7 @@ const SubmissionPage: React.FC = () => {
                     onChange={(e) =>
                       handleInputChange("storyMapUrl", e.target.value)
                     }
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors pr-12 ${
+                    className={`text-black w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors pr-12 ${
                       errors.storyMapUrl
                         ? "border-red-500 error-field"
                         : "border-gray-300"
@@ -619,7 +619,7 @@ const SubmissionPage: React.FC = () => {
                   onChange={(e) =>
                     handleInputChange("thumbnailUrl", e.target.value)
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                  className="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
                   placeholder="https://example.com/thumbnail.jpg"
                 />
                 <p className="mt-1 text-sm text-gray-500">
@@ -637,7 +637,7 @@ const SubmissionPage: React.FC = () => {
                     <input
                       type="url"
                       placeholder="https://example.com/image.jpg"
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      className="text-black flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       onKeyPress={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
@@ -706,7 +706,7 @@ const SubmissionPage: React.FC = () => {
                   onChange={(e) =>
                     handleInputChange("category", e.target.value)
                   }
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${
+                  className={`text-black w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${
                     errors.category
                       ? "border-red-500 error-field"
                       : "border-gray-300"
@@ -737,7 +737,7 @@ const SubmissionPage: React.FC = () => {
                     value={currentTag}
                     onChange={(e) => setCurrentTag(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    className="text-black flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                     placeholder="Enter a tag"
                     maxLength={30}
                   />
@@ -793,7 +793,7 @@ const SubmissionPage: React.FC = () => {
                   onChange={(e) =>
                     handleInputChange("region", e.target.value as Region)
                   }
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
+                  className={`text-black w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
                     errors.region
                       ? "border-red-500 error-field"
                       : "border-gray-300"
@@ -824,7 +824,7 @@ const SubmissionPage: React.FC = () => {
                   onChange={(e) =>
                     handleInputChange("specificLocation", e.target.value)
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                  className="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
                   placeholder="e.g., Colombo, Western Province"
                   maxLength={100}
                 />
@@ -874,7 +874,7 @@ const SubmissionPage: React.FC = () => {
                             e.target.value
                           )
                         }
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                        className={`text-black w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
                           errors[`teamMember_${index}_name`]
                             ? "border-red-500 error-field"
                             : "border-gray-300"
@@ -900,7 +900,7 @@ const SubmissionPage: React.FC = () => {
                             e.target.value
                           )
                         }
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                        className={`text-black w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
                           errors[`teamMember_${index}_email`]
                             ? "border-red-500 error-field"
                             : "border-gray-300"
@@ -924,7 +924,7 @@ const SubmissionPage: React.FC = () => {
                           e.target.value
                         )
                       }
-                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      className="text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                       placeholder="Role/Title"
                       maxLength={50}
                     />
@@ -989,7 +989,7 @@ const SubmissionPage: React.FC = () => {
                             e.target.value
                           )
                         }
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
+                        className={`text-black w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
                           errors[`dataSource_${index}_name`]
                             ? "border-red-500 error-field"
                             : "border-gray-300"
@@ -1013,7 +1013,7 @@ const SubmissionPage: React.FC = () => {
                           e.target.value
                         )
                       }
-                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                       placeholder="Source URL (Optional)"
                     />
                     <div>
@@ -1027,7 +1027,7 @@ const SubmissionPage: React.FC = () => {
                             e.target.value
                           )
                         }
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
+                        className={`text-black w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
                           errors[`dataSource_${index}_type`]
                             ? "border-red-500 error-field"
                             : "border-gray-300"
@@ -1059,7 +1059,7 @@ const SubmissionPage: React.FC = () => {
                   })
                 }
                 disabled={formData.dataSourcesUsed.length >= 20}
-                className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-orange-400 hover:text-orange-600 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="text-black w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-orange-400 hover:text-orange-600 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Data Source
@@ -1086,7 +1086,7 @@ const SubmissionPage: React.FC = () => {
                   onChange={(e) =>
                     handleInputChange("copyrightCompliant", e.target.checked)
                   }
-                  className="mt-1 w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                  className="text-black mt-1 w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
                 />
                 <div>
                   <span className="text-sm font-medium text-gray-900">
