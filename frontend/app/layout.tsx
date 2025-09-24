@@ -113,7 +113,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
           href="https://js.arcgis.com/4.28/esri/themes/light/main.css"
         />
       </head>
-      <body className={`${inter.className} antialiased`}>
+      <body
+        suppressHydrationWarning
+        className={`${inter.className} antialiased`}
+      >
         {/* Skip to main content for accessibility */}
         <a
           href="#main-content"

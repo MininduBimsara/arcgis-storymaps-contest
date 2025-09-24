@@ -2,6 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 const compression = require("compression");
+const cookieParser = require("cookie-parser");
 const connectDB = require("./config/database");
 
 // Import middleware
@@ -16,9 +17,12 @@ const routes = require("./routes");
 const app = express();
 
 // Basic middleware
+// Trust proxy so Secure cookies work behind reverse proxies (e.g., Vercel/Render/Nginx)
+app.set("trust proxy", 1);
 app.use(compression());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(cookieParser());
 
 // CORS configuration - Handle undefined CORS_ORIGIN
 const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:3000";

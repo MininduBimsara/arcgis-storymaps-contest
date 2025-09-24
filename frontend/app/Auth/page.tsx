@@ -73,6 +73,18 @@ const CeylonStoriesAuth = () => {
     };
   }, [isAuthenticated, isLoading, router]);
 
+  // Lock page scroll while on the auth screen
+  useEffect(() => {
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+    };
+  }, []);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -237,7 +249,7 @@ const CeylonStoriesAuth = () => {
   // Show loading during auth check
   if (isLoading) {
     return (
-      <div className="h-screen bg-white flex items-center justify-center overflow-hidden">
+      <div className="fixed inset-0 bg-white flex items-center justify-center overflow-hidden py-24">
         <div className="flex flex-col items-center">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
           <p className="text-gray-600">Loading...</p>
@@ -249,7 +261,7 @@ const CeylonStoriesAuth = () => {
   // Show redirect message only briefly
   if (isAuthenticated && !isLoading) {
     return (
-      <div className="h-screen bg-white flex items-center justify-center overflow-hidden">
+      <div className="fixed inset-0 bg-white flex items-center justify-center overflow-hidden py-24">
         <div className="flex flex-col items-center">
           <CheckCircle className="w-12 h-12 text-green-500 mb-4" />
           <p className="text-gray-600">
@@ -261,7 +273,7 @@ const CeylonStoriesAuth = () => {
   }
 
   return (
-    <div className="h-screen bg-white flex items-center justify-center overflow-hidden">
+    <div className="fixed inset-0 bg-white flex items-center justify-center overflow-hidden py-24 pt-40">
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
@@ -272,8 +284,10 @@ const CeylonStoriesAuth = () => {
         <div className="absolute inset-0 bg-black/30"></div>
       </div>
 
-      {/* Main Container - Fixed height and centered */}
-      <div className="relative w-full max-w-6xl mx-auto h-[600px] bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+      {/* Main Container - Fixed height and centered (taller on Sign Up). Add small vertical margin to avoid navbar overlap */}
+      <div
+        className={` relative w-full max-w-6xl mx-auto ${isLogin ? "h-[600px]" : "h-[720px]"} my-6 bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 overflow-hidden`}
+      >
         <div className="flex h-full">
           {/* Left Panel - Welcome Section */}
           <div className="w-1/2 p-12 flex flex-col justify-center bg-gradient-to-br from-blue-600/50 to-blue-800/50 backdrop-blur-sm">
@@ -312,8 +326,8 @@ const CeylonStoriesAuth = () => {
             </div>
           </div>
 
-          {/* Right Panel - Auth Form - Scrollable content within fixed container */}
-          <div className="w-1/2 p-12 flex flex-col justify-center overflow-y-auto">
+          {/* Right Panel - Auth Form - No scrollbars */}
+          <div className="w-1/2 p-12 flex flex-col justify-center overflow-hidden">
             <div className="w-full max-w-md mx-auto">
               {/* Success Message */}
               {successMessage && (

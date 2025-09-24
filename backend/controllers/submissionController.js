@@ -366,8 +366,23 @@ class SubmissionController {
       return responseHandler.error(res, "Access denied", 403);
     }
 
-    // Extract StoryMap ID from URL
-    const storyMapId = submission.storyMapId;
+    // Ensure StoryMap ID is available; derive from URL if not stored
+    let storyMapId = submission.storyMapId;
+    if (!storyMapId && submission.storyMapUrl) {
+      try {
+        const parsed = new URL(submission.storyMapUrl);
+        const host = parsed.hostname;
+        const pathname = parsed.pathname.replace(/\/$/, "");
+        if (host === "arcg.is") {
+          const parts = pathname.split("/").filter(Boolean);
+          if (parts[0]) storyMapId = parts[0];
+        } else if (host === "storymaps.arcgis.com") {
+          const parts = pathname.split("/").filter(Boolean);
+          const idx = parts.indexOf("stories");
+          if (idx !== -1 && parts[idx + 1]) storyMapId = parts[idx + 1];
+        }
+      } catch (_) {}
+    }
 
     // Return embed data
     const embedData = {

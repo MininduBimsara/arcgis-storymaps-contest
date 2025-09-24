@@ -3,9 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Upload,
-  X,
   Plus,
+  X,
   MapPin,
   Users,
   FileText,
@@ -16,8 +15,8 @@ import {
   AlertCircle,
   Calendar,
   Loader2,
-  Eye,
   ExternalLink,
+  Mail,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import apiService, { SubmissionData, Category } from "@/lib/api";
@@ -160,7 +159,6 @@ const SubmissionPage: React.FC = () => {
   // Check if user email is verified
   useEffect(() => {
     if (user && !user.emailVerified) {
-      // Show a warning or redirect to email verification
       console.warn("User email not verified");
     }
   }, [user]);
@@ -352,7 +350,10 @@ const SubmissionPage: React.FC = () => {
         copyrightCompliant: formData.copyrightCompliant,
       };
 
+      console.log("Submitting data:", submissionData);
+
       const response = await apiService.createSubmission(submissionData);
+      console.log("Submission response:", response);
 
       if (response.success) {
         // Success - redirect to submissions page or show success message
@@ -363,17 +364,18 @@ const SubmissionPage: React.FC = () => {
     } catch (error: any) {
       console.error("Submission error:", error);
 
-      if (error.response?.data?.error) {
-        setErrors({ general: error.response.data.error });
-      } else if (error.error) {
-        setErrors({ general: error.error });
+      // Handle different error formats
+      let errorMessage = "An unexpected error occurred. Please try again.";
+
+      if (error.error) {
+        errorMessage = error.error;
       } else if (error.message) {
-        setErrors({ general: error.message });
-      } else {
-        setErrors({
-          general: "An unexpected error occurred. Please try again.",
-        });
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        errorMessage = error;
       }
+
+      setErrors({ general: errorMessage });
     } finally {
       setIsSubmitting(false);
     }
@@ -552,151 +554,6 @@ const SubmissionPage: React.FC = () => {
                 <p className="mt-1 text-sm text-gray-500">
                   {formData.description.length}/1000 characters
                 </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Categorization */}
-          <div className="bg-white rounded-xl shadow-sm border p-8">
-            <div className="flex items-center mb-6">
-              <Tag className="w-6 h-6 text-purple-600 mr-3" />
-              <h2 className="text-2xl font-semibold text-gray-900">
-                Categorization
-              </h2>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category *
-                </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) =>
-                    handleInputChange("category", e.target.value)
-                  }
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${
-                    errors.category
-                      ? "border-red-500 error-field"
-                      : "border-gray-300"
-                  }`}
-                >
-                  <option value="">Select a category</option>
-                  {categories.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.category && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.category}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tags (Optional, max 10)
-                </label>
-                <div className="flex gap-2 mb-3">
-                  <input
-                    type="text"
-                    value={currentTag}
-                    onChange={(e) => setCurrentTag(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                    placeholder="Enter a tag"
-                    maxLength={30}
-                  />
-                  <button
-                    type="button"
-                    onClick={addTag}
-                    disabled={formData.tags.length >= 10}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {formData.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => removeTag(tag)}
-                        className="ml-2 hover:text-purple-600"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <p className="mt-1 text-sm text-gray-500">
-                  {formData.tags.length}/10 tags
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Geographic Information */}
-          <div className="bg-white rounded-xl shadow-sm border p-8">
-            <div className="flex items-center mb-6">
-              <MapPin className="w-6 h-6 text-red-600 mr-3" />
-              <h2 className="text-2xl font-semibold text-gray-900">
-                Geographic Information
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Region *
-                </label>
-                <select
-                  value={formData.region}
-                  onChange={(e) =>
-                    handleInputChange("region", e.target.value as Region)
-                  }
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
-                    errors.region
-                      ? "border-red-500 error-field"
-                      : "border-gray-300"
-                  }`}
-                >
-                  <option value="">Select a region</option>
-                  {regions.map((region) => (
-                    <option key={region} value={region}>
-                      {region}
-                    </option>
-                  ))}
-                </select>
-                {errors.region && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.region}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Specific Location (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={formData.specificLocation}
-                  onChange={(e) =>
-                    handleInputChange("specificLocation", e.target.value)
-                  }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                  placeholder="e.g., Colombo, Western Province"
-                  maxLength={100}
-                />
               </div>
             </div>
           </div>

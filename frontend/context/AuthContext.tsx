@@ -10,6 +10,8 @@ import React, {
 import { usePathname } from "next/navigation";
 import apiService, { User } from "@/lib/api";
 
+const LOCAL_STORAGE_USER_KEY = "auth_user";
+
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
@@ -41,6 +43,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [initialized, setInitialized] = useState(false);
 
   const isAuthenticated = !!user;
+  const pathname = usePathname();
 
   // Check authentication status once on app load
   useEffect(() => {
@@ -48,13 +51,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const checkAuth = async () => {
       try {
+        // Optimistic hydration from localStorage (fallback/UX only)
+        if (typeof window !== "undefined") {
+          const cached = window.localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+          if (cached) {
+            try {
+              const parsed = JSON.parse(cached) as User;
+              setUser(parsed);
+            } catch {}
+          }
+        }
+
         const response = await apiService.getCurrentUser();
         if (response.success && response.data?.user) {
           setUser(response.data.user);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(
+              LOCAL_STORAGE_USER_KEY,
+              JSON.stringify(response.data.user)
+            );
+          }
+        } else {
+          setUser(null);
+          if (typeof window !== "undefined") {
+            window.localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+          }
         }
-      } catch (error) {
-        // User is not authenticated, which is fine
+      } catch (error: any) {
+        // Only log auth errors if they're not expected 401s
+        if (error?.status !== 401) {
+          console.error("Auth check error:", error);
+        }
         setUser(null);
+        if (typeof window !== "undefined") {
+          window.localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+        }
       } finally {
         setIsLoading(false);
         setInitialized(true);
@@ -64,6 +95,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, [initialized]);
 
+  // Prevent unnecessary auth checks during form submissions
+  const isSubmissionPage = pathname?.includes("/submissions/create");
+
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
@@ -71,11 +105,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (response.success && response.data?.user) {
         setUser(response.data.user);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(
+            LOCAL_STORAGE_USER_KEY,
+            JSON.stringify(response.data.user)
+          );
+        }
       } else {
         throw new Error(response.error || "Login failed");
       }
     } catch (error: any) {
       setUser(null);
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+      }
       throw error;
     } finally {
       setIsLoading(false);
@@ -89,11 +132,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (response.success && response.data?.user) {
         setUser(response.data.user);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(
+            LOCAL_STORAGE_USER_KEY,
+            JSON.stringify(response.data.user)
+          );
+        }
       } else {
         throw new Error(response.error || "Registration failed");
       }
     } catch (error: any) {
       setUser(null);
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+      }
       throw error;
     } finally {
       setIsLoading(false);
@@ -108,6 +160,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error("Logout error:", error);
     } finally {
       setUser(null);
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+      }
       setIsLoading(false);
     }
   };
@@ -118,6 +173,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (response.success && response.data?.user) {
         setUser(response.data.user);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(
+            LOCAL_STORAGE_USER_KEY,
+            JSON.stringify(response.data.user)
+          );
+        }
       } else {
         throw new Error(response.error || "Profile update failed");
       }
@@ -127,13 +188,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const refreshUser = async () => {
+    // Don't refresh user during form submissions to prevent state reset
+    if (isSubmissionPage) {
+      return;
+    }
+
     try {
       const response = await apiService.getCurrentUser();
       if (response.success && response.data?.user) {
         setUser(response.data.user);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(
+            LOCAL_STORAGE_USER_KEY,
+            JSON.stringify(response.data.user)
+          );
+        }
       }
-    } catch (error) {
-      setUser(null);
+    } catch (error: any) {
+      // Only clear user state if it's a legitimate auth error
+      if (error?.status === 401) {
+        setUser(null);
+        if (typeof window !== "undefined") {
+          window.localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+        }
+      }
     }
   };
 

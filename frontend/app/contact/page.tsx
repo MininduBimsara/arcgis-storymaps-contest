@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface FormData {
   name: string;
@@ -17,6 +17,18 @@ const ContactPage: React.FC = () => {
     message: "",
   });
 
+  // Lock page scroll while on the contact screen
+  useEffect(() => {
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+    };
+  }, []);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -26,13 +38,10 @@ const ContactPage: React.FC = () => {
     });
   };
 
-  const handleSubmit = () => {
-    console.log("Form submitted:", formData);
-    // Handle form submission here
-  };
+  // Placeholder: hook up to backend/email service if needed
 
   return (
-    <div className="h-screen relative overflow-hidden ">
+    <div className="fixed inset-0 overflow-hidden ">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -45,7 +54,7 @@ const ContactPage: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex items-center justify-center h-full pt-24 px-4 ">
+      <div className="relative z-10 flex items-center justify-center h-full py-24 px-4 pt-40">
         <div className="w-full max-w-xl">
           {/* Glassmorphism Container */}
           <div className="backdrop-blur-lg bg-white/20 rounded-2xl p-6 md:p-8 shadow-2xl border border-white/30">

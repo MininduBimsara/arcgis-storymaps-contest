@@ -126,6 +126,7 @@ interface Submission {
 class ApiService {
   private api: AxiosInstance;
   private baseURL: string;
+  private isHandlingAuthError = false; // Prevent multiple redirects
 
   constructor() {
     this.baseURL =
@@ -143,11 +144,6 @@ class ApiService {
     // Request interceptor
     this.api.interceptors.request.use(
       (config) => {
-        // You can add auth token to headers here if needed
-        // const token = localStorage.getItem('token');
-        // if (token) {
-        //   config.headers.Authorization = `Bearer ${token}`;
-        // }
         return config;
       },
       (error) => {
@@ -155,73 +151,78 @@ class ApiService {
       }
     );
 
-    // Response interceptor - FIXED
+    // Response interceptor - FIXED TO PREVENT AUTH STATE RESET
     this.api.interceptors.response.use(
       (response: AxiosResponse) => {
         return response.data;
       },
       (error) => {
-        // Handle common errors
+        // Normalize axios error → { status, error, data }
         if (error.response) {
           const { status, data } = error.response;
 
           switch (status) {
             case 401:
-              // FIXED: Only redirect if on a protected page
-              if (typeof window !== "undefined") {
+              // FIXED: Only redirect for specific auth routes, not during form submissions
+              if (typeof window !== "undefined" && !this.isHandlingAuthError) {
                 const currentPath = window.location.pathname;
-                const publicPages = [
-                  "/",
-                  "/Auth",
-                  "/auth",
-                  "/about",
-                  "/contact",
-                  "/details",
-                  "/stories",
-                  "/verify-email",
-                  "/reset-password",
-                ];
-                const protectedPages = [
-                  "/profile",
-                  "/submissions/create",
-                  "/submissions/my-submissions",
-                ];
 
-                const isPublicPage = publicPages.some(
-                  (page) => currentPath === page || currentPath.startsWith(page)
-                );
+                // Only redirect if:
+                // 1. User is on a protected page that requires auth
+                // 2. The error is from an auth-specific endpoint (login/register/me)
+                // 3. Not during form submissions or data operations
+                const protectedPages = ["/profile"];
                 const isProtectedPage = protectedPages.some((page) =>
                   currentPath.startsWith(page)
                 );
 
-                // Only redirect if on protected page or not on auth page already
+                const isAuthEndpoint = error.config?.url?.includes("/auth/");
+                const isCurrentUserCheck =
+                  error.config?.url?.includes("/auth/me");
+
+                // Only redirect if it's an auth endpoint failure or protected page
+                // Don't redirect during submissions or data operations
                 if (
-                  isProtectedPage &&
+                  (isAuthEndpoint || isCurrentUserCheck || isProtectedPage) &&
                   currentPath !== "/auth" &&
-                  currentPath !== "/Auth"
+                  currentPath !== "/Auth" &&
+                  !currentPath.startsWith("/submissions/create")
                 ) {
-                  window.location.href = "/Auth";
+                  this.isHandlingAuthError = true;
+
+                  setTimeout(() => {
+                    this.isHandlingAuthError = false;
+                    window.location.href = "/auth";
+                  }, 100);
                 }
               }
               break;
             case 403:
-              // Forbidden
               console.error("Access forbidden");
               break;
             case 404:
-              // Not found
               console.error("Resource not found");
               break;
             case 500:
-              // Server error
               console.error("Server error");
               break;
           }
 
-          return Promise.reject(data || error.response);
+          const normalized = {
+            status,
+            error:
+              (typeof data === "object" && (data.error || data.message)) ||
+              error.message ||
+              "Request failed",
+            data,
+          } as any;
+          return Promise.reject(normalized);
         }
 
-        return Promise.reject(error);
+        return Promise.reject({
+          status: 0,
+          error: error.message || "Network error",
+        });
       }
     );
   }
@@ -319,7 +320,7 @@ class ApiService {
     submissionYear?: number;
     sortBy?: string;
     order?: "asc" | "desc";
-  }): Promise<PaginatedResponse<{ submissions: Submission[] }>> {
+  }): Promise<PaginatedResponse<Submission[]>> {
     return this.api.get("/submissions", { params });
   }
 
@@ -331,7 +332,7 @@ class ApiService {
     submissionYear?: number;
     sortBy?: string;
     order?: "asc" | "desc";
-  }): Promise<PaginatedResponse<{ submissions: Submission[] }>> {
+  }): Promise<PaginatedResponse<Submission[]>> {
     return this.api.get("/submissions/public", { params });
   }
 
@@ -355,7 +356,7 @@ class ApiService {
   async getMySubmissions(params?: {
     page?: number;
     limit?: number;
-  }): Promise<PaginatedResponse<{ submissions: Submission[] }>> {
+  }): Promise<PaginatedResponse<Submission[]>> {
     return this.api.get("/submissions/my-submissions", { params });
   }
 
@@ -365,7 +366,7 @@ class ApiService {
       page?: number;
       limit?: number;
     }
-  ): Promise<PaginatedResponse<{ submissions: Submission[] }>> {
+  ): Promise<PaginatedResponse<Submission[]>> {
     return this.api.get(`/submissions/category/${categoryId}`, { params });
   }
 
@@ -384,7 +385,7 @@ class ApiService {
       category?: string;
       region?: string;
     }
-  ): Promise<PaginatedResponse<{ submissions: Submission[] }>> {
+  ): Promise<PaginatedResponse<Submission[]>> {
     return this.api.get("/submissions/search", {
       params: { q: query, ...params },
     });

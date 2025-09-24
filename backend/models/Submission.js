@@ -31,10 +31,11 @@ const submissionSchema = new mongoose.Schema(
       required: [true, "StoryMap URL is required"],
       validate: {
         validator: function (url) {
-          // Validate both ArcGIS StoryMaps URL formats
-          const shortUrlPattern = /^https:\/\/arcg\.is\/[a-zA-Z0-9]+$/;
+          // Validate both ArcGIS StoryMaps URL formats (allow trailing slashes or query params)
+          const shortUrlPattern =
+            /^https:\/\/arcg\.is\/[a-zA-Z0-9]+(\/?|\?.*)?$/;
           const longUrlPattern =
-            /^https:\/\/storymaps\.arcgis\.com\/stories\/[a-zA-Z0-9]+$/;
+            /^https:\/\/storymaps\.arcgis\.com\/stories\/[a-zA-Z0-9]+(\/?|\?.*)?$/;
           return shortUrlPattern.test(url) || longUrlPattern.test(url);
         },
         message:
@@ -43,15 +44,7 @@ const submissionSchema = new mongoose.Schema(
     },
     storyMapId: {
       type: String,
-      required: true,
-      unique: true,
-      validate: {
-        validator: function (id) {
-          // Allow both the short ID format (like 0ezGLG0) and long format IDs
-          return /^[a-zA-Z0-9]{6,32}$/.test(id); // More flexible length validation
-        },
-        message: "Invalid StoryMap ID format",
-      },
+      // Optional: we can persist it when extractable, otherwise omit
     },
 
     // Media and Assets
@@ -264,25 +257,31 @@ submissionSchema.pre("save", function (next) {
   next();
 });
 
-// Pre-save middleware to extract StoryMap ID from URL
+// Pre-save middleware to extract StoryMap ID from URL (robust to trailing slash/query)
 submissionSchema.pre("save", function (next) {
   if (this.isModified("storyMapUrl")) {
-    // Handle both short URL format (https://arcg.is/0ezGLG0)
-    // and long format (https://storymaps.arcgis.com/stories/abc123)
-    let storyMapId;
+    let storyMapId = null;
+    try {
+      const parsed = new URL(this.storyMapUrl);
+      const host = parsed.hostname;
+      const pathname = parsed.pathname.replace(/\/$/, ""); // trim trailing slash
 
-    // Check for short URL format first
-    const shortUrlMatch = this.storyMapUrl.match(
-      /\/\/arcg\.is\/([a-zA-Z0-9]+)$/
-    );
-    if (shortUrlMatch) {
-      storyMapId = shortUrlMatch[1];
-    } else {
-      // Check for long URL format
-      const longUrlMatch = this.storyMapUrl.match(/\/stories\/([a-zA-Z0-9]+)$/);
-      if (longUrlMatch) {
-        storyMapId = longUrlMatch[1];
+      if (host === "arcg.is") {
+        // e.g., /abc123
+        const parts = pathname.split("/").filter(Boolean);
+        if (parts.length >= 1) {
+          storyMapId = parts[0];
+        }
+      } else if (host === "storymaps.arcgis.com") {
+        // e.g., /stories/abc123 or /stories/abc123/... (keep first segment after stories)
+        const parts = pathname.split("/").filter(Boolean);
+        const storiesIdx = parts.indexOf("stories");
+        if (storiesIdx !== -1 && parts[storiesIdx + 1]) {
+          storyMapId = parts[storiesIdx + 1];
+        }
       }
+    } catch (_) {
+      // Ignore URL parse errors; validation handles invalid URLs
     }
 
     if (storyMapId) {
