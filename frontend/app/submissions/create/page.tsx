@@ -1,4 +1,6 @@
 // app/submissions/create/page.tsx
+"use client";
+
 import dynamic from "next/dynamic";
 
 // Dynamically import the submission form component to avoid SSR issues

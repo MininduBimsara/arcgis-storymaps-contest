@@ -52,7 +52,7 @@ const CeylonStoriesAuth = () => {
     city: "",
   });
 
-  // FIXED: Better redirect logic
+  // Handle redirect after successful login
   useEffect(() => {
     // Clear any existing timers
     if (redirectTimerRef.current) {
@@ -60,11 +60,10 @@ const CeylonStoriesAuth = () => {
     }
 
     // Only redirect if authenticated and not currently loading
-    // Also add a small delay to prevent rapid redirects
     if (isAuthenticated && !isLoading) {
       redirectTimerRef.current = setTimeout(() => {
         router.replace("/");
-      }, 500); // Increased delay to 500ms
+      }, 1000);
     }
 
     return () => {
@@ -235,11 +234,10 @@ const CeylonStoriesAuth = () => {
     }
   };
 
-  // FIXED: Show loading during auth check on protected pages only
-  // If on auth page, don't show loading screen
-  if (isLoading && isAuthenticated === null) {
+  // Show loading during auth check
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="h-screen bg-white flex items-center justify-center overflow-hidden">
         <div className="flex flex-col items-center">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
           <p className="text-gray-600">Loading...</p>
@@ -251,7 +249,7 @@ const CeylonStoriesAuth = () => {
   // Show redirect message only briefly
   if (isAuthenticated && !isLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="h-screen bg-white flex items-center justify-center overflow-hidden">
         <div className="flex flex-col items-center">
           <CheckCircle className="w-12 h-12 text-green-500 mb-4" />
           <p className="text-gray-600">
@@ -263,7 +261,7 @@ const CeylonStoriesAuth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-start pt-30 justify-center">
+    <div className="h-screen bg-white flex items-center justify-center overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
@@ -274,11 +272,11 @@ const CeylonStoriesAuth = () => {
         <div className="absolute inset-0 bg-black/30"></div>
       </div>
 
-      {/* Main Container */}
-      <div className="relative w-full max-w-6xl mx-auto bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
-        <div className="flex flex-col lg:flex-row min-h-[600px]">
+      {/* Main Container - Fixed height and centered */}
+      <div className="relative w-full max-w-6xl mx-auto h-[600px] bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+        <div className="flex h-full">
           {/* Left Panel - Welcome Section */}
-          <div className="lg:w-1/2 p-2 lg:p-12 flex flex-col justify-start pt-16 bg-gradient-to-br from-blue-600/50 to-blue-800/50 backdrop-blur-sm">
+          <div className="w-1/2 p-12 flex flex-col justify-center bg-gradient-to-br from-blue-600/50 to-blue-800/50 backdrop-blur-sm">
             <div className="text-white">
               <div className="flex items-center mb-5">
                 <MapPin className="w-8 h-8 mr-3 text-cyan-300" />
@@ -314,8 +312,8 @@ const CeylonStoriesAuth = () => {
             </div>
           </div>
 
-          {/* Right Panel - Auth Form */}
-          <div className="lg:w-1/2 p-4 lg:p-12 flex flex-col justify-center">
+          {/* Right Panel - Auth Form - Scrollable content within fixed container */}
+          <div className="w-1/2 p-12 flex flex-col justify-center overflow-y-auto">
             <div className="w-full max-w-md mx-auto">
               {/* Success Message */}
               {successMessage && (
@@ -419,8 +417,8 @@ const CeylonStoriesAuth = () => {
                     </button>
                   </div>
 
-                  {/* Form */}
-                  <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Form - Compact for smaller container */}
+                  <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Username Field (Register only) */}
                     {!isLogin && (
                       <div className="relative">
@@ -431,7 +429,7 @@ const CeylonStoriesAuth = () => {
                           placeholder="Username"
                           value={formData.username}
                           onChange={handleInputChange}
-                          className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
+                          className="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
                           required={!isLogin}
                         />
                         {errors.username && (
@@ -451,7 +449,7 @@ const CeylonStoriesAuth = () => {
                         placeholder="Email Address"
                         value={formData.email}
                         onChange={handleInputChange}
-                        className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
+                        className="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
                         required
                       />
                       {errors.email && (
@@ -462,8 +460,10 @@ const CeylonStoriesAuth = () => {
                     </div>
 
                     {/* Password Fields */}
-                    <div className={`${!isLogin ? "flex space-x-4" : ""}`}>
-                      <div className="relative flex-1">
+                    <div
+                      className={`${!isLogin ? "grid grid-cols-2 gap-3" : ""}`}
+                    >
+                      <div className="relative">
                         <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 w-5 h-5" />
                         <input
                           type={showPassword ? "text" : "password"}
@@ -471,7 +471,7 @@ const CeylonStoriesAuth = () => {
                           placeholder="Password"
                           value={formData.password}
                           onChange={handleInputChange}
-                          className="w-full pl-12 pr-12 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
+                          className="w-full pl-12 pr-12 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
                           required
                         />
                         <button
@@ -493,15 +493,15 @@ const CeylonStoriesAuth = () => {
                       </div>
 
                       {!isLogin && (
-                        <div className="relative flex-1">
+                        <div className="relative">
                           <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 w-5 h-5" />
                           <input
                             type={showConfirmPassword ? "text" : "password"}
                             name="confirmPassword"
-                            placeholder="Confirm Password"
+                            placeholder="Confirm"
                             value={formData.confirmPassword}
                             onChange={handleInputChange}
-                            className="w-full pl-12 pr-12 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
+                            className="w-full pl-12 pr-12 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
                             required={!isLogin}
                           />
                           <button
@@ -526,46 +526,40 @@ const CeylonStoriesAuth = () => {
                       )}
                     </div>
 
-                    {/* Optional Fields for Registration */}
+                    {/* Optional Fields for Registration - Compact layout */}
                     {!isLogin && (
-                      <div className="space-y-4">
-                        <div className="relative">
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
                           <input
                             type="tel"
                             name="phone"
-                            placeholder="Phone Number (Optional)"
+                            placeholder="Phone (Optional)"
                             value={formData.phone}
                             onChange={handleInputChange}
-                            className="w-full pl-4 pr-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
+                            className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
                           />
-                          {errors.phone && (
-                            <p className="mt-1 text-sm text-red-400">
-                              {errors.phone}
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="relative">
-                          <input
-                            type="text"
-                            name="address"
-                            placeholder="Address (Optional)"
-                            value={formData.address}
-                            onChange={handleInputChange}
-                            className="w-full pl-4 pr-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
-                          />
-                        </div>
-
-                        <div className="relative">
                           <input
                             type="text"
                             name="city"
                             placeholder="City (Optional)"
                             value={formData.city}
                             onChange={handleInputChange}
-                            className="w-full pl-4 pr-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
+                            className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
                           />
                         </div>
+                        <input
+                          type="text"
+                          name="address"
+                          placeholder="Address (Optional)"
+                          value={formData.address}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent transition-all duration-300"
+                        />
+                        {errors.phone && (
+                          <p className="mt-1 text-sm text-red-400">
+                            {errors.phone}
+                          </p>
+                        )}
                       </div>
                     )}
 
@@ -632,7 +626,7 @@ const CeylonStoriesAuth = () => {
 
               {/* Footer Text */}
               {!showForgotPassword && (
-                <div className="text-center mt-8">
+                <div className="text-center mt-6">
                   <p className="text-white/60 text-sm">
                     {isLogin
                       ? "Don't have an account? "

@@ -1,105 +1,132 @@
-import { Trophy, Award, Gift, Star } from "lucide-react";
+import { Trophy, Award, Heart, Gift } from "lucide-react";
 
 export const PrizeSection = () => {
   const prizes = [
     {
-      position: "1st Place",
-      amount: "₹1,000,000",
+      id: "grand",
       icon: Trophy,
-      gradient: "from-yellow-400 to-orange-500",
-      bgGradient: "from-yellow-50 to-orange-50",
-      textColor: "text-yellow-600",
-      description: "Grand Champion Award",
+      title: "Grand Prize",
+      amount: "LKR 500,000",
+      description: "Winner across all categories",
+      features: [
+        "Cash Prize: LKR 500,000",
+        "Tourism Board Partnership",
+        "Featured Story Promotion",
+        "Professional Recognition",
+      ],
+      accent: "border-l-4 border-ceylon-gold",
+      bgGradient: "bg-gradient-to-br from-ceylon-gold/5 to-ceylon-gold-light/5",
     },
     {
-      position: "2nd Place",
-      amount: "₹750,000",
+      id: "category",
       icon: Award,
-      gradient: "from-gray-400 to-gray-600",
-      bgGradient: "from-gray-50 to-slate-50",
-      textColor: "text-gray-600",
-      description: "Runner-up Award",
+      title: "Category Winners",
+      amount: "LKR 200,000",
+      description: "Each category (6 winners)",
+      features: [
+        "LKR 200,000 per category winner",
+        "Story featured on platform",
+        "Certificate of Excellence",
+        "Tourism Board recognition",
+      ],
+      accent: "border-l-4 border-ceylon-orange",
+      bgGradient:
+        "bg-gradient-to-br from-ceylon-orange/5 to-ceylon-orange-light/5",
     },
     {
-      position: "3rd Place",
-      amount: "₹500,000",
-      icon: Star,
-      gradient: "from-amber-600 to-yellow-700",
-      bgGradient: "from-amber-50 to-yellow-50",
-      textColor: "text-amber-600",
-      description: "Third Place Award",
+      id: "peoples",
+      icon: Heart,
+      title: "People's Choice",
+      amount: "LKR 100,000",
+      description: "Most popular story",
+      features: [
+        "LKR 100,000 cash prize",
+        "Community favorite badge",
+        "Social media promotion",
+        "Audience engagement award",
+      ],
+      accent: "border-l-4 border-ceylon-green",
+      bgGradient:
+        "bg-gradient-to-br from-ceylon-green/5 to-ceylon-green-light/5",
     },
     {
-      position: "Category Winners",
-      amount: "₹250,000",
+      id: "participation",
       icon: Gift,
-      gradient: "from-blue-500 to-cyan-600",
-      bgGradient: "from-blue-50 to-cyan-50",
-      textColor: "text-blue-600",
-      description: "Each Category",
+      title: "Participation Rewards",
+      amount: "ArcGIS Licenses",
+      description: "All qualified submissions",
+      features: [
+        "Free ArcGIS StoryMaps license",
+        "Digital certificate",
+        "Community membership",
+        "Early access to new features",
+      ],
+      accent: "border-l-4 border-gray-300",
+      bgGradient: "bg-gradient-to-br from-gray-100/50 to-gray-200/50",
     },
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-b from-blue-50 to-white">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Section Header */}
+    <section className="py-20 bg-gray-50">
+      <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-bold text-blue-900 mb-6">
-            Amazing Prizes
-          </h2>
-          <p className="text-xl text-blue-700 max-w-3xl mx-auto leading-relaxed">
-            Win from a total prize pool of ₹2.5 Million! Recognition and rewards
-            for the most compelling Sri Lankan stories.
+          <h2 className="text-4xl font-light text-gray-900 mb-6">Prize Pool</h2>
+          <div className="text-5xl font-bold text-ceylon-gold mb-4">
+            LKR 2.5 Million Total
+          </div>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Compete for substantial cash prizes and incredible recognition
+            opportunities in Sri Lankan Rupees
           </p>
         </div>
 
-        {/* Prize Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {prizes.map((prize, index) => {
-            const IconComponent = prize.icon;
-            return (
-              <div
-                key={index}
-                className={`relative bg-gradient-to-br ${prize.bgGradient} p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-white/50`}
-              >
-                {/* Icon */}
-                <div
-                  className={`inline-flex p-4 bg-gradient-to-r ${prize.gradient} rounded-xl mb-6 shadow-lg`}
-                >
-                  <IconComponent className="w-8 h-8 text-white" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {prizes.map((prize) => (
+            <div
+              key={prize.id}
+              className={`bg-white rounded-xl p-8 shadow-competition hover:shadow-prize transition-all duration-300 ${prize.accent} ${prize.bgGradient} transform hover:scale-105`}
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex items-center justify-center w-12 h-12 bg-white rounded-lg shadow-sm">
+                  <prize.icon className="w-6 h-6 text-gray-700" />
                 </div>
-
-                {/* Content */}
-                <div className="space-y-4">
-                  <h3 className={`text-2xl font-bold ${prize.textColor}`}>
-                    {prize.position}
+                <div>
+                  <h3 className="text-xl font-medium text-gray-900">
+                    {prize.title}
                   </h3>
-                  <div className="text-3xl font-black text-gray-900">
-                    {prize.amount}
-                  </div>
-                  <p className="text-gray-600 font-medium">
-                    {prize.description}
-                  </p>
+                  <p className="text-gray-600">{prize.description}</p>
                 </div>
-
-                {/* Decorative Element */}
-                <div className="absolute top-4 right-4 w-16 h-16 bg-white/20 rounded-full blur-xl"></div>
               </div>
-            );
-          })}
+
+              <div className="mb-6">
+                <div className="text-3xl font-bold text-gray-900 mb-2">
+                  {prize.amount}
+                </div>
+              </div>
+
+              <ul className="space-y-2">
+                {prize.features.map((feature, index) => (
+                  <li
+                    key={index}
+                    className="flex items-center gap-2 text-gray-600"
+                  >
+                    <div className="w-1.5 h-1.5 bg-ceylon-orange rounded-full flex-shrink-0"></div>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        {/* Additional Info */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center gap-4 bg-white/80 backdrop-blur-sm px-8 py-4 rounded-full shadow-lg border border-blue-200">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"></div>
-              <span className="text-blue-800 font-semibold">
-                Total Prize Pool: ₹2,500,000
-              </span>
-            </div>
-          </div>
+        <div className="text-center mt-12">
+          <p className="text-gray-600 mb-6">
+            All prizes are sponsored by the Sri Lankan Tourism Board and our
+            partners
+          </p>
+          <button className="bg-ceylon-orange hover:bg-ceylon-orange-light text-white px-8 py-3 rounded-lg font-medium transition-all duration-300">
+            View Prize Terms & Conditions
+          </button>
         </div>
       </div>
     </section>

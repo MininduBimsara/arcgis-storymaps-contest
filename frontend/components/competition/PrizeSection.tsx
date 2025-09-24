@@ -6,10 +6,10 @@ export const PrizeSection = () => {
       id: "grand",
       icon: Trophy,
       title: "Grand Prize",
-      amount: "₹500,000",
+      amount: "LKR 500,000",
       description: "Winner across all categories",
       features: [
-        "Cash Prize: ₹500,000",
+        "Cash Prize: LKR 500,000",
         "Tourism Board Partnership",
         "Featured Story Promotion",
         "Professional Recognition",
@@ -21,10 +21,10 @@ export const PrizeSection = () => {
       id: "category",
       icon: Award,
       title: "Category Winners",
-      amount: "₹200,000",
+      amount: "LKR 200,000",
       description: "Each category (6 winners)",
       features: [
-        "₹200,000 per category winner",
+        "LKR 200,000 per category winner",
         "Story featured on platform",
         "Certificate of Excellence",
         "Tourism Board recognition",
@@ -37,10 +37,10 @@ export const PrizeSection = () => {
       id: "peoples",
       icon: Heart,
       title: "People's Choice",
-      amount: "₹100,000",
+      amount: "LKR 100,000",
       description: "Most popular story",
       features: [
-        "₹100,000 cash prize",
+        "LKR 100,000 cash prize",
         "Community favorite badge",
         "Social media promotion",
         "Audience engagement award",
@@ -72,11 +72,11 @@ export const PrizeSection = () => {
         <div className="text-center mb-16">
           <h2 className="text-4xl font-light text-gray-900 mb-6">Prize Pool</h2>
           <div className="text-5xl font-bold text-ceylon-gold mb-4">
-            ₹2.5 Million Total
+            LKR 2.5 Million Total
           </div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Compete for substantial cash prizes and incredible recognition
-            opportunities
+            opportunities in Sri Lankan Rupees
           </p>
         </div>
 

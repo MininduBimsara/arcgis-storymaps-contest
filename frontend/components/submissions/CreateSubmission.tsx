@@ -19,7 +19,7 @@ import {
   Eye,
   ExternalLink,
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import apiService, { SubmissionData, Category } from "@/lib/api";
 
 // Type definitions based on the Submission model

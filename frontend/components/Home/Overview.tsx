@@ -180,13 +180,14 @@ export default function OverviewSection() {
         {/* Enhanced Action Buttons */}
         <div className="text-center">
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <button className="group bg-gradient-to-r from-ceylon-orange to-ceylon-orange-light hover:from-ceylon-orange-light hover:to-ceylon-orange text-black px-10 py-4 rounded-xl text-lg font-semibold transition-all duration-300 shadow-xl hover:shadow-ceylon-orange/25 transform hover:scale-105">
-              <span className="flex items-center justify-center gap-2">
-                <Trophy className="w-5 h-5" />
-                Start Your Submission
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-              </span>
-            </button>
+            <Link
+              href="/submissions/create"
+              className="group bg-gradient-to-r from-ceylon-orange to-ceylon-orange-light hover:from-ceylon-orange-light hover:to-ceylon-orange text-black px-10 py-4 rounded-xl text-lg font-semibold transition-all duration-300 shadow-xl hover:shadow-ceylon-orange/25 transform hover:scale-105 inline-flex items-center justify-center gap-2"
+            >
+              <Trophy className="w-5 h-5" />
+              Start Your Submission
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+            </Link>
             <Link
               href="/details"
               className="group bg-white border-2 border-gray-200 hover:border-ceylon-orange text-gray-700 hover:text-ceylon-orange px-10 py-4 rounded-xl text-lg font-semibold transition-all duration-300 inline-flex items-center justify-center gap-2 hover:shadow-lg"
