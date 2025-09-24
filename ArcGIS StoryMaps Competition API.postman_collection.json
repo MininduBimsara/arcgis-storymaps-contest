@@ -1,0 +1,1410 @@
+{
+  "info": {
+    "_postman_id": "8828c8e7-2a25-42b3-9ba4-d674e39c65a9",
+    "name": "ArcGIS StoryMaps Competition API",
+    "description": "Complete API collection for the 2025 ArcGIS StoryMaps Competition backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "39710967"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"johndoe123\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"phone\": \"+1234567890\",\n  \"address\": \"123 Main St, Apt 4B\",\n  \"city\": \"San Francisco\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.token) {",
+                  "        pm.collectionVariables.set('authToken', response.data.token);",
+                  "        pm.collectionVariables.set('userId', response.data.user.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"1df4f667fe626ca07e26b850377b7ab720c13bfa9bb1da6e652e41fe1180bf4a\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/verify-email",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "verify-email"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "forgot-password"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"131df5fa57fbffc8188856b79765ca96d2cf7e7012acce2465705bc4e678b9b2\",\n  \"password\": \"NewSecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "reset-password"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"SecurePass123!\",\n  \"newPassword\": \"NewSecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/change-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "change-password"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "refresh"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resend Verification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/resend-verification",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "resend-verification"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"admin@example.com\",\r\n  \"password\": \"AdminPass123!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get Active Categories (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Category by Slug (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/slug/environmental-conservation",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "slug", "environmental-conservation"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Category Stats (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{categoryId}}/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "{{categoryId}}", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Categories (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/categories/admin/all?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "admin", "all"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Category (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.category) {",
+                  "        pm.collectionVariables.set('categoryId', response.data.category._id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Environmental Conservation\",\n  \"description\": \"StoryMaps showcasing environmental conservation efforts, wildlife protection, and sustainable practices around the world.\",\n  \"icon\": \"🌱\",\n  \"color\": \"#28a745\",\n  \"order\": 1,\n  \"maxSubmissions\": 100\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Category (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Environmental Conservation Updated\",\n  \"description\": \"Updated description for environmental conservation category with focus on climate change solutions.\",\n  \"color\": \"#2d8f47\",\n  \"order\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "{{categoryId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Category Status (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{categoryId}}/toggle",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "{{categoryId}}", "toggle"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Category (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "{{categoryId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Submissions",
+      "item": [
+        {
+          "name": "Public Routes",
+          "item": [
+            {
+              "name": "Get Top Submissions (Public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/submissions/top?limit=10&category={{categoryId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions", "top"],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "category",
+                      "value": "{{categoryId}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Public Submissions (Public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/submissions/public?page=1&limit=10&category={{categoryId}}&region=North America",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions", "public"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "category",
+                      "value": "{{categoryId}}"
+                    },
+                    {
+                      "key": "region",
+                      "value": "North America"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Search Submissions (Public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/submissions/search?q=climate change&page=1&limit=10&category={{categoryId}}&region=Global",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions", "search"],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "climate change"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "category",
+                      "value": "{{categoryId}}"
+                    },
+                    {
+                      "key": "region",
+                      "value": "Global"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Submissions by Category (Public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/submissions/category/{{categoryId}}?page=1&limit=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions", "category", "{{categoryId}}"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Submission by ID (Public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/submissions/{{submissionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions", "{{submissionId}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get StoryMap Embed Data (Public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/submissions/{{submissionId}}/storymap",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions", "{{submissionId}}", "storymap"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "User Submissions",
+          "item": [
+            {
+              "name": "Create Submission",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.data && response.data.submission) {",
+                      "        pm.collectionVariables.set('submissionId', response.data.submission._id);",
+                      "    }",
+                      "}"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Exploring Beautiful Places Around the World\",\n  \"description\": \"A comprehensive StoryMap showcasing the impacts of climate change on Pacific Island nations, featuring detailed analysis of sea level rise, coral reef health, and adaptation strategies. This demo StoryMap provides valuable insights into environmental challenges facing Oceania.\",\n  \"storyMapUrl\": \"https://arcg.is/0ezGLG0\",\n  \"storyMapId\": \"0ezGLG0\",\n  \"category\": \"68d2dd69f4c5c81f9f7cd4be\",\n  \"region\": \"Oceania\",\n  \"specificLocation\": \"Marshall Islands, Tuvalu, Kiribati\",\n  \"tags\": [\"climate change\", \"sea level rise\", \"pacific islands\", \"adaptation\", \"coral reefs\", \"oceanography\", \"environmental science\"],\n  \"teamMembers\": [\n    {\n      \"name\": \"Dr. Sarah Johnson\",\n      \"email\": \"sarah.johnson@oceanresearch.org\",\n      \"role\": \"Marine Biologist\"\n    },\n    {\n      \"name\": \"Michael Chen\",\n      \"email\": \"m.chen@climatedata.edu\",\n      \"role\": \"Climate Data Analyst\"\n    },\n    {\n      \"name\": \"Dr. Elena Rodriguez\",\n      \"email\": \"e.rodriguez@geospatial.edu\",\n      \"role\": \"GIS Specialist\"\n    }\n  ],\n  \"dataSourcesUsed\": [\n    {\n      \"name\": \"NOAA Sea Level Data\",\n      \"url\": \"https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/\",\n      \"type\": \"REST Service\"\n    },\n    {\n      \"name\": \"Coral Reef Monitoring Network\",\n      \"url\": \"https://www.coralreefwatch.noaa.gov/\",\n      \"type\": \"Feature Service\"\n    },\n    {\n      \"name\": \"Pacific Island Climate Data\",\n      \"url\": \"https://data.pacificclimate.org/dataset/climate-indicators.csv\",\n      \"type\": \"CSV\"\n    },\n    {\n      \"name\": \"UNEP Environmental Data\",\n      \"url\": \"https://uneplive.unep.org/\",\n      \"type\": \"REST Service\"\n    },\n    {\n      \"name\": \"Pacific Islands GIS Data\",\n      \"url\": \"\",\n      \"type\": \"Shapefile\"\n    }\n  ],\n  \"copyrightCompliant\": true\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/submissions",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get My Submissions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/submissions/my-submissions?page=1&limit=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions", "my-submissions"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Submissions (Auth)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/submissions?page=1&limit=10&category={{categoryId}}&status=approved&region=Global&sortBy=createdAt&order=desc",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "category",
+                      "value": "{{categoryId}}"
+                    },
+                    {
+                      "key": "status",
+                      "value": "approved"
+                    },
+                    {
+                      "key": "region",
+                      "value": "Global"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "createdAt"
+                    },
+                    {
+                      "key": "order",
+                      "value": "desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Submission",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Climate Change Impact on Pacific Islands - Updated\",\n  \"description\": \"An updated and expanded interactive StoryMap showcasing the devastating effects of climate change on Pacific Island nations, now featuring additional case studies from Fiji and Samoa, enhanced data visualizations, and updated community adaptation strategies based on recent research.\",\n  \"specificLocation\": \"Marshall Islands, Tuvalu, Kiribati, Fiji, Samoa\",\n  \"tags\": [\"climate change\", \"sea level rise\", \"pacific islands\", \"adaptation\", \"coral reefs\", \"community resilience\"],\n  \"isPublic\": true\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/submissions/{{submissionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions", "{{submissionId}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Submission",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/submissions/{{submissionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions", "{{submissionId}}"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin Routes",
+          "item": [
+            {
+              "name": "Get Submission Stats (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/submissions/stats",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions", "stats"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Submission Status (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"approved\",\n  \"adminNotes\": \"Excellent submission with comprehensive data analysis and compelling storytelling. Approved for public display and competition consideration.\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/submissions/{{submissionId}}/status",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions", "{{submissionId}}", "status"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Bulk Approve Submissions (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"submissionIds\": [\n    \"{{submissionId}}\",\n    \"507f1f77bcf86cd799439011\",\n    \"507f1f77bcf86cd799439012\"\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/submissions/bulk-approve",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["submissions", "bulk-approve"]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Admin Routes",
+          "item": [
+            {
+              "name": "Get All Users (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/users?page=1&limit=10&role=user&status=active&emailVerified=true",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "role",
+                      "value": "user"
+                    },
+                    {
+                      "key": "status",
+                      "value": "active"
+                    },
+                    {
+                      "key": "emailVerified",
+                      "value": "true"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get User Stats (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/users/stats",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "stats"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Search Users (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/users/search?q=john&page=1&limit=10&role=user&status=active",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "search"],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "john"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "role",
+                      "value": "user"
+                    },
+                    {
+                      "key": "status",
+                      "value": "active"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get User by ID (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{userId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{userId}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update User (Admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"johndoe_admin_updated\",\n  \"email\": \"john.doe.updated@example.com\",\n  \"role\": \"admin\",\n  \"status\": \"active\",\n  \"emailVerified\": true,\n  \"phone\": \"+1555123456\",\n  \"address\": \"789 Admin Boulevard\",\n  \"city\": \"New York\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{userId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{userId}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Change User Role (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"role\": \"admin\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{userId}}/change-role",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{userId}}", "change-role"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Deactivate User (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{userId}}/deactivate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{userId}}", "deactivate"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Activate User (Admin)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{userId}}/activate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{userId}}", "activate"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete User (Admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{userId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{userId}}"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n \n  \"phone\": \"+1987654321\",\n  \"address\": \"456 Oak Avenue, Suite 12\",\n  \"city\": \"Los Angeles\",\n  \"profileImage\": \"https://example.com/profile-images/johndoe.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "profile"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Check & Info",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Root Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Server Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Test Data Creation Flow",
+      "item": [
+        {
+          "name": "1. Register Admin User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.token) {",
+                  "        pm.collectionVariables.set('authToken', response.data.token);",
+                  "        pm.collectionVariables.set('userId', response.data.user.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin_test\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"AdminPass123!\",\n  \"role\": \"admin\",\n  \"phone\": \"+1234567890\",\n  \"address\": \"123 Admin Street\",\n  \"city\": \"San Francisco\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Create Test Categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.category) {",
+                  "        pm.collectionVariables.set('categoryId', response.data.category._id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Urban Planning\",\n  \"description\": \"StoryMaps focusing on urban development, smart cities, transportation planning, and sustainable urban design solutions.\",\n  \"icon\": \"🏙️\",\n  \"color\": \"#007ac2\",\n  \"order\": 1,\n  \"maxSubmissions\": 50\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Register Regular User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.token) {",
+                  "        pm.collectionVariables.set('userToken', response.data.token);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"participant_test\",\n  \"email\": \"participant@example.com\",\n  \"password\": \"UserPass123!\",\n  \"phone\": \"+1987654321\",\n  \"address\": \"456 User Avenue\",\n  \"city\": \"Los Angeles\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Create Test Submission",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.submission) {",
+                  "        pm.collectionVariables.set('submissionId', response.data.submission._id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Smart City Transportation Network Analysis\",\n  \"description\": \"A comprehensive analysis of smart city transportation networks using real-time traffic data, public transit integration, and predictive modeling. This StoryMap showcases how modern urban planning can leverage technology to create more efficient, sustainable, and user-friendly transportation systems that reduce congestion and environmental impact.\",\n  \"storyMapUrl\": \"https://storymaps.arcgis.com/stories/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p\",\n  \"category\": \"{{categoryId}}\",\n  \"region\": \"North America\",\n  \"specificLocation\": \"San Francisco Bay Area\",\n  \"tags\": [\"smart city\", \"transportation\", \"urban planning\", \"sustainability\", \"traffic analysis\"],\n  \"teamMembers\": [\n    {\n      \"name\": \"Dr. Emily Rodriguez\",\n      \"email\": \"e.rodriguez@urbantech.edu\",\n      \"role\": \"Urban Planning Professor\"\n    },\n    {\n      \"name\": \"Alex Kim\",\n      \"email\": \"alex.kim@transportdata.com\",\n      \"role\": \"Transportation Data Scientist\"\n    }\n  ],\n  \"dataSourcesUsed\": [\n    {\n      \"name\": \"SF Municipal Transportation Agency API\",\n      \"url\": \"https://www.sfmta.com/reports/gtfs-transit-data\",\n      \"type\": \"REST Service\"\n    },\n    {\n      \"name\": \"Real-time Traffic Data\",\n      \"url\": \"https://pems.dot.ca.gov/\",\n      \"type\": \"Feature Service\"\n    },\n    {\n      \"name\": \"Census Transportation Data\",\n      \"url\": \"https://example.com/census-transport.csv\",\n      \"type\": \"CSV\"\n    }\n  ],\n  \"copyrightCompliant\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/submissions",
+              "host": ["{{baseUrl}}"],
+              "path": ["submissions"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set default headers for all requests",
+          "pm.request.headers.add({",
+          "    key: 'User-Agent',",
+          "    value: 'Postman/ArcGIS-StoryMaps-Competition-API'",
+          "});"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script to log response times and status",
+          "console.log('Response Status:', pm.response.status);",
+          "console.log('Response Time:', pm.response.responseTime + 'ms');",
+          "",
+          "// Check if response is JSON",
+          "if (pm.response.headers.get('Content-Type') && pm.response.headers.get('Content-Type').includes('application/json')) {",
+          "    try {",
+          "        const jsonData = pm.response.json();",
+          "        console.log('Response Success:', jsonData.success);",
+          "        if (jsonData.message) {",
+          "            console.log('Message:', jsonData.message);",
+          "        }",
+          "    } catch (e) {",
+          "        console.log('Could not parse JSON response');",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "submissionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "categoryId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
