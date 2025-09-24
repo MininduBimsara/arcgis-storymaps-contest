@@ -19,7 +19,7 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import apiService, { Submission, PaginatedResponse } from "@/lib/api";
 
 interface SubmissionFilters {
