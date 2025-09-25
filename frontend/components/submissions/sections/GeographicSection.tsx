@@ -52,10 +52,10 @@ const GeographicSection: React.FC<GeographicSectionProps> = ({
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-8">
+    <div className="bg-white rounded-md shadow-sm border border-gray-200 p-8">
       <div className="flex items-center mb-6">
-        <MapPin className="w-6 h-6 text-red-600 mr-3" />
-        <h2 className="text-2xl font-semibold text-gray-900">
+        <MapPin className="w-6 h-6 text-blue-600 mr-3" />
+        <h2 className="text-2xl font-light text-black">
           Geographic Information
         </h2>
       </div>

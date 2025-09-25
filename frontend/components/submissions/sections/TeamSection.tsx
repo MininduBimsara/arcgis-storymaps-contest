@@ -74,7 +74,7 @@ const TeamSection: React.FC<TeamSectionProps> = ({
       onChange={onChange}
       getItemTitle={(index) => `Team Member ${index + 1}`}
       icon={<Users className="w-6 h-6 mr-3" />}
-      iconColor="text-indigo-600"
+      iconColor="text-blue-600"
     />
   );
 };

@@ -251,7 +251,7 @@ const CreateSubmissionForm: React.FC = () => {
   // Loading states
   if (isLoading || isLoadingCategories) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex flex-col items-center">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
           <p className="text-gray-600">Loading...</p>
@@ -263,10 +263,10 @@ const CreateSubmissionForm: React.FC = () => {
   // Authentication checks
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl font-light text-black mb-2">
             Authentication Required
           </h1>
           <p className="text-gray-600 mb-6">
@@ -274,7 +274,7 @@ const CreateSubmissionForm: React.FC = () => {
           </p>
           <button
             onClick={() => router.push("/auth")}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition-colors"
           >
             Sign In
           </button>
@@ -285,10 +285,10 @@ const CreateSubmissionForm: React.FC = () => {
 
   if (user && !user.emailVerified) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 text-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md mx-auto bg-white rounded-md shadow-sm border border-gray-200 p-8 text-center">
           <Mail className="w-16 h-16 text-orange-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl font-light text-black mb-2">
             Email Verification Required
           </h1>
           <p className="text-gray-600 mb-6">
@@ -304,13 +304,13 @@ const CreateSubmissionForm: React.FC = () => {
                   alert("Failed to send verification email. Please try again.");
                 }
               }}
-              className="w-full bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors"
+              className="w-full bg-orange-600 text-white px-6 py-3 rounded-md hover:bg-orange-700 transition-colors"
             >
               Resend Verification Email
             </button>
             <button
               onClick={() => router.push("/")}
-              className="w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors"
+              className="w-full bg-white border border-gray-200 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors"
             >
               Back to Home
             </button>
@@ -321,15 +321,15 @@ const CreateSubmissionForm: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-6 py-12">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-3">
+            <h1 className="text-4xl md:text-5xl font-light text-black mb-6">
               Submit Your StoryMap
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Share your compelling geographic story with the world. Complete
               the form below to submit your entry to our competition.
             </p>
@@ -338,13 +338,13 @@ const CreateSubmissionForm: React.FC = () => {
       </div>
 
       {/* Form */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="space-y-8">
           {/* Error Message */}
           {errors.general && (
-            <div className="bg-red-100 border border-red-300 rounded-xl p-4 flex items-center error-field">
-              <AlertCircle className="w-5 h-5 text-red-600 mr-3" />
-              <span className="text-red-800">{errors.general}</span>
+            <div className="bg-red-50 border border-red-200 rounded-md p-4 flex items-center error-field">
+              <AlertCircle className="w-5 h-5 text-red-600 mr-3 flex-shrink-0" />
+              <span className="text-red-700">{errors.general}</span>
             </div>
           )}
 
@@ -406,7 +406,7 @@ const CreateSubmissionForm: React.FC = () => {
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="px-12 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-300 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="px-8 py-3 bg-black text-white font-normal rounded-md hover:bg-gray-800 transition-all duration-300 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>

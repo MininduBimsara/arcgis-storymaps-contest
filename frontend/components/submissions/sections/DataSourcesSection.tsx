@@ -80,7 +80,7 @@ const DataSourcesSection: React.FC<DataSourcesSectionProps> = ({
       onChange={onChange}
       getItemTitle={(index) => `Data Source ${index + 1}`}
       icon={<Database className="w-6 h-6 mr-3" />}
-      iconColor="text-orange-600"
+      iconColor="text-blue-600"
     />
   );
 };

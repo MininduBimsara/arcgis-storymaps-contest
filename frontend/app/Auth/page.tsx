@@ -12,6 +12,8 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useAuthRedirect } from "@/hooks/useProtectedRoute";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface FormData {
   email: string;
@@ -36,6 +38,12 @@ const CeylonStoriesAuth = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+
+  // Use auth context for actual authentication
+  const { login, register } = useAuth();
+  const router = useRouter();
+
+  // This hook already handles redirect if user is authenticated
   const { isAuthenticated, isLoading } = useAuthRedirect();
 
   const [formData, setFormData] = useState<FormData>({
@@ -114,14 +122,31 @@ const CeylonStoriesAuth = () => {
     setSuccessMessage("");
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
       if (isLogin) {
+        // Use the actual login method from AuthContext
+        await login(formData.email, formData.password);
         setSuccessMessage("Login successful! Redirecting...");
+
+        // Redirect to home page after successful login
+        setTimeout(() => {
+          router.push("/");
+        }, 500);
       } else {
+        // Use the actual register method from AuthContext
+        await register({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone || undefined,
+          address: formData.address || undefined,
+          city: formData.city || undefined,
+        });
+
         setSuccessMessage(
           "Registration successful! Please check your email to verify your account."
         );
+
+        // Clear form after successful registration
         setFormData({
           email: "",
           password: "",
@@ -131,11 +156,27 @@ const CeylonStoriesAuth = () => {
           address: "",
           city: "",
         });
+
+        // Optionally redirect after registration
+        setTimeout(() => {
+          router.push("/");
+        }, 1500);
       }
-    } catch {
+    } catch (error: any) {
+      // Handle specific error messages from the API
+      const errorMessage =
+        error?.error ||
+        error?.message ||
+        (isLogin
+          ? "Login failed. Please check your credentials."
+          : "Registration failed. Please try again.");
+
       setErrors({
-        general: "An unexpected error occurred. Please try again.",
+        general: errorMessage,
       });
+
+      // Clear success message if there was an error
+      setSuccessMessage("");
     } finally {
       setIsSubmitting(false);
     }
@@ -158,16 +199,36 @@ const CeylonStoriesAuth = () => {
     setErrors({});
 
     try {
+      // TODO: Call actual forgot password API when implemented
+      // await apiService.forgotPassword(forgotPasswordEmail);
+
       await new Promise((resolve) => setTimeout(resolve, 1500));
       setSuccessMessage("Password reset email sent! Please check your inbox.");
       setShowForgotPassword(false);
       setForgotPasswordEmail("");
-    } catch {
-      setErrors({ forgotEmail: "Network error. Please try again." });
+    } catch (error: any) {
+      setErrors({
+        forgotEmail:
+          error?.error || "Failed to send reset email. Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Show loading state while checking auth status
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-300" />
+      </div>
+    );
+  }
+
+  // If already authenticated (shouldn't happen due to useAuthRedirect, but as safety)
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 overflow-hidden">
@@ -223,7 +284,6 @@ const CeylonStoriesAuth = () => {
 
               {/* Right Panel */}
               <div className="p-8 flex flex-col h-full">
-                {/* Form content remains unchanged */}
                 <div className="flex flex-col justify-center h-full">
                   {/* Success Message */}
                   {successMessage && (
@@ -330,7 +390,7 @@ const CeylonStoriesAuth = () => {
                         </div>
 
                         {/* Form */}
-                        <div className="space-y-4">
+                        <form onSubmit={handleSubmit} className="space-y-4">
                           {/* Username Field (Register only) */}
                           {!isLogin && (
                             <div className="relative">
@@ -499,7 +559,7 @@ const CeylonStoriesAuth = () => {
 
                           {/* Submit Button */}
                           <button
-                            onClick={handleSubmit}
+                            type="submit"
                             disabled={isSubmitting}
                             className="w-full py-3 bg-black text-white font-medium rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-2"
                           >
@@ -537,7 +597,7 @@ const CeylonStoriesAuth = () => {
                           >
                             Sign {isLogin ? "in" : "up"} with Google
                           </button>
-                        </div>
+                        </form>
                       </div>
 
                       {/* Footer Text */}

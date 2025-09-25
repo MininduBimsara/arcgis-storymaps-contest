@@ -16,7 +16,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
   onChange,
   error,
 }) => {
-  const baseClassName = `w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+  const baseClassName = `text-black w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
     error ? "border-red-500 error-field" : "border-gray-300"
   }`;
 
