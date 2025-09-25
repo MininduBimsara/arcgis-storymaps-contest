@@ -404,6 +404,11 @@ class ApiService {
     return this.api.get(`/submissions/${id}/storymap`);
   }
 
+  // Stories (ArcGIS metadata) Methods
+  async getArcgisStories(): Promise<ApiResponse<StoryMetaPublic[]>> {
+    return this.api.get("/stories");
+  }
+
   // Admin Methods (if user is admin)
   async getSubmissionStats(): Promise<ApiResponse<{ stats: any }>> {
     return this.api.get("/submissions/stats");
@@ -437,3 +442,13 @@ export type {
   Submission,
   SubmissionData,
 };
+
+// Shared types for stories metadata
+export interface StoryMetaPublic {
+  id: string;
+  title: string;
+  author: string;
+  description: string;
+  thumbnailUrl: string;
+  storyUrl: string;
+}
