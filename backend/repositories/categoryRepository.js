@@ -106,6 +106,14 @@ class CategoryRepository {
   }
 
   /**
+   * Find all categories sorted by order (for admin panel)
+   * This method returns all categories without pagination
+   */
+  async findAllSorted() {
+    return await Category.find({}).sort({ order: 1, name: 1 });
+  }
+
+  /**
    * Get category statistics
    */
   async getStats() {
@@ -120,6 +128,7 @@ class CategoryRepository {
 
     return {
       totalCategories,
+      findAllSorted,
       activeCategories,
       totalSubmissions: totalSubmissions[0]?.total || 0,
     };

@@ -20,6 +20,7 @@ import {
   Trophy,
   TrendingUp,
   Eye,
+  FolderOpen,
 } from "lucide-react";
 
 interface StatCardProps {

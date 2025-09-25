@@ -242,17 +242,57 @@ export const submissionApi = {
     sortBy?: string;
     order?: "asc" | "desc";
   }) => {
-    const response = await adminApi.get<
-      ApiResponse<{
-        submissions: Submission[];
-        page: number;
-        limit: number;
-        total: number;
-      }>
-    >("/submissions", {
-      params,
-    });
-    return response.data;
+    try {
+      const response = await adminApi.get<
+        ApiResponse<{
+          submissions: Submission[];
+          page: number;
+          limit: number;
+          total: number;
+        }>
+      >("/submissions", {
+        params,
+      });
+
+      // Validate response structure and provide defaults
+      if (response.data && response.data.success && response.data.data) {
+        return {
+          ...response.data,
+          data: {
+            submissions: response.data.data.submissions || [],
+            page: response.data.data.page || 1,
+            limit: response.data.data.limit || 10,
+            total: response.data.data.total || 0,
+          },
+        };
+      }
+
+      // Return default structure if invalid response
+      console.warn("Invalid submissions response structure:", response.data);
+      return {
+        success: false,
+        message: "Invalid response structure",
+        data: {
+          submissions: [],
+          page: 1,
+          limit: 10,
+          total: 0,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching submissions:", error);
+      // Return default structure on error - don't throw so UI can still render
+      return {
+        success: false,
+        message: "Failed to fetch submissions",
+        data: {
+          submissions: [],
+          page: 1,
+          limit: 10,
+          total: 0,
+        },
+      };
+    }
   },
 
   // Get submission statistics
@@ -302,10 +342,27 @@ export const submissionApi = {
 export const categoryApi = {
   // Get all categories (including inactive)
   getAllCategories: async (): Promise<Category[]> => {
-    const response = await adminApi.get<
-      ApiResponse<{ categories: Category[] }>
-    >("/categories/admin/all");
-    return response.data.data!.categories;
+    try {
+      const response = await adminApi.get<
+        ApiResponse<{ categories: Category[] }>
+      >("/categories/admin/all");
+
+      // Validate response structure
+      if (
+        response.data &&
+        response.data.success &&
+        response.data.data &&
+        response.data.data.categories
+      ) {
+        return response.data.data.categories;
+      }
+
+      console.warn("Invalid categories response structure:", response.data);
+      return [];
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      throw error; // Re-throw for proper error handling in components
+    }
   },
 
   // Create category

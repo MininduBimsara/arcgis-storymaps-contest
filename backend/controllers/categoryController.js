@@ -1,18 +1,7 @@
-// controllers/categoryController.js - Final version with no pagination import
+// backend/controllers/categoryController.js - Fixed version
 const categoryService = require("../services/categoryService");
 const { responseHandler } = require("../utils/responseHandler");
 const { asyncHandler } = require("../middleware/errorHandler");
-
-/**
- * Pagination Helper Class - Inline to avoid import issues
- */
-class PaginationHelper {
-  static getParams(req) {
-    const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 10));
-    return { page, limit };
-  }
-}
 
 /**
  * Category Controller - HTTP Request Handlers
@@ -65,24 +54,16 @@ class CategoryController {
   /**
    * Get all categories including inactive (Admin only)
    * GET /api/v1/categories/admin/all
+   * FIXED: Return direct categories array instead of paginated response
    */
   getAllCategories = asyncHandler(async (req, res) => {
-    const pagination = PaginationHelper.getParams(req);
+    // Get all categories without pagination for admin panel
+    const categories = await categoryService.getAllCategoriesNoPagination();
 
-    const result = await categoryService.getAllCategories(
-      pagination.page,
-      pagination.limit
-    );
-
-    return responseHandler.paginated(
+    return responseHandler.success(
       res,
-      result.categories,
-      {
-        page: result.page,
-        limit: pagination.limit,
-        total: result.total,
-      },
-      "All categories retrieved successfully"
+      "All categories retrieved successfully",
+      { categories }
     );
   });
 
@@ -108,13 +89,13 @@ class CategoryController {
     const categoryId = req.params.id;
     const updateData = req.body;
 
-    const updatedCategory = await categoryService.updateCategory(
+    const category = await categoryService.updateCategory(
       categoryId,
       updateData
     );
 
     return responseHandler.success(res, "Category updated successfully", {
-      category: updatedCategory,
+      category,
     });
   });
 
@@ -137,14 +118,14 @@ class CategoryController {
   toggleCategoryStatus = asyncHandler(async (req, res) => {
     const categoryId = req.params.id;
 
-    const updatedCategory = await categoryService.toggleCategoryStatus(
-      categoryId
-    );
+    const category = await categoryService.toggleCategoryStatus(categoryId);
 
     return responseHandler.success(
       res,
-      "Category status toggled successfully",
-      { category: updatedCategory }
+      "Category status updated successfully",
+      {
+        category,
+      }
     );
   });
 }

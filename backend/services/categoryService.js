@@ -1,4 +1,4 @@
-// services/categoryService.js
+// backend/services/categoryService.js - Add this method to your existing service
 const categoryRepository = require("../repositories/categoryRepository");
 
 /**
@@ -52,10 +52,17 @@ class CategoryService {
   }
 
   /**
-   * Get all categories (Admin only)
+   * Get all categories (Admin only) - EXISTING METHOD
    */
   async getAllCategories(page = 1, limit = 10) {
     return await categoryRepository.findWithPagination({}, page, limit);
+  }
+
+  /**
+   * Get all categories without pagination (Admin only) - NEW METHOD
+   */
+  async getAllCategoriesNoPagination() {
+    return await categoryRepository.findAllSorted();
   }
 
   /**
@@ -103,23 +110,20 @@ class CategoryService {
    * Delete category (Admin only)
    */
   async deleteCategory(categoryId) {
-    // Check if category has submissions
-    const submissionRepository = require("../repositories/submissionRepository");
-    const categorySubmissions = await submissionRepository.findWithFilters(
-      { category: categoryId },
-      { page: 1, limit: 1 }
-    );
-
-    if (categorySubmissions.total > 0) {
-      throw new Error("Cannot delete category with existing submissions");
-    }
-
-    const deletedCategory = await categoryRepository.deleteById(categoryId);
-    if (!deletedCategory) {
+    const category = await categoryRepository.findById(categoryId);
+    if (!category) {
       throw new Error("Category not found");
     }
 
-    return deletedCategory;
+    // Check if category has submissions
+    if (category.submissionCount > 0) {
+      throw new Error(
+        "Cannot delete category with submissions. Please move submissions to another category first."
+      );
+    }
+
+    await categoryRepository.deleteById(categoryId);
+    return { message: "Category deleted successfully" };
   }
 
   /**
@@ -131,9 +135,11 @@ class CategoryService {
       throw new Error("Category not found");
     }
 
-    return await categoryRepository.updateById(categoryId, {
+    const updatedCategory = await categoryRepository.updateById(categoryId, {
       isActive: !category.isActive,
     });
+
+    return updatedCategory;
   }
 }
 

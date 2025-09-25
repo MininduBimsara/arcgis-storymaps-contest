@@ -73,7 +73,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
@@ -85,12 +85,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       {/* Sidebar */}
       <div
         className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:translate-x-0 lg:static lg:inset-0
-      `}
+          fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          lg:translate-x-0 lg:relative lg:flex lg:flex-col
+        `}
       >
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
               <Shield className="h-5 w-5 text-blue-600" />
@@ -109,7 +109,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </div>
 
         {/* User info */}
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-blue-100 rounded-md flex items-center justify-center">
               <Shield className="w-5 h-5 text-blue-600" />
@@ -126,7 +126,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-1">
+        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
           {navigation.map((item) => {
             const Icon = item.icon;
             const isActive = isActivePath(item.href);
@@ -139,7 +139,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   flex items-center px-3 py-2.5 text-sm font-medium rounded-md transition-colors
                   ${
                     isActive
-                      ? "bg-blue-50 text-blue-600 border-r-2 border-blue-600"
+                      ? "bg-blue-50 text-blue-600"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   }
                 `}
@@ -155,10 +155,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </nav>
 
         {/* Bottom actions */}
-        <div className="px-4 py-4 border-t border-gray-200">
+        <div className="px-4 py-4 border-t border-gray-200 flex-shrink-0">
           <Link
             href="/"
             className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-gray-50 mb-2"
+            onClick={() => setSidebarOpen(false)}
           >
             <MapPin className="mr-3 h-5 w-5 text-gray-400" />
             Back to Site
@@ -175,9 +176,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Top header */}
-        <div className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-200">
+        <div className="bg-white shadow-sm border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center justify-between h-16 px-6">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -186,7 +187,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <Menu className="h-6 w-6" />
             </button>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 ml-auto">
               <div className="text-sm text-gray-500">
                 Last updated: {new Date().toLocaleString()}
               </div>
@@ -195,7 +196,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </div>
 
         {/* Page content */}
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>
   );

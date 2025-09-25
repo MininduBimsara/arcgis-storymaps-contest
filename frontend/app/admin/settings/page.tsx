@@ -1,72 +1,75 @@
 // app/admin/settings/page.tsx
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
-import AdminLayout from '@/components/admin/AdminLayout';
-import { 
-  Settings, 
-  User, 
-  Shield, 
-  Bell, 
+import React, { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import AdminLayout from "@/components/admin/AdminLayout";
+import {
+  Settings,
+  User,
+  Shield,
+  Bell,
   Database,
   Save,
   RefreshCw,
   AlertCircle,
   CheckCircle,
   Eye,
-  EyeOff
-} from 'lucide-react';
+  EyeOff,
+} from "lucide-react";
 
 interface AdminSettingsPageProps {}
 
 const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
   const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
-  
-  const [activeTab, setActiveTab] = useState('general');
+
+  const [activeTab, setActiveTab] = useState("general");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  
+
   // Form states
   const [profileData, setProfileData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    username: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    username: "",
   });
 
   const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   useEffect(() => {
     if (!authLoading) {
       if (!user) {
-        router.push('/auth');
+        router.push("/auth");
         return;
       }
-      if (user.role !== 'admin') {
-        router.push('/');
+      if (user.role !== "admin") {
+        router.push("/");
         return;
       }
-      
+
       // Initialize form data
       setProfileData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        username: user.username || '',
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        email: user.email || "",
+        username: user.username || "",
       });
     }
   }, [user, authLoading, router]);
 
-  const showMessage = (type: 'success' | 'error', text: string) => {
+  const showMessage = (type: "success" | "error", text: string) => {
     setMessage({ type, text });
     setTimeout(() => setMessage(null), 5000);
   };
@@ -75,14 +78,14 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      
+
       // Here you would call your API to update profile
       // await adminApi.updateProfile(profileData);
-      
-      showMessage('success', 'Profile updated successfully');
+
+      showMessage("success", "Profile updated successfully");
     } catch (error) {
-      console.error('Error updating profile:', error);
-      showMessage('error', 'Failed to update profile');
+      console.error("Error updating profile:", error);
+      showMessage("error", "Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -90,43 +93,43 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      showMessage('error', 'New passwords do not match');
+      showMessage("error", "New passwords do not match");
       return;
     }
 
     if (passwordData.newPassword.length < 8) {
-      showMessage('error', 'Password must be at least 8 characters long');
+      showMessage("error", "Password must be at least 8 characters long");
       return;
     }
 
     try {
       setLoading(true);
-      
+
       // Here you would call your API to change password
       // await adminApi.changePassword(passwordData);
-      
+
       setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       });
-      
-      showMessage('success', 'Password changed successfully');
+
+      showMessage("success", "Password changed successfully");
     } catch (error) {
-      console.error('Error changing password:', error);
-      showMessage('error', 'Failed to change password');
+      console.error("Error changing password:", error);
+      showMessage("error", "Failed to change password");
     } finally {
       setLoading(false);
     }
   };
 
   const tabs = [
-    { id: 'general', name: 'General', icon: Settings },
-    { id: 'profile', name: 'Profile', icon: User },
-    { id: 'security', name: 'Security', icon: Shield },
-    { id: 'system', name: 'System', icon: Database },
+    { id: "general", name: "General", icon: Settings },
+    { id: "profile", name: "Profile", icon: User },
+    { id: "security", name: "Security", icon: Shield },
+    { id: "system", name: "System", icon: Database },
   ];
 
   if (authLoading) {
@@ -155,21 +158,27 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
 
         {/* Message */}
         {message && (
-          <div className={`mb-6 rounded-md p-4 ${
-            message.type === 'success' 
-              ? 'bg-green-50 border border-green-200' 
-              : 'bg-red-50 border border-red-200'
-          }`}>
+          <div
+            className={`mb-6 rounded-md p-4 ${
+              message.type === "success"
+                ? "bg-green-50 border border-green-200"
+                : "bg-red-50 border border-red-200"
+            }`}
+          >
             <div className="flex">
-              {message.type === 'success' ? (
+              {message.type === "success" ? (
                 <CheckCircle className="h-5 w-5 text-green-400" />
               ) : (
                 <AlertCircle className="h-5 w-5 text-red-400" />
               )}
               <div className="ml-3">
-                <p className={`text-sm ${
-                  message.type === 'success' ? 'text-green-700' : 'text-red-700'
-                }`}>
+                <p
+                  className={`text-sm ${
+                    message.type === "success"
+                      ? "text-green-700"
+                      : "text-red-700"
+                  }`}
+                >
                   {message.text}
                 </p>
               </div>
@@ -189,13 +198,15 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md ${
                       activeTab === tab.id
-                        ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                        ? "bg-blue-50 text-blue-600 border-r-2 border-blue-600"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                     }`}
                   >
-                    <Icon className={`mr-3 h-5 w-5 ${
-                      activeTab === tab.id ? 'text-blue-600' : 'text-gray-400'
-                    }`} />
+                    <Icon
+                      className={`mr-3 h-5 w-5 ${
+                        activeTab === tab.id ? "text-blue-600" : "text-gray-400"
+                      }`}
+                    />
                     {tab.name}
                   </button>
                 );
@@ -207,9 +218,11 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
           <div className="flex-1">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               {/* General Settings */}
-              {activeTab === 'general' && (
+              {activeTab === "general" && (
                 <div className="p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">General Settings</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    General Settings
+                  </h3>
                   <div className="space-y-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -221,7 +234,7 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
                         defaultValue="Ceylon Stories"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Site Description
@@ -257,9 +270,11 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
               )}
 
               {/* Profile Settings */}
-              {activeTab === 'profile' && (
+              {activeTab === "profile" && (
                 <div className="p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Information</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Profile Information
+                  </h3>
                   <form onSubmit={handleProfileUpdate} className="space-y-6">
                     <div className="grid grid-cols-2 gap-6">
                       <div>
@@ -270,7 +285,12 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
                           type="text"
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                           value={profileData.firstName}
-                          onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
+                          onChange={(e) =>
+                            setProfileData((prev) => ({
+                              ...prev,
+                              firstName: e.target.value,
+                            }))
+                          }
                         />
                       </div>
 
@@ -282,7 +302,12 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
                           type="text"
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                           value={profileData.lastName}
-                          onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
+                          onChange={(e) =>
+                            setProfileData((prev) => ({
+                              ...prev,
+                              lastName: e.target.value,
+                            }))
+                          }
                         />
                       </div>
                     </div>
@@ -295,7 +320,12 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
                         type="email"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                         value={profileData.email}
-                        onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
+                        onChange={(e) =>
+                          setProfileData((prev) => ({
+                            ...prev,
+                            email: e.target.value,
+                          }))
+                        }
                       />
                     </div>
 
@@ -307,7 +337,12 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
                         type="text"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                         value={profileData.username}
-                        onChange={(e) => setProfileData(prev => ({ ...prev, username: e.target.value }))}
+                        onChange={(e) =>
+                          setProfileData((prev) => ({
+                            ...prev,
+                            username: e.target.value,
+                          }))
+                        }
                       />
                     </div>
 
@@ -328,9 +363,11 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
               )}
 
               {/* Security Settings */}
-              {activeTab === 'security' && (
+              {activeTab === "security" && (
                 <div className="p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Change Password
+                  </h3>
                   <form onSubmit={handlePasswordChange} className="space-y-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -338,16 +375,23 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
                       </label>
                       <div className="relative">
                         <input
-                          type={showCurrentPassword ? 'text' : 'password'}
+                          type={showCurrentPassword ? "text" : "password"}
                           className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                           value={passwordData.currentPassword}
-                          onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                          onChange={(e) =>
+                            setPasswordData((prev) => ({
+                              ...prev,
+                              currentPassword: e.target.value,
+                            }))
+                          }
                           required
                         />
                         <button
                           type="button"
                           className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          onClick={() =>
+                            setShowCurrentPassword(!showCurrentPassword)
+                          }
                         >
                           {showCurrentPassword ? (
                             <EyeOff className="h-4 w-4 text-gray-400" />
@@ -364,10 +408,15 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
                       </label>
                       <div className="relative">
                         <input
-                          type={showNewPassword ? 'text' : 'password'}
+                          type={showNewPassword ? "text" : "password"}
                           className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                           value={passwordData.newPassword}
-                          onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                          onChange={(e) =>
+                            setPasswordData((prev) => ({
+                              ...prev,
+                              newPassword: e.target.value,
+                            }))
+                          }
                           required
                           minLength={8}
                         />
@@ -396,7 +445,12 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
                         type="password"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                         value={passwordData.confirmPassword}
-                        onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                        onChange={(e) =>
+                          setPasswordData((prev) => ({
+                            ...prev,
+                            confirmPassword: e.target.value,
+                          }))
+                        }
                         required
                       />
                     </div>
@@ -418,32 +472,47 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
               )}
 
               {/* System Settings */}
-              {activeTab === 'system' && (
+              {activeTab === "system" && (
                 <div className="p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">System Information</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    System Information
+                  </h3>
                   <div className="space-y-6">
                     <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <dt className="font-medium text-gray-700">System Version</dt>
+                          <dt className="font-medium text-gray-700">
+                            System Version
+                          </dt>
                           <dd className="text-gray-900">v1.0.0</dd>
                         </div>
                         <div>
-                          <dt className="font-medium text-gray-700">Last Updated</dt>
-                          <dd className="text-gray-900">{new Date().toLocaleDateString()}</dd>
+                          <dt className="font-medium text-gray-700">
+                            Last Updated
+                          </dt>
+                          <dd className="text-gray-900">
+                            {new Date().toLocaleDateString()}
+                          </dd>
                         </div>
                         <div>
-                          <dt className="font-medium text-gray-700">Environment</dt>
+                          <dt className="font-medium text-gray-700">
+                            Environment
+                          </dt>
                           <dd className="text-gray-900">Production</dd>
                         </div>
                         <div>
-                          <dt className="font-medium text-gray-700">API Version</dt>
+                          <dt className="font-medium text-gray-700">
+                            API Version
+                          </dt>
                           <dd className="text-gray-900">v1</dd>
                         </div>
                       </div>
                     </div>
 
                     <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Database Status</h4>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">
+                        Database Status
+                      </h4>
                       <div className="flex items-center">
                         <div className="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
                         <span className="text-sm text-gray-900">Connected</span>
@@ -451,7 +520,9 @@ const AdminSettingsPage: React.FC<AdminSettingsPageProps> = () => {
                     </div>
 
                     <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Email Service</h4>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">
+                        Email Service
+                      </h4>
                       <div className="flex items-center">
                         <div className="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
                         <span className="text-sm text-gray-900">Active</span>

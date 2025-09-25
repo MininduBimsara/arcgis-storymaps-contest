@@ -405,15 +405,24 @@ const AdminCategoriesPage: React.FC = () => {
       setLoading(true);
       setError(null);
       const categoriesData = await categoryApi.getAllCategories();
-      setCategories(categoriesData.sort((a, b) => a.order - b.order));
+
+      // Add null check and ensure it's an array
+      if (Array.isArray(categoriesData)) {
+        setCategories(categoriesData.sort((a, b) => a.order - b.order));
+      } else {
+        console.error("Categories data is not an array:", categoriesData);
+        setCategories([]);
+        setError("Invalid data format received from server.");
+      }
     } catch (err) {
       console.error("Error loading categories:", err);
       setError("Failed to load categories. Please try again.");
+      setCategories([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
   };
-
+  
   const handleCategoryAction = async (categoryId: string, action: string) => {
     try {
       switch (action) {
