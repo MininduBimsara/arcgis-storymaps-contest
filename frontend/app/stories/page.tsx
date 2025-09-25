@@ -4,12 +4,15 @@ import React, { useState, useEffect } from "react";
 import StoriesHeroSection from "@/components/stories/StoriesHeroSection";
 import FeaturedStoriesSection from "@/components/stories/FeaturedStories";
 import StoryDetails from "@/components/stories/StoryDetails";
+import ArcgisStoriesList from "@/components/stories/ArcgisStoriesList";
 import Footer from "@/components/layout/Footer";
-import { Story } from "@/components/stories/StoryCard";
+import { StoryMetaPublic } from "@/lib/api";
 
 // Main Stories Page Component
 const StoriesPage = () => {
-  const [selectedStory, setSelectedStory] = useState<Story | null>(null);
+  const [selectedStory, setSelectedStory] = useState<StoryMetaPublic | null>(
+    null
+  );
   const [isScrolled, setIsScrolled] = useState(false);
 
   // Handle scroll detection for navbar
@@ -23,9 +26,8 @@ const StoriesPage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleReadMore = (story: Story) => {
-    setSelectedStory(story);
-    window.scrollTo(0, 0);
+  const handleReadMore = (story: StoryMetaPublic) => {
+    window.open(story.storyUrl, "_blank");
   };
 
   const handleBackToStories = () => {
@@ -48,6 +50,7 @@ const StoriesPage = () => {
     <div className="min-h-screen bg-white">
       <StoriesHeroSection />
       <FeaturedStoriesSection onReadMore={handleReadMore} />
+      <ArcgisStoriesList />
       <Footer />
     </div>
   );
