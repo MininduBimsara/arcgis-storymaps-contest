@@ -7,6 +7,7 @@ const authRoutes = require("./auth");
 const userRoutes = require("./users");
 const submissionRoutes = require("./submissions");
 const categoryRoutes = require("./categories");
+const storyRoutes = require("./stories");
 
 // API version
 const API_VERSION = process.env.API_VERSION || "v1";
@@ -16,6 +17,7 @@ router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 router.use("/submissions", submissionRoutes);
 router.use("/categories", categoryRoutes);
+router.use("/stories", storyRoutes);
 
 // Health check endpoint
 router.get("/health", (req, res) => {
