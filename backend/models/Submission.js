@@ -291,4 +291,98 @@ submissionSchema.pre("save", function (next) {
   next();
 });
 
+// Add this static method to your backend/models/Submission.js file
+
+// Static method to get submission statistics
+submissionSchema.statics.getSubmissionStats = async function() {
+  try {
+    const stats = await this.aggregate([
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+          draft: { 
+            $sum: { 
+              $cond: [{ $eq: ["$status", "draft"] }, 1, 0] 
+            } 
+          },
+          submitted: { 
+            $sum: { 
+              $cond: [{ $eq: ["$status", "submitted"] }, 1, 0] 
+            } 
+          },
+          under_review: { 
+            $sum: { 
+              $cond: [{ $eq: ["$status", "under_review"] }, 1, 0] 
+            } 
+          },
+          approved: { 
+            $sum: { 
+              $cond: [{ $eq: ["$status", "approved"] }, 1, 0] 
+            } 
+          },
+          rejected: { 
+            $sum: { 
+              $cond: [{ $eq: ["$status", "rejected"] }, 1, 0] 
+            } 
+          },
+          winner: { 
+            $sum: { 
+              $cond: [{ $eq: ["$status", "winner"] }, 1, 0] 
+            } 
+          }
+        }
+      }
+    ]);
+
+    // Get submissions by category
+    const categoryStats = await this.aggregate([
+      {
+        $match: {
+          status: { $in: ["approved", "winner"] }
+        }
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "categoryData"
+        }
+      },
+      {
+        $unwind: "$categoryData"
+      },
+      {
+        $group: {
+          _id: "$category",
+          category: { $first: "$categoryData.name" },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ]);
+
+    const result = stats[0] || {
+      total: 0,
+      draft: 0,
+      submitted: 0,
+      under_review: 0,
+      approved: 0,
+      rejected: 0,
+      winner: 0
+    };
+
+    return {
+      ...result,
+      byCategory: categoryStats
+    };
+  } catch (error) {
+    console.error('Error getting submission stats:', error);
+    throw error;
+  }
+};
+
 module.exports = mongoose.model("Submission", submissionSchema);

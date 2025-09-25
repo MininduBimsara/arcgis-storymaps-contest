@@ -1,3 +1,4 @@
+// app/auth/page.tsx - FIXED VERSION with proper admin redirect (keeping original UI)
 "use client";
 import React, { useState, useEffect } from "react";
 import {
@@ -40,7 +41,7 @@ const CeylonStoriesAuth = () => {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
 
   // Use auth context for actual authentication
-  const { login, register } = useAuth();
+  const { login, register, user } = useAuth(); // ⚠️ ADDED 'user' to get user data after login
   const router = useRouter();
 
   // This hook already handles redirect if user is authenticated
@@ -113,6 +114,23 @@ const CeylonStoriesAuth = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // ✅ FIXED: Proper redirect logic based on user role
+  const handlePostLoginRedirect = (user: any) => {
+    if (user && user.role === "admin") {
+      setSuccessMessage(
+        "Admin login successful! Redirecting to admin dashboard..."
+      );
+      setTimeout(() => {
+        router.push("/admin");
+      }, 500);
+    } else {
+      setSuccessMessage("Login successful! Redirecting...");
+      setTimeout(() => {
+        router.push("/");
+      }, 500);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -125,12 +143,28 @@ const CeylonStoriesAuth = () => {
       if (isLogin) {
         // Use the actual login method from AuthContext
         await login(formData.email, formData.password);
-        setSuccessMessage("Login successful! Redirecting...");
 
-        // Redirect to home page after successful login
+        // ✅ FIXED: Check user role after login and redirect accordingly
+        // The login function should update the user in context
+        // We need to wait a bit for the context to update
         setTimeout(() => {
-          router.push("/");
-        }, 500);
+          if (user && user.role === "admin") {
+            handlePostLoginRedirect(user);
+          } else {
+            // If user is not immediately available, get it from localStorage as fallback
+            const cachedUser = localStorage.getItem("auth_user");
+            if (cachedUser) {
+              const parsedUser = JSON.parse(cachedUser);
+              handlePostLoginRedirect(parsedUser);
+            } else {
+              // Default redirect
+              setSuccessMessage("Login successful! Redirecting...");
+              setTimeout(() => {
+                router.push("/");
+              }, 500);
+            }
+          }
+        }, 100);
       } else {
         // Use the actual register method from AuthContext
         await register({

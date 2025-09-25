@@ -21,6 +21,7 @@ import {
   RefreshCw,
   ExternalLink,
   Calendar,
+  AlertCircle,
 } from "lucide-react";
 
 interface SubmissionsTableProps {
@@ -30,7 +31,7 @@ interface SubmissionsTableProps {
 }
 
 const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
-  submissions,
+  submissions = [], // Default to empty array
   onSubmissionAction,
   loading = false,
 }) => {
@@ -73,7 +74,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedSubmissions(submissions.map((s) => s._id));
+      setSelectedSubmissions(submissions?.map((s) => s._id) || []);
     } else {
       setSelectedSubmissions([]);
     }
@@ -103,6 +104,24 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Add null check for submissions
+  if (!submissions || !Array.isArray(submissions)) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="text-center py-12">
+          <FileText className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            Unable to load submissions
+          </h3>
+          <p className="mt-1 text-sm text-gray-500">
+            There was an issue loading the submissions data. Please refresh the
+            page.
+          </p>
         </div>
       </div>
     );
@@ -144,8 +163,8 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
                   type="checkbox"
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   checked={
-                    selectedSubmissions.length === submissions.length &&
-                    submissions.length > 0
+                    submissions.length > 0 &&
+                    selectedSubmissions.length === submissions.length
                   }
                   onChange={handleSelectAll}
                 />
@@ -390,13 +409,23 @@ const AdminSubmissionsPage: React.FC = () => {
 
       const response = await submissionApi.getSubmissions(params);
 
-      if (response.data) {
-        setSubmissions(response.data.submissions);
-        setTotalSubmissions(response.data.total);
+      if (response && response.data) {
+        // Ensure submissions is always an array
+        const submissionsData = response.data.submissions || [];
+        setSubmissions(submissionsData);
+        setTotalSubmissions(response.data.total || 0);
+      } else {
+        // Handle case where response structure is unexpected
+        setSubmissions([]);
+        setTotalSubmissions(0);
+        setError("Unexpected response format from server.");
       }
     } catch (err) {
       console.error("Error loading submissions:", err);
       setError("Failed to load submissions. Please try again.");
+      // Ensure submissions is set to empty array on error
+      setSubmissions([]);
+      setTotalSubmissions(0);
     } finally {
       setLoading(false);
     }
@@ -526,7 +555,7 @@ const AdminSubmissionsPage: React.FC = () => {
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
             <div className="flex">
-              <XCircle className="h-5 w-5 text-red-400" />
+              <AlertCircle className="h-5 w-5 text-red-400" />
               <div className="ml-3">
                 <p className="text-sm text-red-700">{error}</p>
               </div>

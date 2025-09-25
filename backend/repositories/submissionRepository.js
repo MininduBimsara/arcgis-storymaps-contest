@@ -144,7 +144,22 @@ class SubmissionRepository {
    * Get submission statistics
    */
   async getStats() {
-    return await Submission.getSubmissionStats();
+    try {
+      return await Submission.getSubmissionStats();
+    } catch (error) {
+      console.error("Repository error getting submission stats:", error);
+      // Return default stats if database query fails
+      return {
+        total: 0,
+        draft: 0,
+        submitted: 0,
+        under_review: 0,
+        approved: 0,
+        rejected: 0,
+        winner: 0,
+        byCategory: [],
+      };
+    }
   }
 
   /**
