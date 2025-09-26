@@ -108,6 +108,8 @@ userSchema.virtual("isLocked").get(function () {
 userSchema.index({ role: 1 });
 userSchema.index({ status: 1 });
 userSchema.index({ createdAt: -1 });
+userSchema.index({ emailVerified: 1 });
+userSchema.index({ lastLogin: -1 });
 
 // Pre-save middleware to hash password
 userSchema.pre("save", async function (next) {

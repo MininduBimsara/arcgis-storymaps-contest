@@ -43,5 +43,6 @@ const StoryMetaSchema = new mongoose.Schema(
 
 // Ensure combination uniqueness to avoid duplicates if desired
 StoryMetaSchema.index({ itemId: 1 }, { unique: true });
+StoryMetaSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model("StoryMeta", StoryMetaSchema);

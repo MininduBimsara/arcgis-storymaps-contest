@@ -58,6 +58,7 @@ const categorySchema = new mongoose.Schema(
 
 // Indexes (slug already has unique: true, so no duplicate needed)
 categorySchema.index({ isActive: 1, order: 1 });
+categorySchema.index({ createdAt: -1 });
 
 // Pre-save middleware to generate slug
 categorySchema.pre("save", function (next) {

@@ -151,6 +151,36 @@ export const userApi = {
     >("/users", {
       params,
     });
+
+    // Normalize backend paginated shape: data is an array, pagination has meta
+    // Expected by callers: { success, data: { users, page, limit, total } }
+    const d: any = response.data;
+    if (d && d.success) {
+      // If already in expected shape
+      if (d.data && Array.isArray(d.data.users)) {
+        return d;
+      }
+
+      // If paginated helper returned array in data and meta in pagination
+      if (Array.isArray(d.data) && d.pagination) {
+        return {
+          success: true,
+          message: d.message,
+          data: {
+            users: d.data as User[],
+            page: d.pagination.page || 1,
+            limit: d.pagination.limit || 10,
+            total: d.pagination.total || 0,
+          },
+          pagination: d.pagination,
+        } as ApiResponse<{
+          users: User[];
+          page: number;
+          limit: number;
+          total: number;
+        }>;
+      }
+    }
     return response.data;
   },
 
@@ -174,6 +204,31 @@ export const userApi = {
     >("/users/search", {
       params,
     });
+
+    const d: any = response.data;
+    if (d && d.success) {
+      if (d.data && Array.isArray(d.data.users)) {
+        return d;
+      }
+      if (Array.isArray(d.data) && d.pagination) {
+        return {
+          success: true,
+          message: d.message,
+          data: {
+            users: d.data as User[],
+            page: d.pagination.page || 1,
+            limit: d.pagination.limit || 10,
+            total: d.pagination.total || 0,
+          },
+          pagination: d.pagination,
+        } as ApiResponse<{
+          users: User[];
+          page: number;
+          limit: number;
+          total: number;
+        }>;
+      }
+    }
     return response.data;
   },
 
@@ -254,20 +309,34 @@ export const submissionApi = {
         params,
       });
 
-      // Validate response structure and provide defaults
-      if (response.data && response.data.success && response.data.data) {
-        return {
-          ...response.data,
-          data: {
-            submissions: response.data.data.submissions || [],
-            page: response.data.data.page || 1,
-            limit: response.data.data.limit || 10,
-            total: response.data.data.total || 0,
-          },
-        };
+      const d: any = response.data;
+      if (d && d.success) {
+        // Backend may return array + pagination via responseHandler.paginated
+        if (Array.isArray(d.data) && d.pagination) {
+          return {
+            success: true,
+            message: d.message,
+            data: {
+              submissions: d.data as Submission[],
+              page: d.pagination.page || 1,
+              limit: d.pagination.limit || 10,
+              total: d.pagination.total || 0,
+            },
+            pagination: d.pagination,
+          } as ApiResponse<{
+            submissions: Submission[];
+            page: number;
+            limit: number;
+            total: number;
+          }>;
+        }
+
+        // Already in expected shape
+        if (d.data && Array.isArray(d.data.submissions)) {
+          return d;
+        }
       }
 
-      // Return default structure if invalid response
       console.warn("Invalid submissions response structure:", response.data);
       return {
         success: false,
@@ -281,7 +350,6 @@ export const submissionApi = {
       };
     } catch (error) {
       console.error("Error fetching submissions:", error);
-      // Return default structure on error - don't throw so UI can still render
       return {
         success: false,
         message: "Failed to fetch submissions",

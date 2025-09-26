@@ -237,6 +237,11 @@ submissionSchema.index({ category: 1 });
 submissionSchema.index({ status: 1 });
 submissionSchema.index({ submissionYear: 1 });
 submissionSchema.index({ createdAt: -1 });
+submissionSchema.index({ isPublic: 1 });
+submissionSchema.index({ storyMapId: 1 });
+// Common compound sorts/filters for feeds and admin tables
+submissionSchema.index({ status: 1, isPublic: 1, createdAt: -1 });
+submissionSchema.index({ category: 1, status: 1, createdAt: -1 });
 
 // Text index for search functionality
 submissionSchema.index({
@@ -294,75 +299,75 @@ submissionSchema.pre("save", function (next) {
 // Add this static method to your backend/models/Submission.js file
 
 // Static method to get submission statistics
-submissionSchema.statics.getSubmissionStats = async function() {
+submissionSchema.statics.getSubmissionStats = async function () {
   try {
     const stats = await this.aggregate([
       {
         $group: {
           _id: null,
           total: { $sum: 1 },
-          draft: { 
-            $sum: { 
-              $cond: [{ $eq: ["$status", "draft"] }, 1, 0] 
-            } 
+          draft: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "draft"] }, 1, 0],
+            },
           },
-          submitted: { 
-            $sum: { 
-              $cond: [{ $eq: ["$status", "submitted"] }, 1, 0] 
-            } 
+          submitted: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "submitted"] }, 1, 0],
+            },
           },
-          under_review: { 
-            $sum: { 
-              $cond: [{ $eq: ["$status", "under_review"] }, 1, 0] 
-            } 
+          under_review: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "under_review"] }, 1, 0],
+            },
           },
-          approved: { 
-            $sum: { 
-              $cond: [{ $eq: ["$status", "approved"] }, 1, 0] 
-            } 
+          approved: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "approved"] }, 1, 0],
+            },
           },
-          rejected: { 
-            $sum: { 
-              $cond: [{ $eq: ["$status", "rejected"] }, 1, 0] 
-            } 
+          rejected: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "rejected"] }, 1, 0],
+            },
           },
-          winner: { 
-            $sum: { 
-              $cond: [{ $eq: ["$status", "winner"] }, 1, 0] 
-            } 
-          }
-        }
-      }
+          winner: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "winner"] }, 1, 0],
+            },
+          },
+        },
+      },
     ]);
 
     // Get submissions by category
     const categoryStats = await this.aggregate([
       {
         $match: {
-          status: { $in: ["approved", "winner"] }
-        }
+          status: { $in: ["approved", "winner"] },
+        },
       },
       {
         $lookup: {
           from: "categories",
           localField: "category",
           foreignField: "_id",
-          as: "categoryData"
-        }
+          as: "categoryData",
+        },
       },
       {
-        $unwind: "$categoryData"
+        $unwind: "$categoryData",
       },
       {
         $group: {
           _id: "$category",
           category: { $first: "$categoryData.name" },
-          count: { $sum: 1 }
-        }
+          count: { $sum: 1 },
+        },
       },
       {
-        $sort: { count: -1 }
-      }
+        $sort: { count: -1 },
+      },
     ]);
 
     const result = stats[0] || {
@@ -372,15 +377,15 @@ submissionSchema.statics.getSubmissionStats = async function() {
       under_review: 0,
       approved: 0,
       rejected: 0,
-      winner: 0
+      winner: 0,
     };
 
     return {
       ...result,
-      byCategory: categoryStats
+      byCategory: categoryStats,
     };
   } catch (error) {
-    console.error('Error getting submission stats:', error);
+    console.error("Error getting submission stats:", error);
     throw error;
   }
 };

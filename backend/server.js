@@ -1,9 +1,10 @@
 // server.js - Fixed version
 require("dotenv").config();
 const { startServer } = require("./app");
+const logger = require("./utils/logger");
 
 process.on("uncaughtException", (err) => {
-  console.error("Uncaught Exception! Shutting down...", {
+  logger.error("Uncaught Exception! Shutting down...", {
     error: err.message,
     stack: err.stack,
   });
@@ -11,7 +12,7 @@ process.on("uncaughtException", (err) => {
 });
 
 process.on("unhandledRejection", (err) => {
-  console.error("Unhandled Rejection! Shutting down...", {
+  logger.error("Unhandled Rejection! Shutting down...", {
     error: err.message,
     stack: err.stack,
   });

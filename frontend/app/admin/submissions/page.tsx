@@ -128,7 +128,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-visible">
       {/* Bulk Actions */}
       {selectedSubmissions.length > 0 && (
         <div className="bg-blue-50 px-6 py-3 border-b border-gray-200">
@@ -247,7 +247,9 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {submission.category}
+                  {typeof submission.category === "object"
+                    ? (submission.category as any)?.name || "Unknown"
+                    : submission.category || "Unknown"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <div className="flex items-center">
@@ -271,19 +273,8 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
                     </button>
 
                     {dropdownOpen === submission._id && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
                         <div className="py-1">
-                          <button
-                            onClick={() => {
-                              onSubmissionAction(submission._id, "view");
-                              setDropdownOpen(null);
-                            }}
-                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                          >
-                            <Eye className="mr-3 h-4 w-4" />
-                            View Details
-                          </button>
-
                           {submission.status === "under_review" && (
                             <>
                               <button
