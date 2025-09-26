@@ -1,4 +1,4 @@
-// app/admin/categories/page.tsx
+// app/admin/categories/page.tsx - FIXED VERSION with improved layout
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -15,14 +15,18 @@ import {
   ToggleLeft,
   ToggleRight,
   RefreshCw,
-  X,
-  Check,
   AlertCircle,
+  X,
 } from "lucide-react";
 
 interface CategoryFormProps {
   category?: Category | null;
-  onSave: (categoryData: any) => void;
+  onSave: (categoryData: {
+    name: string;
+    description: string;
+    slug: string;
+    order: number;
+  }) => void;
   onCancel: () => void;
   loading?: boolean;
 }
@@ -64,12 +68,20 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+    <div className="admin-modal-overlay">
+      <div className="admin-modal max-w-md w-full mx-4">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
-            {category ? "Edit Category" : "Create Category"}
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium text-gray-900">
+              {category ? "Edit Category" : "Create Category"}
+            </h3>
+            <button
+              onClick={onCancel}
+              className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6">
@@ -81,7 +93,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
               <input
                 type="text"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="admin-input"
                 value={formData.name}
                 onChange={(e) => handleNameChange(e.target.value)}
                 placeholder="Enter category name"
@@ -95,7 +107,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
               <input
                 type="text"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="admin-input"
                 value={formData.slug}
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, slug: e.target.value }))
@@ -113,7 +125,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
               </label>
               <textarea
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="admin-input"
                 value={formData.description}
                 onChange={(e) =>
                   setFormData((prev) => ({
@@ -132,7 +144,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
               <input
                 type="number"
                 min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="admin-input"
                 value={formData.order}
                 onChange={(e) =>
                   setFormData((prev) => ({
@@ -152,14 +164,14 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
               disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
               disabled={loading}
             >
               {loading ? "Saving..." : category ? "Update" : "Create"}
@@ -184,12 +196,24 @@ const CategoriesTable: React.FC<CategoriesTableProps> = ({
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
 
+  // Click outside handler to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!(event.target as Element).closest(".dropdown-container")) {
+        setDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="admin-table-container">
         <div className="animate-pulse">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="border-b border-gray-200 p-4">
+            <div key={i} className="border-b border-gray-200 p-6">
               <div className="flex items-center space-x-4">
                 <div className="h-12 w-12 bg-gray-200 rounded"></div>
                 <div className="flex-1 space-y-2">
@@ -206,64 +230,58 @@ const CategoriesTable: React.FC<CategoriesTableProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className="admin-table-container">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="admin-table">
+          <thead>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Category
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Slug
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Submissions
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Order
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
+              <th>Category</th>
+              <th>Slug</th>
+              <th>Submissions</th>
+              <th>Order</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody>
             {categories.map((category) => (
-              <tr key={category._id} className="hover:bg-gray-50">
-                <td className="px-6 py-4">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <tr key={category._id}>
+                <td>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <FolderOpen className="h-5 w-5 text-blue-600" />
                     </div>
-                    <div className="ml-4">
+                    <div className="min-w-0 flex-1">
                       <div className="text-sm font-medium text-gray-900">
                         {category.name}
                       </div>
-                      <div className="text-sm text-gray-500 mt-1">
-                        {category.description}
-                      </div>
+                      {category.description && (
+                        <div className="text-sm text-gray-500 mt-1 line-clamp-2">
+                          {category.description}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td>
                   <code className="text-sm bg-gray-100 px-2 py-1 rounded text-gray-800">
                     {category.slug}
                   </code>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {category.submissionCount || 0}
+                <td>
+                  <span className="text-sm font-medium text-gray-900">
+                    {category.submissionCount || 0}
+                  </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {category.order}
+                <td>
+                  <span className="text-sm text-gray-900">
+                    {category.order}
+                  </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td>
                   <button
                     onClick={() => onCategoryAction(category._id, "toggle")}
-                    className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
+                    className={`admin-status-badge transition-colors ${
                       category.isActive
                         ? "bg-green-100 text-green-800 hover:bg-green-200"
                         : "bg-gray-100 text-gray-800 hover:bg-gray-200"
@@ -282,21 +300,21 @@ const CategoriesTable: React.FC<CategoriesTableProps> = ({
                     )}
                   </button>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="relative">
+                <td>
+                  <div className="dropdown-container">
                     <button
                       onClick={() =>
                         setDropdownOpen(
                           dropdownOpen === category._id ? null : category._id
                         )
                       }
-                      className="text-gray-400 hover:text-gray-600 p-1 rounded"
+                      className="text-gray-400 hover:text-gray-600 p-2 rounded-md hover:bg-gray-100 transition-colors"
                     >
                       <MoreVertical className="h-4 w-4" />
                     </button>
 
                     {dropdownOpen === category._id && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+                      <div className="table-dropdown-menu admin-fade-in">
                         <div className="py-1">
                           <button
                             onClick={() => {
@@ -329,7 +347,7 @@ const CategoriesTable: React.FC<CategoriesTableProps> = ({
                             )}
                           </button>
 
-                          <div className="border-t border-gray-100"></div>
+                          <div className="border-t border-gray-100 my-1"></div>
 
                           <button
                             onClick={() => {
@@ -337,13 +355,13 @@ const CategoriesTable: React.FC<CategoriesTableProps> = ({
                               setDropdownOpen(null);
                             }}
                             className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
-                            disabled={category.submissionCount > 0}
+                            disabled={(category.submissionCount || 0) > 0}
                           >
                             <Trash2 className="mr-3 h-4 w-4" />
                             Delete
                           </button>
 
-                          {category.submissionCount > 0 && (
+                          {(category.submissionCount || 0) > 0 && (
                             <div className="px-4 py-2 text-xs text-gray-500">
                               Cannot delete: has {category.submissionCount}{" "}
                               submissions
@@ -406,7 +424,6 @@ const AdminCategoriesPage: React.FC = () => {
       setError(null);
       const categoriesData = await categoryApi.getAllCategories();
 
-      // Add null check and ensure it's an array
       if (Array.isArray(categoriesData)) {
         setCategories(categoriesData.sort((a, b) => a.order - b.order));
       } else {
@@ -417,12 +434,12 @@ const AdminCategoriesPage: React.FC = () => {
     } catch (err) {
       console.error("Error loading categories:", err);
       setError("Failed to load categories. Please try again.");
-      setCategories([]); // Set empty array on error
+      setCategories([]);
     } finally {
       setLoading(false);
     }
   };
-  
+
   const handleCategoryAction = async (categoryId: string, action: string) => {
     try {
       switch (action) {
@@ -437,7 +454,7 @@ const AdminCategoriesPage: React.FC = () => {
           break;
         case "delete":
           const categoryToDelete = categories.find((c) => c._id === categoryId);
-          if (categoryToDelete?.submissionCount > 0) {
+          if ((categoryToDelete?.submissionCount ?? 0) > 0) {
             alert(
               "Cannot delete category with submissions. Please move submissions to another category first."
             );
@@ -455,11 +472,17 @@ const AdminCategoriesPage: React.FC = () => {
       }
     } catch (err) {
       console.error("Error performing category action:", err);
-      alert("Failed to perform action. Please try again.");
+      setError("Failed to perform action. Please try again.");
+      setTimeout(() => setError(null), 5000);
     }
   };
 
-  const handleFormSave = async (categoryData: any) => {
+  const handleFormSave = async (categoryData: {
+    name: string;
+    description: string;
+    slug: string;
+    order: number;
+  }) => {
     try {
       setFormLoading(true);
       if (editingCategory) {
@@ -472,7 +495,8 @@ const AdminCategoriesPage: React.FC = () => {
       loadCategories();
     } catch (err) {
       console.error("Error saving category:", err);
-      alert("Failed to save category. Please try again.");
+      setError("Failed to save category. Please try again.");
+      setTimeout(() => setError(null), 5000);
     } finally {
       setFormLoading(false);
     }
@@ -486,7 +510,7 @@ const AdminCategoriesPage: React.FC = () => {
   if (authLoading) {
     return (
       <AdminLayout>
-        <div className="p-6">
+        <div className="p-4 sm:p-6 lg:p-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-64 mb-6"></div>
             <div className="h-40 bg-gray-200 rounded mb-6"></div>
@@ -498,65 +522,74 @@ const AdminCategoriesPage: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Categories Management
-              </h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Organize submissions into categories
-              </p>
-            </div>
-            <div className="flex space-x-3">
-              <button
-                onClick={loadCategories}
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Refresh
-              </button>
-              <button
-                onClick={() => setShowForm(true)}
-                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create Category
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
-            <div className="flex">
-              <AlertCircle className="h-5 w-5 text-red-400" />
-              <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+      <div className="admin-container">
+        <div className="p-4 sm:p-6 lg:p-8 admin-layout-main">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Categories Management
+                </h1>
+                <p className="mt-1 text-sm text-gray-500">
+                  Organize submissions into categories ({categories.length}{" "}
+                  total)
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={loadCategories}
+                  className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition-colors"
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Refresh
+                </button>
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 transition-colors"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Category
+                </button>
               </div>
             </div>
           </div>
-        )}
 
-        {/* Categories Table */}
-        <CategoriesTable
-          categories={categories}
-          onCategoryAction={handleCategoryAction}
-          loading={loading}
-        />
+          {/* Error Message */}
+          {error && (
+            <div className="admin-error-message">
+              <div className="flex">
+                <AlertCircle className="h-5 w-5 text-red-400" />
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                  <button
+                    onClick={() => setError(null)}
+                    className="mt-2 text-sm bg-red-100 text-red-800 px-3 py-1 rounded-md hover:bg-red-200 transition-colors"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
-        {/* Category Form Modal */}
-        {showForm && (
-          <CategoryForm
-            category={editingCategory}
-            onSave={handleFormSave}
-            onCancel={handleFormCancel}
-            loading={formLoading}
+          {/* Categories Table */}
+          <CategoriesTable
+            categories={categories}
+            onCategoryAction={handleCategoryAction}
+            loading={loading}
           />
-        )}
+
+          {/* Category Form Modal */}
+          {showForm && (
+            <CategoryForm
+              category={editingCategory}
+              onSave={handleFormSave}
+              onCancel={handleFormCancel}
+              loading={formLoading}
+            />
+          )}
+        </div>
       </div>
     </AdminLayout>
   );

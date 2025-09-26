@@ -1,4 +1,4 @@
-// app/admin/submissions/page.tsx
+// app/admin/submissions/page.tsx - FIXED VERSION with improved layout
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -22,6 +22,7 @@ import {
   ExternalLink,
   Calendar,
   AlertCircle,
+  X,
 } from "lucide-react";
 
 interface SubmissionsTableProps {
@@ -31,12 +32,24 @@ interface SubmissionsTableProps {
 }
 
 const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
-  submissions = [], // Default to empty array
+  submissions = [],
   onSubmissionAction,
   loading = false,
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
+
+  // Click outside handler to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!(event.target as Element).closest(".dropdown-container")) {
+        setDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -90,10 +103,10 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="admin-table-container">
         <div className="animate-pulse">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="border-b border-gray-200 p-4">
+            <div key={i} className="border-b border-gray-200 p-6">
               <div className="flex items-center space-x-4">
                 <div className="h-4 w-4 bg-gray-200 rounded"></div>
                 <div className="flex-1 space-y-2">
@@ -109,10 +122,9 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
     );
   }
 
-  // Add null check for submissions
   if (!submissions || !Array.isArray(submissions)) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="admin-table-container">
         <div className="text-center py-12">
           <FileText className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">
@@ -128,7 +140,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-visible">
+    <div className="admin-table-container">
       {/* Bulk Actions */}
       {selectedSubmissions.length > 0 && (
         <div className="bg-blue-50 px-6 py-3 border-b border-gray-200">
@@ -136,16 +148,16 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
             <span className="text-sm font-medium text-blue-800">
               {selectedSubmissions.length} submissions selected
             </span>
-            <div className="flex space-x-2">
+            <div className="admin-button-group">
               <button
                 onClick={() => onSubmissionAction("bulk", "approve")}
-                className="px-3 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700"
+                className="px-3 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 transition-colors"
               >
                 Bulk Approve
               </button>
               <button
                 onClick={() => onSubmissionAction("bulk", "reject")}
-                className="px-3 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700"
+                className="px-3 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors"
               >
                 Bulk Reject
               </button>
@@ -155,10 +167,10 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
       )}
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="admin-table">
+          <thead>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-12">
                 <input
                   type="checkbox"
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
@@ -169,30 +181,18 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
                   onChange={handleSelectAll}
                 />
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Submission
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Author
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Category
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Submitted
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
+              <th>Submission</th>
+              <th>Author</th>
+              <th>Status</th>
+              <th>Category</th>
+              <th>Submitted</th>
+              <th>Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody>
             {submissions.map((submission) => (
-              <tr key={submission._id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
+              <tr key={submission._id}>
+                <td>
                   <input
                     type="checkbox"
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
@@ -200,9 +200,9 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
                     onChange={() => handleSelectSubmission(submission._id)}
                   />
                 </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-start">
-                    <div className="flex-1">
+                <td>
+                  <div className="flex items-start space-x-3">
+                    <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-gray-900 line-clamp-2">
                         {submission.title}
                       </div>
@@ -214,7 +214,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
                           href={submission.storyMapUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center mt-2 text-xs text-blue-600 hover:text-blue-800"
+                          className="inline-flex items-center mt-2 text-xs text-blue-600 hover:text-blue-800 transition-colors"
                         >
                           <ExternalLink className="mr-1 h-3 w-3" />
                           View StoryMap
@@ -223,7 +223,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td>
                   <div className="text-sm text-gray-900">
                     {typeof submission.submittedBy === "object"
                       ? submission.submittedBy.firstName
@@ -236,9 +236,9 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
                       submission.submittedBy.email}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td>
                   <span
-                    className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(submission.status)}`}
+                    className={`admin-status-badge ${getStatusColor(submission.status)}`}
                   >
                     {getStatusIcon(submission.status)}
                     <span className="ml-1 capitalize">
@@ -246,19 +246,21 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
                     </span>
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {typeof submission.category === "object"
-                    ? (submission.category as any)?.name || "Unknown"
-                    : submission.category || "Unknown"}
+                <td>
+                  <span className="text-sm text-gray-900">
+                    {typeof submission.category === "object"
+                      ? (submission.category as any)?.name || "Unknown"
+                      : submission.category || "Unknown"}
+                  </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <div className="flex items-center">
+                <td>
+                  <div className="flex items-center text-sm text-gray-500">
                     <Calendar className="mr-1 h-4 w-4" />
                     {new Date(submission.createdAt).toLocaleDateString()}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="relative">
+                <td>
+                  <div className="dropdown-container">
                     <button
                       onClick={() =>
                         setDropdownOpen(
@@ -267,16 +269,29 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
                             : submission._id
                         )
                       }
-                      className="text-gray-400 hover:text-gray-600 p-1 rounded"
+                      className="text-gray-400 hover:text-gray-600 p-2 rounded-md hover:bg-gray-100 transition-colors"
                     >
                       <MoreVertical className="h-4 w-4" />
                     </button>
 
                     {dropdownOpen === submission._id && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                      <div className="table-dropdown-menu admin-fade-in">
                         <div className="py-1">
+                          <button
+                            onClick={() => {
+                              onSubmissionAction(submission._id, "view");
+                              setDropdownOpen(null);
+                            }}
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                          >
+                            <Eye className="mr-3 h-4 w-4" />
+                            View Details
+                          </button>
+
                           {submission.status === "under_review" && (
                             <>
+                              <div className="border-t border-gray-100 my-1"></div>
+
                               <button
                                 onClick={() => {
                                   onSubmissionAction(submission._id, "approve");
@@ -302,22 +317,25 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
                           )}
 
                           {submission.status === "approved" && (
-                            <button
-                              onClick={() => {
-                                onSubmissionAction(
-                                  submission._id,
-                                  "make-winner"
-                                );
-                                setDropdownOpen(null);
-                              }}
-                              className="flex items-center px-4 py-2 text-sm text-amber-600 hover:bg-gray-100 w-full text-left"
-                            >
-                              <Trophy className="mr-3 h-4 w-4" />
-                              Mark as Winner
-                            </button>
+                            <>
+                              <div className="border-t border-gray-100 my-1"></div>
+                              <button
+                                onClick={() => {
+                                  onSubmissionAction(
+                                    submission._id,
+                                    "make-winner"
+                                  );
+                                  setDropdownOpen(null);
+                                }}
+                                className="flex items-center px-4 py-2 text-sm text-amber-600 hover:bg-gray-100 w-full text-left"
+                              >
+                                <Trophy className="mr-3 h-4 w-4" />
+                                Mark as Winner
+                              </button>
+                            </>
                           )}
 
-                          <div className="border-t border-gray-100"></div>
+                          <div className="border-t border-gray-100 my-1"></div>
 
                           <button
                             onClick={() => {
@@ -370,6 +388,7 @@ const AdminSubmissionsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalSubmissions, setTotalSubmissions] = useState(0);
   const [limit] = useState(10);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     if (!authLoading) {
@@ -401,12 +420,10 @@ const AdminSubmissionsPage: React.FC = () => {
       const response = await submissionApi.getSubmissions(params);
 
       if (response && response.data) {
-        // Ensure submissions is always an array
         const submissionsData = response.data.submissions || [];
         setSubmissions(submissionsData);
         setTotalSubmissions(response.data.total || 0);
       } else {
-        // Handle case where response structure is unexpected
         setSubmissions([]);
         setTotalSubmissions(0);
         setError("Unexpected response format from server.");
@@ -414,7 +431,6 @@ const AdminSubmissionsPage: React.FC = () => {
     } catch (err) {
       console.error("Error loading submissions:", err);
       setError("Failed to load submissions. Please try again.");
-      // Ensure submissions is set to empty array on error
       setSubmissions([]);
       setTotalSubmissions(0);
     } finally {
@@ -459,16 +475,26 @@ const AdminSubmissionsPage: React.FC = () => {
       }
     } catch (err) {
       console.error("Error performing submission action:", err);
-      alert("Failed to perform action. Please try again.");
+      setError("Failed to perform action. Please try again.");
+      setTimeout(() => setError(null), 5000);
     }
   };
+
+  const clearFilters = () => {
+    setStatusFilter("");
+    setCategoryFilter("");
+    setCurrentPage(1);
+    setShowFilters(false);
+  };
+
+  const hasActiveFilters = statusFilter || categoryFilter;
 
   const totalPages = Math.ceil(totalSubmissions / limit);
 
   if (authLoading) {
     return (
       <AdminLayout>
-        <div className="p-6">
+        <div className="p-4 sm:p-6 lg:p-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-64 mb-6"></div>
             <div className="h-40 bg-gray-200 rounded mb-6"></div>
@@ -480,133 +506,190 @@ const AdminSubmissionsPage: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Submissions Management
-              </h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Review and manage competition submissions
-              </p>
-            </div>
-            <button
-              onClick={loadSubmissions}
-              className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Refresh
-            </button>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="mb-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex gap-3">
-              <select
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="">All Status</option>
-                <option value="draft">Draft</option>
-                <option value="submitted">Submitted</option>
-                <option value="under_review">Under Review</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="winner">Winner</option>
-              </select>
-
-              <select
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                value={categoryFilter}
-                onChange={(e) => {
-                  setCategoryFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="">All Categories</option>
-                <option value="tourism">Tourism</option>
-                <option value="culture">Culture</option>
-                <option value="nature">Nature</option>
-                <option value="history">History</option>
-                <option value="food">Food</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
-            <div className="flex">
-              <AlertCircle className="h-5 w-5 text-red-400" />
-              <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+      <div className="admin-container">
+        <div className="p-4 sm:p-6 lg:p-8 admin-layout-main">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Submissions Management
+                </h1>
+                <p className="mt-1 text-sm text-gray-500">
+                  Review and manage competition submissions ({totalSubmissions}{" "}
+                  total)
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={loadSubmissions}
+                  className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition-colors"
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Refresh
+                </button>
               </div>
             </div>
           </div>
-        )}
 
-        {/* Submissions Table */}
-        <SubmissionsTable
-          submissions={submissions}
-          onSubmissionAction={handleSubmissionAction}
-          loading={loading}
-        />
+          {/* Filters */}
+          <div className="admin-search-filters">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
+                    showFilters || hasActiveFilters
+                      ? "bg-blue-50 text-blue-700 border-blue-200"
+                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                  }`}
+                >
+                  <Filter className="mr-2 h-4 w-4" />
+                  Filters
+                  {hasActiveFilters && (
+                    <span className="ml-2 bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full">
+                      {[statusFilter, categoryFilter].filter(Boolean).length}
+                    </span>
+                  )}
+                </button>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-6 flex items-center justify-between">
-            <div className="text-sm text-gray-700">
-              Showing {(currentPage - 1) * limit + 1} to{" "}
-              {Math.min(currentPage * limit, totalSubmissions)} of{" "}
-              {totalSubmissions} submissions
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Previous
-              </button>
-
-              {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                const page = i + 1;
-                return (
+                {hasActiveFilters && (
                   <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-3 py-1 text-sm font-medium rounded-md ${
-                      currentPage === page
-                        ? "bg-blue-600 text-white"
-                        : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-50"
-                    }`}
+                    onClick={clearFilters}
+                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
                   >
-                    {page}
+                    <X className="mr-1 h-4 w-4" />
+                    Clear Filters
                   </button>
-                );
-              })}
-
-              <button
-                onClick={() =>
-                  setCurrentPage(Math.min(totalPages, currentPage + 1))
-                }
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
+                )}
+              </div>
             </div>
+
+            {/* Expandable Filters */}
+            {showFilters && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg border admin-fade-in">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+                    <select
+                      className="admin-select w-full"
+                      value={statusFilter}
+                      onChange={(e) => {
+                        setStatusFilter(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                    >
+                      <option value="">All Status</option>
+                      <option value="draft">Draft</option>
+                      <option value="submitted">Submitted</option>
+                      <option value="under_review">Under Review</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                      <option value="winner">Winner</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Category
+                    </label>
+                    <select
+                      className="admin-select w-full"
+                      value={categoryFilter}
+                      onChange={(e) => {
+                        setCategoryFilter(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                    >
+                      <option value="">All Categories</option>
+                      <option value="tourism">Tourism</option>
+                      <option value="culture">Culture</option>
+                      <option value="nature">Nature</option>
+                      <option value="history">History</option>
+                      <option value="food">Food</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Error Message */}
+          {error && (
+            <div className="admin-error-message">
+              <div className="flex">
+                <AlertCircle className="h-5 w-5 text-red-400" />
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                  <button
+                    onClick={() => setError(null)}
+                    className="mt-2 text-sm bg-red-100 text-red-800 px-3 py-1 rounded-md hover:bg-red-200 transition-colors"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Submissions Table */}
+          <SubmissionsTable
+            submissions={submissions}
+            onSubmissionAction={handleSubmissionAction}
+            loading={loading}
+          />
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="admin-pagination">
+              <div className="admin-pagination-info">
+                Showing {(currentPage - 1) * limit + 1} to{" "}
+                {Math.min(currentPage * limit, totalSubmissions)} of{" "}
+                {totalSubmissions} submissions
+              </div>
+              <div className="admin-pagination-controls">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Previous
+                </button>
+
+                {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                  const page = Math.max(1, currentPage - 2) + i;
+                  if (page > totalPages) return null;
+
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                        currentPage === page
+                          ? "bg-blue-600 text-white"
+                          : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-50"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+
+                <button
+                  onClick={() =>
+                    setCurrentPage(Math.min(totalPages, currentPage + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </AdminLayout>
   );

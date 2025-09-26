@@ -25,108 +25,385 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Add these CSS classes to your globals.css or create a new admin.css file */
+/* Admin Layout Fixes */
+.admin-layout-main {
+  position: relative;
+  z-index: 1;
+  overflow: visible !important;
+}
 
-/* Fix for table alignment and responsive behavior */
+.admin-container {
+  position: relative;
+  overflow: visible !important;
+}
+
+/* Table Container Fixes */
 .admin-table-container {
-  @apply bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden;
+  @apply bg-white rounded-lg shadow-sm border border-gray-200;
+  position: relative;
+  overflow: visible !important;
+}
+
+.admin-table-container .overflow-x-auto {
+  overflow-x: auto;
+  overflow-y: visible;
+  position: relative;
 }
 
 .admin-table {
   @apply min-w-full divide-y divide-gray-200;
+  position: relative;
 }
 
 .admin-table thead {
   @apply bg-gray-50;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .admin-table thead th {
   @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+  background-color: #f9fafb;
 }
 
 .admin-table tbody {
   @apply bg-white divide-y divide-gray-200;
+  position: relative;
 }
 
 .admin-table tbody tr {
   @apply hover:bg-gray-50;
+  position: relative;
 }
 
 .admin-table tbody td {
-  @apply px-6 py-4 whitespace-nowrap text-sm;
+  @apply px-6 py-4 text-sm;
+  position: relative;
+  vertical-align: top;
 }
 
-/* Fix for grid layout consistency */
+/* Dropdown Container Fixes */
+.dropdown-container {
+  position: relative;
+  z-index: 1000;
+}
+
+/* Enhanced Dropdown Menu */
+.table-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.25rem);
+  width: 12rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e5e7eb;
+  z-index: 9999;
+  transform: translateZ(0);
+  opacity: 1;
+  pointer-events: auto;
+  min-width: 12rem;
+}
+
+/* Ensure dropdown appears above everything */
+.table-dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -0.5rem;
+  right: 1rem;
+  width: 0;
+  height: 0;
+  border-left: 0.5rem solid transparent;
+  border-right: 0.5rem solid transparent;
+  border-bottom: 0.5rem solid white;
+  filter: drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.05));
+}
+
+/* Dropdown Menu Items */
+.table-dropdown-menu .py-1 {
+  padding: 0.25rem 0;
+}
+
+.table-dropdown-menu button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: #374151;
+  transition: background-color 0.15s ease-in-out;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.table-dropdown-menu button:hover {
+  background-color: #f3f4f6;
+}
+
+.table-dropdown-menu button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.table-dropdown-menu button:disabled:hover {
+  background-color: transparent;
+}
+
+/* Divider in dropdown */
+.table-dropdown-menu .border-t {
+  margin: 0.25rem 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Admin Layout Grid Fixes */
 .admin-stats-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+@media (min-width: 768px) {
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .admin-content-grid {
-  @apply grid grid-cols-1 md:grid-cols-3 gap-6;
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
-/* Fix for sidebar layout */
+@media (min-width: 768px) {
+  .admin-content-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Form Layout Fixes */
+.admin-form-grid {
+  @apply grid gap-6;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .admin-form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Sidebar Layout Fixes */
 .admin-sidebar {
-  @apply w-64 mr-8;
+  @apply w-64;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1023px) {
+  .admin-sidebar {
+    @apply w-full;
+  }
 }
 
 .admin-sidebar nav {
   @apply space-y-1;
 }
 
-/* Fix for main content area */
+/* Main Content Area */
 .admin-main-content {
-  @apply flex-1;
+  @apply flex-1 min-w-0;
+  position: relative;
+  overflow: visible;
 }
 
-/* Fix for card spacing */
+/* Card Styling */
 .admin-card {
   @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
 }
 
-/* Fix for form layouts */
-.admin-form-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
-}
-
-/* Fix for responsive behavior */
-@media (max-width: 768px) {
-  .admin-sidebar {
-    @apply w-full mr-0 mb-6;
-  }
-  
-  .admin-stats-grid {
-    @apply grid-cols-1 md:grid-cols-2;
-  }
-  
-  .admin-content-grid {
-    @apply grid-cols-1;
-  }
-  
-  .admin-form-grid {
-    @apply grid-cols-1;
-  }
-}
-
-/* Fix for dropdown positioning */
-.admin-dropdown {
-  @apply absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10;
-}
-
-/* Fix for status badges alignment */
+/* Status Badge Fixes */
 .admin-status-badge {
   @apply inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full;
+  white-space: nowrap;
 }
 
-/* Fix for pagination alignment */
+/* Pagination Fixes */
 .admin-pagination {
   @apply mt-6 flex items-center justify-between;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .admin-pagination-info {
   @apply text-sm text-gray-700;
+  flex-shrink: 0;
 }
 
 .admin-pagination-controls {
   @apply flex items-center space-x-2;
+  flex-wrap: wrap;
+}
+
+/* Responsive Table Fixes */
+@media (max-width: 768px) {
+  .admin-table thead th,
+  .admin-table tbody td {
+    @apply px-3 py-2;
+  }
+  
+  .admin-table-container {
+    border-radius: 0.5rem;
+    margin: 0 -1rem;
+  }
+  
+  .table-dropdown-menu {
+    right: 0.5rem;
+    left: auto;
+    width: 10rem;
+  }
+}
+
+/* Search and Filter Section */
+.admin-search-filters {
+  @apply mb-6;
+}
+
+.admin-search-filters > div {
+  @apply flex flex-col gap-4;
+}
+
+@media (min-width: 1024px) {
+  .admin-search-filters > div {
+    @apply flex-row;
+  }
+}
+
+/* Button Group Fixes */
+.admin-button-group {
+  @apply flex flex-wrap gap-3;
+}
+
+/* Loading State Fixes */
+.admin-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+/* Error Message Styling */
+.admin-error-message {
+  @apply mb-6 bg-red-50 border border-red-200 rounded-md p-4;
+}
+
+.admin-success-message {
+  @apply mb-6 bg-green-50 border border-green-200 rounded-md p-4;
+}
+
+/* Form Input Fixes */
+.admin-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md;
+  @apply focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500;
+  @apply transition-colors duration-200;
+}
+
+.admin-select {
+  @apply px-3 py-2 border border-gray-300 rounded-md;
+  @apply focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500;
+  @apply transition-colors duration-200;
+}
+
+/* Modal Fixes */
+.admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.admin-modal {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Scrollbar Styling */
+.admin-scrollable::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.admin-scrollable::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.admin-scrollable::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.admin-scrollable::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Line Clamp Utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Animation Fixes */
+.admin-fade-in {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .admin-sidebar,
+  .admin-pagination,
+  .dropdown-container,
+  .admin-button-group {
+    display: none !important;
+  }
+  
+  .admin-table-container {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
 }

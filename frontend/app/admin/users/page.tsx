@@ -1,4 +1,4 @@
-// app/admin/users/page.tsx - FIXED VERSION with proper backend connection
+// app/admin/users/page.tsx - FIXED VERSION with improved layout
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -21,6 +21,8 @@ import {
   Mail,
   Calendar,
   AlertCircle,
+  Filter,
+  X,
 } from "lucide-react";
 
 interface UsersTableProps {
@@ -35,6 +37,18 @@ const UsersTable: React.FC<UsersTableProps> = ({
   loading = false,
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+
+  // Click outside handler to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!(event.target as Element).closest(".dropdown-container")) {
+        setDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -62,10 +76,10 @@ const UsersTable: React.FC<UsersTableProps> = ({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="admin-table-container">
         <div className="animate-pulse">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="border-b border-gray-200 p-4">
+            <div key={i} className="border-b border-gray-200 p-6">
               <div className="flex items-center space-x-4">
                 <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
                 <div className="flex-1 space-y-2">
@@ -84,7 +98,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
 
   if (!users || users.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="admin-table-container">
         <div className="text-center py-12">
           <Users className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">
@@ -99,62 +113,48 @@ const UsersTable: React.FC<UsersTableProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-visible">
+    <div className="admin-table-container">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="admin-table">
+          <thead>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                User
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Role
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Email Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Submissions
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Joined
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
+              <th>User</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Email Status</th>
+              <th>Submissions</th>
+              <th>Joined</th>
+              <th>Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody>
             {users.map((user) => (
-              <tr key={user._id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <tr key={user._id}>
+                <td>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-blue-600 font-medium text-sm">
                         {user.firstName
                           ? user.firstName.charAt(0).toUpperCase()
                           : user.username.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-medium text-gray-900 truncate">
                         {user.firstName
                           ? `${user.firstName} ${user.lastName}`
                           : user.username}
                       </div>
                       <div className="text-sm text-gray-500 flex items-center">
-                        <Mail className="mr-1 h-3 w-3" />
-                        {user.email}
+                        <Mail className="mr-1 h-3 w-3 flex-shrink-0" />
+                        <span className="truncate">{user.email}</span>
                       </div>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td>
                   <span
-                    className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.role)}`}
+                    className={`admin-status-badge ${getRoleColor(user.role)}`}
                   >
                     {user.role === "admin" && (
                       <Shield className="mr-1 h-3 w-3" />
@@ -162,14 +162,14 @@ const UsersTable: React.FC<UsersTableProps> = ({
                     {user.role}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td>
                   <span
-                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(user.status)}`}
+                    className={`admin-status-badge ${getStatusColor(user.status)}`}
                   >
                     {user.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td>
                   <div className="flex items-center">
                     {user.emailVerified ? (
                       <div className="flex items-center text-green-600">
@@ -184,120 +184,112 @@ const UsersTable: React.FC<UsersTableProps> = ({
                     )}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <div className="flex items-center">
-                    <span className="font-medium">
-                      {user.submissionCount || 0}
-                    </span>
-                  </div>
+                <td>
+                  <span className="text-sm font-medium text-gray-900">
+                    {user.submissionCount || 0}
+                  </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <div className="flex items-center">
+                <td>
+                  <div className="flex items-center text-sm text-gray-500">
                     <Calendar className="mr-1 h-4 w-4" />
                     {new Date(user.createdAt).toLocaleDateString()}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="relative">
+                <td>
+                  <div className="dropdown-container">
                     <button
                       onClick={() =>
                         setDropdownOpen(
                           dropdownOpen === user._id ? null : user._id
                         )
                       }
-                      className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100"
+                      className="text-gray-400 hover:text-gray-600 p-2 rounded-md hover:bg-gray-100 transition-colors"
+                      aria-label="User actions"
                     >
                       <MoreVertical className="h-4 w-4" />
                     </button>
 
                     {dropdownOpen === user._id && (
-                      <>
-                        <div
-                          className="fixed inset-0 z-10"
-                          onClick={() => setDropdownOpen(null)}
-                        />
+                      <div className="table-dropdown-menu admin-fade-in">
+                        <div className="py-1">
+                          <button
+                            onClick={() => {
+                              onUserAction(user._id, "view");
+                              setDropdownOpen(null);
+                            }}
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                          >
+                            <Eye className="mr-3 h-4 w-4" />
+                            View Details
+                          </button>
 
-                        <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-50">
-                          <div className="py-1">
+                          <button
+                            onClick={() => {
+                              onUserAction(user._id, "edit");
+                              setDropdownOpen(null);
+                            }}
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                          >
+                            <Edit3 className="mr-3 h-4 w-4" />
+                            Edit User
+                          </button>
+
+                          <div className="border-t border-gray-100 my-1"></div>
+
+                          {user.status === "active" ? (
                             <button
                               onClick={() => {
-                                onUserAction(user._id, "view");
+                                onUserAction(user._id, "deactivate");
                                 setDropdownOpen(null);
                               }}
-                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                              className="flex items-center px-4 py-2 text-sm text-orange-600 hover:bg-gray-100 w-full text-left"
                             >
-                              <Eye className="mr-3 h-4 w-4" />
-                              View Details
+                              <ShieldOff className="mr-3 h-4 w-4" />
+                              Deactivate User
                             </button>
-
+                          ) : (
                             <button
                               onClick={() => {
-                                onUserAction(user._id, "edit");
+                                onUserAction(user._id, "activate");
                                 setDropdownOpen(null);
                               }}
-                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                            >
-                              <Edit3 className="mr-3 h-4 w-4" />
-                              Edit User
-                            </button>
-
-                            <div className="border-t border-gray-100 my-1"></div>
-
-                            {user.status === "active" ? (
-                              <button
-                                onClick={() => {
-                                  onUserAction(user._id, "deactivate");
-                                  setDropdownOpen(null);
-                                }}
-                                className="flex items-center px-4 py-2 text-sm text-orange-600 hover:bg-gray-100 w-full text-left"
-                              >
-                                <ShieldOff className="mr-3 h-4 w-4" />
-                                Deactivate User
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => {
-                                  onUserAction(user._id, "activate");
-                                  setDropdownOpen(null);
-                                }}
-                                className="flex items-center px-4 py-2 text-sm text-green-600 hover:bg-gray-100 w-full text-left"
-                              >
-                                <Shield className="mr-3 h-4 w-4" />
-                                Activate User
-                              </button>
-                            )}
-
-                            <button
-                              onClick={() => {
-                                onUserAction(
-                                  user._id,
-                                  user.role === "admin"
-                                    ? "make-user"
-                                    : "make-admin"
-                                );
-                                setDropdownOpen(null);
-                              }}
-                              className="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-gray-100 w-full text-left"
+                              className="flex items-center px-4 py-2 text-sm text-green-600 hover:bg-gray-100 w-full text-left"
                             >
                               <Shield className="mr-3 h-4 w-4" />
-                              Make {user.role === "admin" ? "User" : "Admin"}
+                              Activate User
                             </button>
+                          )}
 
-                            <div className="border-t border-gray-100 my-1"></div>
+                          <button
+                            onClick={() => {
+                              onUserAction(
+                                user._id,
+                                user.role === "admin"
+                                  ? "make-user"
+                                  : "make-admin"
+                              );
+                              setDropdownOpen(null);
+                            }}
+                            className="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-gray-100 w-full text-left"
+                          >
+                            <Shield className="mr-3 h-4 w-4" />
+                            Make {user.role === "admin" ? "User" : "Admin"}
+                          </button>
 
-                            <button
-                              onClick={() => {
-                                onUserAction(user._id, "delete");
-                                setDropdownOpen(null);
-                              }}
-                              className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
-                            >
-                              <Trash2 className="mr-3 h-4 w-4" />
-                              Delete User
-                            </button>
-                          </div>
+                          <div className="border-t border-gray-100 my-1"></div>
+
+                          <button
+                            onClick={() => {
+                              onUserAction(user._id, "delete");
+                              setDropdownOpen(null);
+                            }}
+                            className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                          >
+                            <Trash2 className="mr-3 h-4 w-4" />
+                            Delete User
+                          </button>
                         </div>
-                      </>
+                      </div>
                     )}
                   </div>
                 </td>
@@ -325,6 +317,7 @@ const AdminUsersPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
   const [limit] = useState(10);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     if (!authLoading) {
@@ -353,8 +346,6 @@ const AdminUsersPage: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      console.log("Loading users..."); // Debug log
-
       const params: any = {
         page: currentPage,
         limit,
@@ -365,33 +356,20 @@ const AdminUsersPage: React.FC = () => {
       if (emailVerifiedFilter !== "")
         params.emailVerified = emailVerifiedFilter === "true";
 
-      console.log("API params:", params); // Debug log
-
       let response;
       if (searchTerm.trim()) {
-        console.log("Searching users with term:", searchTerm); // Debug log
         response = await userApi.searchUsers({
           q: searchTerm,
           ...params,
         });
       } else {
-        console.log("Getting all users"); // Debug log
         response = await userApi.getUsers(params);
       }
-
-      console.log("API response:", response); // Debug log
 
       if (response && response.success && response.data) {
         setUsers(response.data.users || []);
         setTotalUsers(response.data.total || 0);
-        console.log(
-          "Users loaded:",
-          response.data.users?.length,
-          "Total:",
-          response.data.total
-        );
       } else {
-        console.warn("Invalid response structure:", response);
         setUsers([]);
         setTotalUsers(0);
         setError("Invalid response from server");
@@ -399,7 +377,6 @@ const AdminUsersPage: React.FC = () => {
     } catch (err: any) {
       console.error("Error loading users:", err);
 
-      // Handle different types of errors
       if (err.response?.status === 401) {
         setError("Unauthorized access. Please login again.");
         router.push("/auth");
@@ -428,32 +405,25 @@ const AdminUsersPage: React.FC = () => {
 
   const handleUserAction = async (userId: string, action: string) => {
     try {
-      console.log("Performing action:", action, "on user:", userId); // Debug log
-
       switch (action) {
         case "view":
-          console.log("View user:", userId);
           break;
         case "edit":
-          console.log("Edit user:", userId);
           break;
         case "activate":
-          console.log("Activating user:", userId);
           await userApi.activateUser(userId);
-          await loadUsers(); // Refresh the list
+          await loadUsers();
           break;
         case "deactivate":
           if (confirm("Are you sure you want to deactivate this user?")) {
-            console.log("Deactivating user:", userId);
             await userApi.deactivateUser(userId);
-            await loadUsers(); // Refresh the list
+            await loadUsers();
           }
           break;
         case "make-admin":
           if (confirm("Are you sure you want to make this user an admin?")) {
-            console.log("Making user admin:", userId);
             await userApi.changeUserRole(userId, "admin");
-            await loadUsers(); // Refresh the list
+            await loadUsers();
           }
           break;
         case "make-user":
@@ -462,9 +432,8 @@ const AdminUsersPage: React.FC = () => {
               "Are you sure you want to remove admin privileges from this user?"
             )
           ) {
-            console.log("Removing admin role from user:", userId);
             await userApi.changeUserRole(userId, "user");
-            await loadUsers(); // Refresh the list
+            await loadUsers();
           }
           break;
         case "delete":
@@ -473,23 +442,20 @@ const AdminUsersPage: React.FC = () => {
               "Are you sure you want to delete this user? This action cannot be undone."
             )
           ) {
-            console.log("Deleting user:", userId);
             await userApi.deleteUser(userId);
-            await loadUsers(); // Refresh the list
+            await loadUsers();
           }
           break;
       }
     } catch (err: any) {
       console.error("Error performing user action:", err);
 
-      // Show specific error messages
       if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else {
         setError(err.message || `Failed to ${action} user. Please try again.`);
       }
 
-      // Clear error after 5 seconds
       setTimeout(() => setError(null), 5000);
     }
   };
@@ -500,26 +466,18 @@ const AdminUsersPage: React.FC = () => {
     setStatusFilter("");
     setEmailVerifiedFilter("");
     setCurrentPage(1);
+    setShowFilters(false);
   };
 
-  // Clear filters when dependencies change
-  useEffect(() => {
-    if (
-      !roleFilter &&
-      !statusFilter &&
-      !emailVerifiedFilter &&
-      currentPage === 1
-    ) {
-      loadUsers();
-    }
-  }, [roleFilter, statusFilter, emailVerifiedFilter, currentPage]);
+  const hasActiveFilters =
+    roleFilter || statusFilter || emailVerifiedFilter || searchTerm;
 
   const totalPages = Math.ceil(totalUsers / limit);
 
   if (authLoading) {
     return (
       <AdminLayout>
-        <div className="p-6">
+        <div className="p-4 sm:p-6 lg:p-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-64 mb-6"></div>
             <div className="h-40 bg-gray-200 rounded mb-6"></div>
@@ -531,178 +489,230 @@ const AdminUsersPage: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Users Management
-              </h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Manage user accounts, roles, and permissions ({totalUsers} total
-                users)
-              </p>
-            </div>
-            <div className="mt-4 sm:mt-0 flex space-x-3">
-              <button
-                onClick={loadUsers}
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Refresh
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Search and Filters */}
-        <div className="mb-6">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute inset-y-0 left-0 pl-3 h-full w-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search users by name, email, or username..."
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                />
+      <div className="admin-container">
+        <div className="p-4 sm:p-6 lg:p-8 admin-layout-main">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Users Management
+                </h1>
+                <p className="mt-1 text-sm text-gray-500">
+                  Manage user accounts, roles, and permissions ({totalUsers}{" "}
+                  total users)
+                </p>
               </div>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <select
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                value={roleFilter}
-                onChange={(e) => {
-                  setRoleFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="">All Roles</option>
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </select>
-
-              <select
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="banned">Banned</option>
-              </select>
-
-              <select
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                value={emailVerifiedFilter}
-                onChange={(e) => {
-                  setEmailVerifiedFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="">Email Status</option>
-                <option value="true">Verified</option>
-                <option value="false">Unverified</option>
-              </select>
-
-              <button
-                onClick={handleSearch}
-                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                Search
-              </button>
-
-              <button
-                onClick={clearFilters}
-                className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
-              >
-                Clear
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
-            <div className="flex">
-              <AlertCircle className="h-5 w-5 text-red-400" />
-              <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="flex flex-wrap gap-3">
                 <button
-                  onClick={() => setError(null)}
-                  className="mt-2 text-sm bg-red-100 text-red-800 px-3 py-1 rounded-md hover:bg-red-200"
+                  onClick={loadUsers}
+                  className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition-colors"
                 >
-                  Dismiss
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Refresh
                 </button>
               </div>
             </div>
           </div>
-        )}
 
-        {/* Users Table */}
-        <UsersTable
-          users={users}
-          onUserAction={handleUserAction}
-          loading={loading}
-        />
+          {/* Search and Filters */}
+          <div className="admin-search-filters">
+            <div>
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute inset-y-0 left-0 pl-3 h-full w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search users by name, email, or username..."
+                    className="admin-input pl-10 pr-3"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  />
+                </div>
+              </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-6 flex items-center justify-between">
-            <div className="text-sm text-gray-700">
-              Showing {(currentPage - 1) * limit + 1} to{" "}
-              {Math.min(currentPage * limit, totalUsers)} of {totalUsers} users
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Previous
-              </button>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
+                    showFilters || hasActiveFilters
+                      ? "bg-blue-50 text-blue-700 border-blue-200"
+                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                  }`}
+                >
+                  <Filter className="mr-2 h-4 w-4" />
+                  Filters
+                  {hasActiveFilters && (
+                    <span className="ml-2 bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full">
+                      {
+                        [
+                          roleFilter,
+                          statusFilter,
+                          emailVerifiedFilter,
+                          searchTerm,
+                        ].filter(Boolean).length
+                      }
+                    </span>
+                  )}
+                </button>
 
-              {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                const page = Math.max(1, currentPage - 2) + i;
-                if (page > totalPages) return null;
+                <button
+                  onClick={handleSearch}
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                >
+                  Search
+                </button>
 
-                return (
+                {hasActiveFilters && (
                   <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-3 py-1 text-sm font-medium rounded-md ${
-                      currentPage === page
-                        ? "bg-blue-600 text-white"
-                        : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-50"
-                    }`}
+                    onClick={clearFilters}
+                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
                   >
-                    {page}
+                    <X className="mr-1 h-4 w-4" />
+                    Clear
                   </button>
-                );
-              })}
-
-              <button
-                onClick={() =>
-                  setCurrentPage(Math.min(totalPages, currentPage + 1))
-                }
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
+                )}
+              </div>
             </div>
+
+            {/* Expandable Filters */}
+            {showFilters && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg border admin-fade-in">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Role
+                    </label>
+                    <select
+                      className="admin-select w-full"
+                      value={roleFilter}
+                      onChange={(e) => {
+                        setRoleFilter(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                    >
+                      <option value="">All Roles</option>
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+                    <select
+                      className="admin-select w-full"
+                      value={statusFilter}
+                      onChange={(e) => {
+                        setStatusFilter(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                    >
+                      <option value="">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="banned">Banned</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email Status
+                    </label>
+                    <select
+                      className="admin-select w-full"
+                      value={emailVerifiedFilter}
+                      onChange={(e) => {
+                        setEmailVerifiedFilter(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                    >
+                      <option value="">All Email Status</option>
+                      <option value="true">Verified</option>
+                      <option value="false">Unverified</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Error Message */}
+          {error && (
+            <div className="admin-error-message">
+              <div className="flex">
+                <AlertCircle className="h-5 w-5 text-red-400" />
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                  <button
+                    onClick={() => setError(null)}
+                    className="mt-2 text-sm bg-red-100 text-red-800 px-3 py-1 rounded-md hover:bg-red-200 transition-colors"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Users Table */}
+          <UsersTable
+            users={users}
+            onUserAction={handleUserAction}
+            loading={loading}
+          />
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="admin-pagination">
+              <div className="admin-pagination-info">
+                Showing {(currentPage - 1) * limit + 1} to{" "}
+                {Math.min(currentPage * limit, totalUsers)} of {totalUsers}{" "}
+                users
+              </div>
+              <div className="admin-pagination-controls">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Previous
+                </button>
+
+                {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                  const page = Math.max(1, currentPage - 2) + i;
+                  if (page > totalPages) return null;
+
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                        currentPage === page
+                          ? "bg-blue-600 text-white"
+                          : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-50"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+
+                <button
+                  onClick={() =>
+                    setCurrentPage(Math.min(totalPages, currentPage + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </AdminLayout>
   );
