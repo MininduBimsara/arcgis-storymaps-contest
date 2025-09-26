@@ -5,7 +5,6 @@ import StoriesHeroSection from "@/components/stories/StoriesHeroSection";
 import FeaturedStoriesSection from "@/components/stories/FeaturedStories";
 import StoryDetails from "@/components/stories/StoryDetails";
 import ArcgisStoriesList from "@/components/stories/ArcgisStoriesList";
-import Footer from "@/components/layout/Footer";
 import { StoryMetaPublic } from "@/lib/api";
 
 // Main Stories Page Component
@@ -51,7 +50,6 @@ const StoriesPage = () => {
       <StoriesHeroSection />
       <FeaturedStoriesSection onReadMore={handleReadMore} />
       <ArcgisStoriesList />
-      <Footer />
     </div>
   );
 };

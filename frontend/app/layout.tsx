@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import { AuthProvider } from "@/context/AuthContext";
+import Footer from "@/components/layout/Footer";
 
 // Configure Inter font
 const inter = Inter({
@@ -132,6 +133,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
           {/* Main content wrapper */}
           <div id="main-content">{children}</div>
+
+          {/* Global Footer */}
+          <Footer />
         </AuthProvider>
 
         {/* ArcGIS JavaScript API - Load at the end for better performance */}
