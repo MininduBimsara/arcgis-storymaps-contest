@@ -46,7 +46,7 @@ body {
 
 .admin-table-container .overflow-x-auto {
   overflow-x: auto;
-  overflow-y: visible;
+  overflow-y: visible !important;
   position: relative;
 }
 
@@ -81,6 +81,7 @@ body {
   @apply px-6 py-4 text-sm;
   position: relative;
   vertical-align: top;
+  overflow: visible !important; /* ✅ Ensure dropdown can overflow */
 }
 
 /* Dropdown Container Fixes */
@@ -91,24 +92,24 @@ body {
 
 /* Enhanced Dropdown Menu */
 .table-dropdown-menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 0.25rem);
+  position: fixed;
   width: 12rem;
   background: white;
   border-radius: 0.5rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   border: 1px solid #e5e7eb;
-  z-index: 9999;
+  z-index: 99999; /* ✅ Keep dropdown above everything */
   transform: translateZ(0);
   opacity: 1;
   pointer-events: auto;
   min-width: 12rem;
 }
 
-/* Ensure dropdown appears above everything */
+/* Arrow for dropdown - only show when not using fixed positioning */
 .table-dropdown-menu::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -0.5rem;
   right: 1rem;
@@ -118,6 +119,7 @@ body {
   border-right: 0.5rem solid transparent;
   border-bottom: 0.5rem solid white;
   filter: drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.05));
+  display: none; /* Hide arrow for fixed positioning */
 }
 
 /* Dropdown Menu Items */
@@ -256,12 +258,13 @@ body {
   .admin-table tbody td {
     @apply px-3 py-2;
   }
-  
+
   .admin-table-container {
-    border-radius: 0.5rem;
-    margin: 0 -1rem;
+    @apply bg-white rounded-lg shadow-sm border border-gray-200;
+    position: relative;
+    overflow: visible !important;
   }
-  
+
   .table-dropdown-menu {
     right: 0.5rem;
     left: auto;
@@ -401,7 +404,7 @@ body {
   .admin-button-group {
     display: none !important;
   }
-  
+
   .admin-table-container {
     box-shadow: none;
     border: 1px solid #000;

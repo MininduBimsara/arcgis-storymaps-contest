@@ -69,7 +69,7 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center flex-shrink-0">
             <Link href="/" className="flex items-center">
               <Image
                 src="/logo1.png"
@@ -197,7 +197,7 @@ const Navigation = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center flex-shrink-0">
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -226,7 +226,7 @@ const Navigation = () => {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`block px-3 py-3 rounded-md text-sm font-normal transition-colors ${
+                  className={`block px-3 py-3 rounded-md text-sm font-normal transition-colors text-left ${
                     pathname === item.href
                       ? "text-black bg-blue-50"
                       : "text-gray-600 hover:text-black hover:bg-gray-50"
@@ -240,12 +240,12 @@ const Navigation = () => {
               <hr className="my-3 border-gray-100" />
 
               {isLoading ? (
-                <div className="px-3 py-3">
+                <div className="px-3 py-3 text-left">
                   <div className="animate-pulse h-5 w-20 bg-gray-100 rounded-md"></div>
                 </div>
               ) : isAuthenticated && user ? (
                 <div className="space-y-1">
-                  <div className="px-3 py-2 text-xs text-gray-500">
+                  <div className="px-3 py-2 text-xs text-gray-500 text-left">
                     Signed in as {user.username}
                     {isAdmin && (
                       <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
@@ -258,7 +258,7 @@ const Navigation = () => {
                   {isAdmin && (
                     <Link
                       href="/admin"
-                      className="flex items-center px-3 py-3 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                      className="flex items-center px-3 py-3 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors text-left"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <Shield className="w-4 h-4 mr-2" />
@@ -268,14 +268,14 @@ const Navigation = () => {
 
                   <Link
                     href="/profile"
-                    className="block px-3 py-3 rounded-md text-sm font-normal text-black hover:bg-gray-50 transition-colors"
+                    className="block px-3 py-3 rounded-md text-sm font-normal text-black hover:bg-gray-50 transition-colors text-left"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Profile Settings
                   </Link>
                   <Link
                     href="/submissions"
-                    className="block px-3 py-3 rounded-md text-sm font-normal text-black hover:bg-gray-50 transition-colors"
+                    className="block px-3 py-3 rounded-md text-sm font-normal text-black hover:bg-gray-50 transition-colors text-left"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     My Submissions
@@ -293,7 +293,7 @@ const Navigation = () => {
                 <div className="space-y-1">
                   <Link
                     href="/auth"
-                    className="block px-3 py-3 rounded-md text-sm font-normal bg-white text-black border border-blue-100 hover:bg-blue-50 transition-colors"
+                    className="block px-3 py-3 rounded-md text-sm font-normal bg-white text-black border border-blue-100 hover:bg-blue-50 transition-colors text-left"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Get Started

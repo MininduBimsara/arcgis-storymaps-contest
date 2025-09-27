@@ -27,6 +27,10 @@ const UsersTable: React.FC<UsersTableProps> = ({
   loading = false,
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{
+    top: number;
+    right: number;
+  } | null>(null);
 
   // Click outside handler to close dropdowns
   useEffect(() => {
@@ -36,9 +40,19 @@ const UsersTable: React.FC<UsersTableProps> = ({
       }
     };
 
+    const handleScroll = () => {
+      if (dropdownOpen) {
+        setDropdownOpen(null);
+      }
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    window.addEventListener("scroll", handleScroll, true);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [dropdownOpen]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -188,11 +202,18 @@ const UsersTable: React.FC<UsersTableProps> = ({
                 <td>
                   <div className="dropdown-container">
                     <button
-                      onClick={() =>
+                      onClick={(e) => {
+                        const button = e.currentTarget;
+                        const rect = button.getBoundingClientRect();
+                        const newPosition = {
+                          top: rect.bottom + 4,
+                          right: window.innerWidth - rect.right,
+                        };
+                        setDropdownPosition(newPosition);
                         setDropdownOpen(
                           dropdownOpen === user._id ? null : user._id
-                        )
-                      }
+                        );
+                      }}
                       className="text-gray-400 hover:text-gray-600 p-2 rounded-md hover:bg-gray-100 transition-colors"
                       aria-label="User actions"
                     >
@@ -200,7 +221,13 @@ const UsersTable: React.FC<UsersTableProps> = ({
                     </button>
 
                     {dropdownOpen === user._id && (
-                      <div className="table-dropdown-menu admin-fade-in">
+                      <div
+                        className="table-dropdown-menu admin-fade-in"
+                        style={{
+                          top: dropdownPosition?.top,
+                          right: dropdownPosition?.right,
+                        }}
+                      >
                         <div className="py-1">
                           <button
                             onClick={() => {

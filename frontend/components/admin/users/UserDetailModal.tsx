@@ -25,7 +25,7 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({
       />
 
       {/* Modal Container */}
-      <div className="flex min-h-screen items-center justify-center p-4">
+      <div className="flex min-h-screen items-center justify-center p-35">
         <div className="relative w-full max-w-2xl mx-auto my-8 transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5 transition-all">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">

@@ -8,7 +8,7 @@ export default function HeroSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid lg:grid-cols-3 gap-8 lg:gap-12 items-center">
           {/* Left Content */}
-          <div className="lg:col-span-1 space-y-6 sm:space-y-8">
+          <div className="lg:col-span-1 md:col-span-1 col-span-full space-y-6 sm:space-y-8">
             {/* Main Hero Content */}
             <div className="space-y-4 sm:space-y-6">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-black leading-tight">
@@ -100,8 +100,8 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right Side - Background Image Placeholder */}
-          <div className="mb-8 sm:mb-12 lg:mb-30 mx-4 sm:mx-8 lg:mx-20 lg:col-span-2 relative h-[300px] sm:h-[400px] md:h-[500px] lg:h-[700px] w-full">
+          {/* Right Side - Background Image Placeholder - Hidden on Mobile */}
+          <div className="hidden md:block mb-8 sm:mb-12 lg:mb-30 mx-4 sm:mx-8 lg:mx-20 lg:col-span-2 relative h-[300px] sm:h-[400px] md:h-[500px] lg:h-[700px] w-full">
             <Image
               src="/tiger.png"
               alt="Sri Lankan cultural heritage and landscapes"

@@ -22,6 +22,10 @@ const CategoriesTable: React.FC<CategoriesTableProps> = ({
   loading = false,
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{
+    top: number;
+    right: number;
+  } | null>(null);
 
   // Click outside handler to close dropdowns
   useEffect(() => {
@@ -31,9 +35,19 @@ const CategoriesTable: React.FC<CategoriesTableProps> = ({
       }
     };
 
+    const handleScroll = () => {
+      if (dropdownOpen) {
+        setDropdownOpen(null);
+      }
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    window.addEventListener("scroll", handleScroll, true);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [dropdownOpen]);
 
   if (loading) {
     return (
@@ -127,21 +141,34 @@ const CategoriesTable: React.FC<CategoriesTableProps> = ({
                     )}
                   </button>
                 </td>
-                <td>
+                <td className="relative">
                   <div className="dropdown-container">
                     <button
-                      onClick={() =>
+                      onClick={(e) => {
+                        const button = e.currentTarget;
+                        const rect = button.getBoundingClientRect();
+                        const newPosition = {
+                          top: rect.bottom + 4,
+                          right: window.innerWidth - rect.right,
+                        };
+                        setDropdownPosition(newPosition);
                         setDropdownOpen(
                           dropdownOpen === category._id ? null : category._id
-                        )
-                      }
-                      className="text-gray-400 hover:text-gray-600 p-2 rounded-md hover:bg-gray-100 transition-colors"
+                        );
+                      }}
+                      className="text-gray-400 hover:text-gray-600 p-2 rounded-md hover:bg-gray-100 transition-colors relative z-50"
                     >
                       <MoreVertical className="h-4 w-4" />
                     </button>
 
                     {dropdownOpen === category._id && (
-                      <div className="table-dropdown-menu admin-fade-in">
+                      <div
+                        className="table-dropdown-menu"
+                        style={{
+                          top: dropdownPosition?.top,
+                          right: dropdownPosition?.right,
+                        }}
+                      >
                         <div className="py-1">
                           <button
                             onClick={() => {

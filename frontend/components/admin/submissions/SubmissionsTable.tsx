@@ -26,6 +26,10 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
   loading = false,
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{
+    top: number;
+    right: number;
+  } | null>(null);
   const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
 
   // Click outside handler to close dropdowns
@@ -36,9 +40,19 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
       }
     };
 
+    const handleScroll = () => {
+      if (dropdownOpen) {
+        setDropdownOpen(null);
+      }
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    window.addEventListener("scroll", handleScroll, true);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [dropdownOpen]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -251,20 +265,33 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
                 <td>
                   <div className="dropdown-container">
                     <button
-                      onClick={() =>
+                      onClick={(e) => {
+                        const button = e.currentTarget;
+                        const rect = button.getBoundingClientRect();
+                        const newPosition = {
+                          top: rect.bottom + 4,
+                          right: window.innerWidth - rect.right,
+                        };
+                        setDropdownPosition(newPosition);
                         setDropdownOpen(
                           dropdownOpen === submission._id
                             ? null
                             : submission._id
-                        )
-                      }
+                        );
+                      }}
                       className="text-gray-400 hover:text-gray-600 p-2 rounded-md hover:bg-gray-100 transition-colors"
                     >
                       <MoreVertical className="h-4 w-4" />
                     </button>
 
                     {dropdownOpen === submission._id && (
-                      <div className="table-dropdown-menu admin-fade-in">
+                      <div
+                        className="table-dropdown-menu admin-fade-in"
+                        style={{
+                          top: dropdownPosition?.top,
+                          right: dropdownPosition?.right,
+                        }}
+                      >
                         <div className="py-1">
                           <button
                             onClick={() => {
