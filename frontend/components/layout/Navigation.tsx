@@ -18,11 +18,42 @@ const Navigation = () => {
     try {
       await logout();
       setIsProfileDropdownOpen(false);
+      setIsMenuOpen(false);
       router.push("/");
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
+
+  // Close mobile menu when clicking outside or pressing escape
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (isMenuOpen && !target.closest("nav")) {
+        setIsMenuOpen(false);
+      }
+      if (isProfileDropdownOpen && !target.closest(".relative")) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+        setIsProfileDropdownOpen(false);
+      }
+    };
+
+    if (isMenuOpen || isProfileDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMenuOpen, isProfileDropdownOpen]);
 
   const navigationItems = [
     { name: "Home", href: "/" },
@@ -35,8 +66,8 @@ const Navigation = () => {
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex justify-between items-center h-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
@@ -45,19 +76,19 @@ const Navigation = () => {
                 alt="Ceylon Stories"
                 width={180}
                 height={40}
-                className="h-10 w-auto"
+                className="h-8 sm:h-10 w-auto"
                 priority
               />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {navigationItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`text-base font-normal transition-colors ${
+                className={`text-sm lg:text-base font-normal transition-colors ${
                   pathname === item.href
                     ? "text-black border-b-2 border-blue-100 pb-1"
                     : "text-gray-600 hover:text-black"
@@ -69,10 +100,10 @@ const Navigation = () => {
           </div>
 
           {/* User Actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
             {isLoading ? (
               <div className="animate-pulse">
-                <div className="h-10 w-20 bg-gray-100 rounded-md"></div>
+                <div className="h-8 lg:h-10 w-16 lg:w-20 bg-gray-100 rounded-md"></div>
               </div>
             ) : isAuthenticated && user ? (
               <>
@@ -80,10 +111,11 @@ const Navigation = () => {
                 {isAdmin && (
                   <Link
                     href="/admin"
-                    className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700 transition-all duration-200"
+                    className="flex items-center space-x-1 lg:space-x-2 px-2 lg:px-3 py-1.5 lg:py-2 text-xs lg:text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700 transition-all duration-200"
                   >
-                    <Shield className="w-4 h-4" />
-                    <span>Admin Panel</span>
+                    <Shield className="w-3 h-3 lg:w-4 lg:h-4" />
+                    <span className="hidden lg:inline">Admin Panel</span>
+                    <span className="lg:hidden">Admin</span>
                   </Link>
                 )}
 
@@ -93,30 +125,37 @@ const Navigation = () => {
                     onClick={() =>
                       setIsProfileDropdownOpen(!isProfileDropdownOpen)
                     }
-                    className="flex items-center space-x-2 text-black hover:text-gray-600 transition-colors p-2 rounded-md hover:bg-gray-50"
+                    className="flex items-center space-x-1 lg:space-x-2 text-black hover:text-gray-600 transition-colors p-1.5 lg:p-2 rounded-md hover:bg-gray-50"
                   >
-                    <div className="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
-                      <User className="w-4 h-4 text-black" />
+                    <div className="w-6 h-6 lg:w-8 lg:h-8 bg-blue-100 rounded-md flex items-center justify-center">
+                      <User className="w-3 h-3 lg:w-4 lg:h-4 text-black" />
                     </div>
-                    <span className="font-normal">{user.username}</span>
+                    <span className="font-normal text-sm lg:text-base hidden lg:inline">
+                      {user.username}
+                    </span>
+                    <span className="font-normal text-xs lg:hidden">
+                      {user.username.length > 8
+                        ? user.username.substring(0, 8) + "..."
+                        : user.username}
+                    </span>
                   </button>
 
                   {isProfileDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-sm border border-gray-100 py-1 z-50">
+                    <div className="absolute right-0 mt-2 w-44 lg:w-48 bg-white rounded-md shadow-sm border border-gray-100 py-1 z-50">
                       <Link
                         href="/profile"
-                        className="flex items-center px-4 py-2 text-base text-black hover:bg-gray-50"
+                        className="flex items-center px-3 lg:px-4 py-2 text-sm lg:text-base text-black hover:bg-gray-50"
                         onClick={() => setIsProfileDropdownOpen(false)}
                       >
-                        <Settings className="w-4 h-4 mr-2" />
+                        <Settings className="w-3 h-3 lg:w-4 lg:h-4 mr-2" />
                         Profile Settings
                       </Link>
                       <Link
                         href="/submissions"
-                        className="flex items-center px-4 py-2 text-base text-black hover:bg-gray-50"
+                        className="flex items-center px-3 lg:px-4 py-2 text-sm lg:text-base text-black hover:bg-gray-50"
                         onClick={() => setIsProfileDropdownOpen(false)}
                       >
-                        <MapPin className="w-4 h-4 mr-2" />
+                        <MapPin className="w-3 h-3 lg:w-4 lg:h-4 mr-2" />
                         My Submissions
                       </Link>
 
@@ -126,10 +165,10 @@ const Navigation = () => {
                           <hr className="my-1 border-gray-100" />
                           <Link
                             href="/admin"
-                            className="flex items-center px-4 py-2 text-base text-blue-600 hover:bg-blue-50"
+                            className="flex items-center px-3 lg:px-4 py-2 text-sm lg:text-base text-blue-600 hover:bg-blue-50"
                             onClick={() => setIsProfileDropdownOpen(false)}
                           >
-                            <Shield className="w-4 h-4 mr-2" />
+                            <Shield className="w-3 h-3 lg:w-4 lg:h-4 mr-2" />
                             Admin Panel
                           </Link>
                         </>
@@ -138,9 +177,9 @@ const Navigation = () => {
                       <hr className="my-1 border-gray-100" />
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-2 text-base text-red-600 hover:bg-gray-50"
+                        className="flex items-center w-full px-3 lg:px-4 py-2 text-sm lg:text-base text-red-600 hover:bg-gray-50"
                       >
-                        <LogOut className="w-4 h-4 mr-2" />
+                        <LogOut className="w-3 h-3 lg:w-4 lg:h-4 mr-2" />
                         Sign Out
                       </button>
                     </div>
@@ -150,7 +189,7 @@ const Navigation = () => {
             ) : (
               <Link
                 href="/auth"
-                className="bg-white text-black px-4 py-2 rounded-md border border-blue-100 hover:bg-blue-50 transition-all duration-200 font-normal"
+                className="bg-white text-black px-3 lg:px-4 py-1.5 lg:py-2 rounded-md border border-blue-100 hover:bg-blue-50 transition-all duration-200 font-normal text-sm lg:text-base"
               >
                 Get Started
               </Link>
@@ -160,8 +199,15 @@ const Navigation = () => {
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-black hover:text-gray-600 transition-colors p-2"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log("Menu toggle clicked, current state:", isMenuOpen);
+                setIsMenuOpen(!isMenuOpen);
+              }}
+              className="text-black hover:text-gray-600 transition-colors p-1.5 rounded-md hover:bg-gray-100"
+              aria-label="Toggle mobile menu"
+              aria-expanded={isMenuOpen}
             >
               {isMenuOpen ? (
                 <X className="h-5 w-5" />
@@ -174,13 +220,13 @@ const Navigation = () => {
 
         {/* Mobile Navigation Menu */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 border-t border-gray-100">
+          <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
+            <div className="px-4 py-3 space-y-1">
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`block px-3 py-2 rounded-md text-base font-normal transition-colors ${
+                  className={`block px-3 py-3 rounded-md text-sm font-normal transition-colors ${
                     pathname === item.href
                       ? "text-black bg-blue-50"
                       : "text-gray-600 hover:text-black hover:bg-gray-50"
@@ -194,12 +240,12 @@ const Navigation = () => {
               <hr className="my-3 border-gray-100" />
 
               {isLoading ? (
-                <div className="px-3 py-2">
-                  <div className="animate-pulse h-6 w-24 bg-gray-100 rounded-md"></div>
+                <div className="px-3 py-3">
+                  <div className="animate-pulse h-5 w-20 bg-gray-100 rounded-md"></div>
                 </div>
               ) : isAuthenticated && user ? (
                 <div className="space-y-1">
-                  <div className="px-3 py-2 text-sm text-gray-500">
+                  <div className="px-3 py-2 text-xs text-gray-500">
                     Signed in as {user.username}
                     {isAdmin && (
                       <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
@@ -212,7 +258,7 @@ const Navigation = () => {
                   {isAdmin && (
                     <Link
                       href="/admin"
-                      className="flex items-center px-3 py-2 rounded-md text-base font-medium text-white bg-blue-600 hover:bg-blue-700"
+                      className="flex items-center px-3 py-3 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <Shield className="w-4 h-4 mr-2" />
@@ -222,14 +268,14 @@ const Navigation = () => {
 
                   <Link
                     href="/profile"
-                    className="block px-3 py-2 rounded-md text-base font-normal text-black hover:bg-gray-50"
+                    className="block px-3 py-3 rounded-md text-sm font-normal text-black hover:bg-gray-50 transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Profile Settings
                   </Link>
                   <Link
                     href="/submissions"
-                    className="block px-3 py-2 rounded-md text-base font-normal text-black hover:bg-gray-50"
+                    className="block px-3 py-3 rounded-md text-sm font-normal text-black hover:bg-gray-50 transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     My Submissions
@@ -237,9 +283,8 @@ const Navigation = () => {
                   <button
                     onClick={() => {
                       handleLogout();
-                      setIsMenuOpen(false);
                     }}
-                    className="block w-full text-left px-3 py-2 rounded-md text-base font-normal text-red-600 hover:bg-gray-50"
+                    className="block w-full text-left px-3 py-3 rounded-md text-sm font-normal text-red-600 hover:bg-red-50 transition-colors"
                   >
                     Sign Out
                   </button>
@@ -248,7 +293,7 @@ const Navigation = () => {
                 <div className="space-y-1">
                   <Link
                     href="/auth"
-                    className="block px-3 py-2 rounded-md text-base font-normal bg-white text-black border border-blue-100 hover:bg-blue-50"
+                    className="block px-3 py-3 rounded-md text-sm font-normal bg-white text-black border border-blue-100 hover:bg-blue-50 transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Get Started
@@ -259,17 +304,6 @@ const Navigation = () => {
           </div>
         )}
       </div>
-
-      {/* Click outside to close dropdowns */}
-      {(isProfileDropdownOpen || isMenuOpen) && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => {
-            setIsProfileDropdownOpen(false);
-            setIsMenuOpen(false);
-          }}
-        />
-      )}
     </nav>
   );
 };

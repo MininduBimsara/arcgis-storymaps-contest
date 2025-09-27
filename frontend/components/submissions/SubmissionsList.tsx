@@ -214,24 +214,24 @@ const SubmissionsList: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-gray-50 pt-16 sm:pt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Header */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between">
+        <div className="mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
             <div>
-              <h1 className="text-4xl md:text-5xl font-light text-black mb-6">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-black mb-3 sm:mb-6">
                 My Submissions
               </h1>
-              <p className="text-lg text-gray-600">
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600">
                 Manage your StoryMap submissions and track their status
               </p>
             </div>
             <button
               onClick={() => router.push("/submissions/create")}
-              className="bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-md font-normal transition-colors flex items-center gap-2"
+              className="bg-black hover:bg-gray-800 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-md font-normal transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
               New Submission
             </button>
           </div>
@@ -239,12 +239,14 @@ const SubmissionsList: React.FC = () => {
 
         {/* Success Message */}
         {showSuccessMessage && (
-          <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-md text-green-700 flex items-center">
-            <CheckCircle className="w-5 h-5 mr-3 text-green-600" />
-            <span>Your submission has been created successfully!</span>
+          <div className="mb-6 sm:mb-8 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-md text-green-700 flex items-center">
+            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-green-600 flex-shrink-0" />
+            <span className="text-sm sm:text-base">
+              Your submission has been created successfully!
+            </span>
             <button
               onClick={() => setShowSuccessMessage(false)}
-              className="ml-auto text-green-600 hover:text-green-800"
+              className="ml-auto text-green-600 hover:text-green-800 flex-shrink-0"
             >
               <X className="w-4 h-4" />
             </button>
@@ -252,26 +254,28 @@ const SubmissionsList: React.FC = () => {
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-md shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-black">Filters</h3>
+        <div className="bg-white rounded-md shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 className="text-base sm:text-lg font-medium text-black">
+              Filters
+            </h3>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="text-blue-600 hover:text-blue-800 flex items-center gap-2 transition-colors"
+              className="text-blue-600 hover:text-blue-800 flex items-center gap-1 sm:gap-2 transition-colors text-sm sm:text-base"
             >
-              <Filter className="w-4 h-4" />
+              <Filter className="w-3 h-3 sm:w-4 sm:h-4" />
               {showFilters ? "Hide Filters" : "Show Filters"}
             </button>
           </div>
 
           {showFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                   Search
                 </label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3 h-3 sm:w-4 sm:h-4" />
                   <input
                     type="text"
                     value={filters.search || ""}
@@ -279,13 +283,13 @@ const SubmissionsList: React.FC = () => {
                       handleFilterChange({ search: e.target.value })
                     }
                     placeholder="Search submissions..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                   Status
                 </label>
                 <select
@@ -293,7 +297,7 @@ const SubmissionsList: React.FC = () => {
                   onChange={(e) =>
                     handleFilterChange({ status: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-3 sm:px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 >
                   <option value="">All Statuses</option>
                   <option value="draft">Draft</option>
@@ -305,10 +309,10 @@ const SubmissionsList: React.FC = () => {
                 </select>
               </div>
 
-              <div className="flex items-end">
+              <div className="flex items-end sm:col-span-2 lg:col-span-1">
                 <button
                   onClick={() => setFilters({})}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                  className="px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-600 hover:text-gray-800 transition-colors"
                 >
                   Clear Filters
                 </button>
@@ -319,26 +323,28 @@ const SubmissionsList: React.FC = () => {
 
         {/* Submissions List */}
         {isLoadingSubmissions ? (
-          <div className="bg-white rounded-md shadow-sm border border-gray-200 p-12 text-center">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-            <p className="text-gray-600">Loading your submissions...</p>
+          <div className="bg-white rounded-md shadow-sm border border-gray-200 p-8 sm:p-12 text-center">
+            <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-blue-600 mx-auto mb-3 sm:mb-4" />
+            <p className="text-sm sm:text-base text-gray-600">
+              Loading your submissions...
+            </p>
           </div>
         ) : submissions.length === 0 ? (
-          <div className="bg-white rounded-md shadow-sm border border-gray-200 p-12 text-center">
+          <div className="bg-white rounded-md shadow-sm border border-gray-200 p-8 sm:p-12 text-center">
             <div className="max-w-md mx-auto">
-              <div className="w-16 h-16 bg-blue-50 rounded-md border border-blue-200 flex items-center justify-center mx-auto mb-6">
-                <Plus className="w-8 h-8 text-blue-600" />
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-50 rounded-md border border-blue-200 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <Plus className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-medium text-black mb-3">
+              <h3 className="text-lg sm:text-xl font-medium text-black mb-2 sm:mb-3">
                 No submissions yet
               </h3>
-              <p className="text-gray-600 mb-8 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 leading-relaxed">
                 Create your first StoryMap submission to get started in the
                 competition.
               </p>
               <button
                 onClick={() => router.push("/submissions/create")}
-                className="bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-md font-normal transition-colors"
+                className="bg-black hover:bg-gray-800 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-md font-normal transition-colors text-sm sm:text-base"
               >
                 Create Your First Submission
               </button>
@@ -351,68 +357,72 @@ const SubmissionsList: React.FC = () => {
                 {submissions.map((submission) => (
                   <div
                     key={submission._id}
-                    className="p-8 hover:bg-gray-50 transition-colors"
+                    className="p-4 sm:p-6 lg:p-8 hover:bg-gray-50 transition-colors"
                   >
-                    <div className="flex items-start justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-3">
-                          <h3 className="text-xl font-medium text-black">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                          <h3 className="text-lg sm:text-xl font-medium text-black">
                             {submission.title}
                           </h3>
                           <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(submission.status)}`}
+                            className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit ${getStatusColor(submission.status)}`}
                           >
                             {getStatusIcon(submission.status)}
                             {submission.status.replace("_", " ").toUpperCase()}
                           </span>
                         </div>
-                        
-                        <p className="text-gray-600 mb-4 leading-relaxed line-clamp-2">
+
+                        <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 leading-relaxed line-clamp-2">
                           {submission.description}
                         </p>
 
-                        <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4" />
+                        <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>
                               Submitted {formatDate(submission.createdAt)}
                             </span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <MapPin className="w-4 h-4" />
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>{submission.region}</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Tag className="w-4 h-4" />
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <Tag className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>{submission.category.name}</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Action buttons */}
-                      <div className="flex items-center gap-2 ml-6">
+                      <div className="flex items-center gap-1 sm:gap-2 sm:ml-6">
                         {submission.storyMapUrl && (
                           <button
-                            onClick={() => window.open(submission.storyMapUrl, "_blank")}
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                            onClick={() =>
+                              window.open(submission.storyMapUrl, "_blank")
+                            }
+                            className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                             title="View StoryMap"
                           >
-                            <ExternalLink className="w-4 h-4" />
+                            <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
                           </button>
                         )}
                         <button
-                          onClick={() => router.push(`/submissions/${submission._id}/edit`)}
-                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                          onClick={() =>
+                            router.push(`/submissions/${submission._id}/edit`)
+                          }
+                          className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                           title="Edit submission"
                         >
-                          <Edit className="w-4 h-4" />
+                          <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(submission._id)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                          className="p-1.5 sm:p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
                           title="Delete submission"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
                       </div>
                     </div>
@@ -422,11 +432,11 @@ const SubmissionsList: React.FC = () => {
 
               {/* Pagination Controls */}
               {pagination.pages > 1 && (
-                <div className="flex items-center justify-center gap-2 p-6 border-t border-gray-200">
+                <div className="flex items-center justify-center gap-1 sm:gap-2 p-4 sm:p-6 border-t border-gray-200">
                   <button
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page <= 1}
-                    className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Previous
                   </button>
@@ -446,7 +456,7 @@ const SubmissionsList: React.FC = () => {
                         <button
                           key={page}
                           onClick={() => handlePageChange(page)}
-                          className={`px-3 py-2 text-sm rounded-md transition-colors ${
+                          className={`px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm rounded-md transition-colors ${
                             page === pagination.page
                               ? "bg-black text-white"
                               : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
@@ -460,7 +470,7 @@ const SubmissionsList: React.FC = () => {
                   <button
                     onClick={() => handlePageChange(pagination.page + 1)}
                     disabled={pagination.page >= pagination.pages}
-                    className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Next
                   </button>

@@ -221,19 +221,19 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <div className="flex-1 flex flex-col min-w-0 lg:ml-0">
         {/* Top Header */}
         <header className="bg-white shadow-sm border-b border-gray-200 flex-shrink-0 z-30">
-          <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-4 lg:px-8">
             <div className="flex items-center">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                className="lg:hidden p-1.5 sm:p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                 aria-label="Open sidebar"
               >
-                <Menu className="h-6 w-6" />
+                <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
 
-              <div className="ml-4 lg:ml-0">
+              <div className="ml-2 sm:ml-4 lg:ml-0">
                 <nav aria-label="Breadcrumb">
-                  <ol className="flex items-center space-x-2 text-sm text-gray-500">
+                  <ol className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-500">
                     <li>
                       <Link
                         href="/admin"
@@ -245,7 +245,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     {pathname !== "/admin" && (
                       <>
                         <li>/</li>
-                        <li className="text-gray-900 font-medium">
+                        <li className="text-gray-900 font-medium truncate">
                           {pathname.split("/").pop()?.charAt(0).toUpperCase() +
                             (pathname.split("/").pop()?.slice(1) || "")}
                         </li>
@@ -256,8 +256,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
-              <div className="hidden sm:block text-sm text-gray-500">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="hidden sm:block text-xs sm:text-sm text-gray-500">
                 Last updated: {new Date().toLocaleString()}
               </div>
             </div>

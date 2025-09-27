@@ -54,20 +54,20 @@ export const TimelineSection = () => {
   };
 
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-light text-black mb-4">
+    <section className="py-12 sm:py-16 bg-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl font-light text-black mb-3 sm:mb-4">
             Competition Timeline
           </h2>
-          <p className="text-base text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
             Important dates and milestones for the competition
           </p>
         </div>
 
         {/* Desktop Timeline */}
         <div className="hidden md:block">
-          <div className="flex justify-between relative mb-8">
+          <div className="flex justify-between relative mb-6 sm:mb-8">
             {/* Progress Line */}
             <div className="absolute top-6 left-0 w-full h-0.5 bg-gray-200">
               <div className="h-full bg-blue-100 w-1/5"></div>
@@ -76,19 +76,19 @@ export const TimelineSection = () => {
             {timelinePhases.map((phase, index) => (
               <div
                 key={phase.id}
-                className="flex flex-col items-center max-w-48 relative"
+                className="flex flex-col items-center max-w-40 lg:max-w-48 relative"
               >
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center ${getStatusColor(phase.status)} mb-4 z-10 border-2 border-white shadow-sm`}
+                  className={`w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center ${getStatusColor(phase.status)} mb-3 sm:mb-4 z-10 border-2 border-white shadow-sm`}
                 >
-                  <phase.icon className="w-5 h-5" />
+                  <phase.icon className="w-4 h-4 lg:w-5 lg:h-5" />
                 </div>
 
-                <div className="bg-white border border-gray-100 rounded-md p-4 hover:border-blue-100 hover:bg-blue-50/30 transition-all duration-300 text-center w-full">
-                  <div className="text-xs text-blue-300 font-medium mb-2">
+                <div className="bg-white border border-gray-100 rounded-md p-3 sm:p-4 hover:border-blue-100 hover:bg-blue-50/30 transition-all duration-300 text-center w-full">
+                  <div className="text-xs text-blue-300 font-medium mb-1 sm:mb-2">
                     {phase.date}
                   </div>
-                  <h3 className="text-sm font-medium text-black">
+                  <h3 className="text-xs sm:text-sm font-medium text-black">
                     {phase.title}
                   </h3>
                 </div>
@@ -98,25 +98,25 @@ export const TimelineSection = () => {
         </div>
 
         {/* Mobile Timeline */}
-        <div className="md:hidden space-y-4">
+        <div className="md:hidden space-y-3 sm:space-y-4">
           {timelinePhases.map((phase, index) => (
-            <div key={phase.id} className="flex gap-4 items-start">
+            <div key={phase.id} className="flex gap-3 sm:gap-4 items-start">
               <div className="flex flex-col items-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center ${getStatusColor(phase.status)} border-2 border-white shadow-sm`}
+                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${getStatusColor(phase.status)} border-2 border-white shadow-sm`}
                 >
-                  <phase.icon className="w-4 h-4" />
+                  <phase.icon className="w-3 h-3 sm:w-4 sm:h-4" />
                 </div>
                 {index < timelinePhases.length - 1 && (
-                  <div className="w-0.5 h-12 bg-gray-200 mt-2"></div>
+                  <div className="w-0.5 h-8 sm:h-12 bg-gray-200 mt-2"></div>
                 )}
               </div>
 
-              <div className="bg-white border border-gray-100 rounded-md p-4 flex-1 hover:border-blue-100 hover:bg-blue-50/30 transition-all duration-300">
+              <div className="bg-white border border-gray-100 rounded-md p-3 sm:p-4 flex-1 hover:border-blue-100 hover:bg-blue-50/30 transition-all duration-300">
                 <div className="text-xs text-blue-300 font-medium mb-1">
                   {phase.date}
                 </div>
-                <h3 className="text-sm font-medium text-black">
+                <h3 className="text-sm sm:text-base font-medium text-black">
                   {phase.title}
                 </h3>
               </div>
@@ -125,12 +125,12 @@ export const TimelineSection = () => {
         </div>
 
         {/* Countdown */}
-        <div className="mt-12 text-center">
-          <div className="bg-blue-50 border border-blue-100 rounded-md p-6 max-w-lg mx-auto">
-            <h3 className="text-lg font-medium text-black mb-4">
+        <div className="mt-8 sm:mt-12 text-center">
+          <div className="bg-blue-50 border border-blue-100 rounded-md p-4 sm:p-6 max-w-lg mx-auto">
+            <h3 className="text-base sm:text-lg font-medium text-black mb-3 sm:mb-4">
               Time Until Submission Deadline
             </h3>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-4 gap-2 sm:gap-4">
               {[
                 { label: "Days", value: "47" },
                 { label: "Hours", value: "12" },
@@ -138,7 +138,7 @@ export const TimelineSection = () => {
                 { label: "Seconds", value: "56" },
               ].map((unit) => (
                 <div key={unit.label} className="text-center">
-                  <div className="text-xl font-medium text-blue-300 mb-1">
+                  <div className="text-lg sm:text-xl font-medium text-blue-300 mb-1">
                     {unit.value}
                   </div>
                   <div className="text-xs text-gray-500">{unit.label}</div>

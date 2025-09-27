@@ -41,23 +41,23 @@ export default function ResourcesSection() {
   };
 
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-md text-sm font-medium mb-6">
-            <Clock className="w-4 h-4" />
+    <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-1 sm:gap-2 bg-blue-50 text-blue-600 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+            <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
             Getting Started
           </div>
-          <h3 className="text-3xl md:text-4xl font-light text-black mb-6">
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-light text-black mb-4 sm:mb-6">
             Everything You Need to Begin
           </h3>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
             Access comprehensive guides, tutorials, and examples to create your
             winning story
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {resources.map((resource, index) => {
             const ResourceComponent = resource.isExternal ? "button" : Link;
             const componentProps = resource.isExternal
@@ -73,7 +73,7 @@ export default function ResourcesSection() {
                 {...componentProps}
                 className="group bg-white border border-gray-200 hover:border-blue-600 hover:shadow-md rounded-md overflow-hidden text-left transition-all duration-300 block"
               >
-                <div className="relative h-32 bg-blue-50">
+                <div className="relative h-24 sm:h-32 bg-blue-50">
                   {/* Real Image */}
                   <Image
                     src={resource.image}
@@ -81,20 +81,20 @@ export default function ResourcesSection() {
                     fill
                     className="object-cover"
                   />
-                  <div className="absolute top-3 right-3 bg-white rounded-md p-2 border border-gray-100">
-                    <resource.icon className="w-4 h-4 text-blue-600" />
+                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white rounded-md p-1.5 sm:p-2 border border-gray-100">
+                    <resource.icon className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                   </div>
                 </div>
-                <div className="p-5">
-                  <h4 className="text-lg font-medium text-black mb-2 group-hover:text-blue-600 transition-colors duration-300">
+                <div className="p-3 sm:p-5">
+                  <h4 className="text-base sm:text-lg font-medium text-black mb-1 sm:mb-2 group-hover:text-blue-600 transition-colors duration-300">
                     {resource.title}
                   </h4>
-                  <p className="text-base text-gray-600 leading-relaxed mb-3">
+                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed mb-2 sm:mb-3">
                     {resource.description}
                   </p>
-                  <div className="flex items-center gap-2 text-base font-normal text-gray-500 group-hover:text-blue-600 transition-colors duration-300">
+                  <div className="flex items-center gap-1 sm:gap-2 text-sm sm:text-base font-normal text-gray-500 group-hover:text-blue-600 transition-colors duration-300">
                     <span>Learn More</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                    <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </div>
                 </div>
               </ResourceComponent>

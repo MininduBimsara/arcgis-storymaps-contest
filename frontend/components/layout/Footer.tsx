@@ -2,12 +2,14 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-white border-t border-gray-200 py-16">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="grid md:grid-cols-4 gap-8">
+    <footer className="bg-white border-t border-gray-200 py-12 sm:py-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           <div>
-            <h3 className="font-medium text-black mb-4">About</h3>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <h3 className="font-medium text-black mb-3 sm:mb-4 text-sm sm:text-base">
+              About
+            </h3>
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600">
               <li>
                 <a href="#" className="hover:text-blue-600 transition-colors">
                   Our Mission
@@ -27,8 +29,10 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-medium text-black mb-4">Stories</h3>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <h3 className="font-medium text-black mb-3 sm:mb-4 text-sm sm:text-base">
+              Stories
+            </h3>
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600">
               <li>
                 <a href="#" className="hover:text-blue-600 transition-colors">
                   Featured
@@ -48,8 +52,10 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-medium text-black mb-4">Contest</h3>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <h3 className="font-medium text-black mb-3 sm:mb-4 text-sm sm:text-base">
+              Contest
+            </h3>
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600">
               <li>
                 <a href="#" className="hover:text-blue-600 transition-colors">
                   Rules
@@ -69,8 +75,10 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-medium text-black mb-4">Connect</h3>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <h3 className="font-medium text-black mb-3 sm:mb-4 text-sm sm:text-base">
+              Connect
+            </h3>
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600">
               <li>
                 <a href="#" className="hover:text-blue-600 transition-colors">
                   Newsletter
@@ -90,8 +98,8 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 mt-12 pt-8 text-center">
-          <p className="text-sm text-gray-500">
+        <div className="border-t border-gray-200 mt-8 sm:mt-12 pt-6 sm:pt-8 text-center">
+          <p className="text-xs sm:text-sm text-gray-500">
             © 2025 Ceylon Stories. All rights reserved.
           </p>
         </div>

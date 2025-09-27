@@ -324,12 +324,12 @@ const CreateSubmissionForm: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-6 py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-light text-black mb-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-black mb-4 sm:mb-6">
               Submit Your StoryMap
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Share your compelling geographic story with the world. Complete
               the form below to submit your entry to our competition.
             </p>
@@ -338,13 +338,15 @@ const CreateSubmissionForm: React.FC = () => {
       </div>
 
       {/* Form */}
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="space-y-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="space-y-6 sm:space-y-8">
           {/* Error Message */}
           {errors.general && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4 flex items-center error-field">
-              <AlertCircle className="w-5 h-5 text-red-600 mr-3 flex-shrink-0" />
-              <span className="text-red-700">{errors.general}</span>
+            <div className="bg-red-50 border border-red-200 rounded-md p-3 sm:p-4 flex items-center error-field">
+              <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 mr-2 sm:mr-3 flex-shrink-0" />
+              <span className="text-sm sm:text-base text-red-700">
+                {errors.general}
+              </span>
             </div>
           )}
 
