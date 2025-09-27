@@ -11,7 +11,7 @@ export default function ResourcesSection() {
       description:
         "Complete rules, judging criteria, and submission requirements",
       icon: ExternalLink,
-      image: "/guidelines.jpg",
+      image: "/6.png",
       href: "/details",
       isExternal: false,
     },
@@ -20,7 +20,7 @@ export default function ResourcesSection() {
       description:
         "Step-by-step guide to creating interactive ArcGIS StoryMaps",
       icon: ExternalLink,
-      image: "/tutorial.jpg",
+      image: "/5.png",
       href: "https://arcg.is/aDqTP",
       isExternal: true,
     },
@@ -28,7 +28,7 @@ export default function ResourcesSection() {
       title: "Example Stories",
       description: "Inspiring examples from previous competitions and winners",
       icon: Award,
-      image: "/examples.jpg",
+      image: "/2.png",
       href: "/stories",
       isExternal: false,
     },
@@ -74,15 +74,13 @@ export default function ResourcesSection() {
                 className="group bg-white border border-gray-200 hover:border-blue-600 hover:shadow-md rounded-md overflow-hidden text-left transition-all duration-300 block"
               >
                 <div className="relative h-32 bg-blue-50">
-                  {/* Image placeholder */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center text-gray-400">
-                      <div className="w-12 h-12 mx-auto mb-2 bg-white rounded-md border-2 border-dashed border-gray-200 flex items-center justify-center">
-                        <resource.icon className="w-6 h-6" />
-                      </div>
-                      <p className="text-xs">Resource Image</p>
-                    </div>
-                  </div>
+                  {/* Real Image */}
+                  <Image
+                    src={resource.image}
+                    alt={resource.title}
+                    fill
+                    className="object-cover"
+                  />
                   <div className="absolute top-3 right-3 bg-white rounded-md p-2 border border-gray-100">
                     <resource.icon className="w-4 h-4 text-blue-600" />
                   </div>

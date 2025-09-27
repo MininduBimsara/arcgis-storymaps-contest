@@ -1,4 +1,4 @@
-// app/admin/users/page.tsx
+// app/admin/users/page.tsx - Updated with modals
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -9,6 +9,8 @@ import { userApi, User } from "@/lib/adminApi";
 import UsersTable from "@/components/admin/users/UsersTable";
 import SearchFilters from "@/components/admin/users/SearchFilters";
 import Pagination from "@/components/admin/users/Pagination";
+import UserDetailModal from "@/components/admin/users/UserDetailModal";
+import UserEditModal from "@/components/admin/users/UserEditModal";
 import { RefreshCw, AlertCircle } from "lucide-react";
 
 const AdminUsersPage: React.FC = () => {
@@ -27,6 +29,11 @@ const AdminUsersPage: React.FC = () => {
   const [totalUsers, setTotalUsers] = useState(0);
   const [limit] = useState(10);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Modal states
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     if (!authLoading) {
@@ -113,11 +120,21 @@ const AdminUsersPage: React.FC = () => {
   };
 
   const handleUserAction = async (userId: string, action: string) => {
+    const user = users.find((u) => u._id === userId);
+
     try {
       switch (action) {
         case "view":
+          if (user) {
+            setSelectedUser(user);
+            setShowDetailModal(true);
+          }
           break;
         case "edit":
+          if (user) {
+            setSelectedUser(user);
+            setShowEditModal(true);
+          }
           break;
         case "activate":
           await userApi.activateUser(userId);
@@ -167,6 +184,13 @@ const AdminUsersPage: React.FC = () => {
 
       setTimeout(() => setError(null), 5000);
     }
+  };
+
+  const handleUserSave = async (userId: string, userData: Partial<User>) => {
+    await userApi.updateUser(userId, userData);
+    await loadUsers();
+    setShowEditModal(false);
+    setSelectedUser(null);
   };
 
   const clearFilters = () => {
@@ -276,6 +300,29 @@ const AdminUsersPage: React.FC = () => {
               itemsPerPage={limit}
               onPageChange={setCurrentPage}
             />
+          )}
+
+          {/* Modals */}
+          {selectedUser && (
+            <>
+              <UserDetailModal
+                user={selectedUser}
+                isOpen={showDetailModal}
+                onClose={() => {
+                  setShowDetailModal(false);
+                  setSelectedUser(null);
+                }}
+              />
+              <UserEditModal
+                user={selectedUser}
+                isOpen={showEditModal}
+                onClose={() => {
+                  setShowEditModal(false);
+                  setSelectedUser(null);
+                }}
+                onSave={handleUserSave}
+              />
+            </>
           )}
         </div>
       </div>

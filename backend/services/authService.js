@@ -3,7 +3,7 @@ const userRepository = require("../repositories/userRepository");
 const emailService = require("./emailService");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-
+const bcrypt = require("bcryptjs");
 /**
  * Authentication Service - Business Logic Layer
  * Handles authentication-related business operations
